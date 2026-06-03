@@ -14,6 +14,8 @@ html,
 body {
   background-color: #ffffff;
   color: #000000;
+  overflow-x: hidden;
+  max-width: 100%;
   /* Inter is the default for all non-heading text. */
   font-family: var(--font-inter), system-ui, sans-serif;
 }
@@ -32,6 +34,8 @@ h6 {
 /* Mobile / iPhone view: visible up to iPad width. */
 .mobile-view {
   display: block;
+  overflow-x: hidden;
+  max-width: 100%;
 }
 .desktop-view {
   display: none;
@@ -87,6 +91,14 @@ h6 {
   width: 100%;
 }
 
+.hero-intro-images {
+  overflow: hidden;
+}
+
+.hero-prompt-card {
+  overflow-x: clip;
+}
+
 /* Fade + rise in while prompt types. */
 .hero-image-rise {
   --base-rotate: 0deg;
@@ -130,6 +142,16 @@ h6 {
 
   .hero-prompt-send {
     transition: none;
+  }
+
+  .mobile-nav-bg,
+  .mobile-nav-logo {
+    transition: none;
+  }
+
+  .mobile-nav-bg.is-visible,
+  .mobile-nav-logo.is-visible {
+    transform: none;
   }
 }
 
@@ -300,12 +322,16 @@ h6 {
   border-bottom: 0.0625em solid rgba(0, 0, 0, 0.1);
   z-index: 9;
   opacity: 0;
-  transition: opacity 0.25s ease;
+  transform: translate3d(0, -0.35em, 0);
+  transition:
+    opacity 0.9s ease,
+    transform 0.9s ease;
   pointer-events: none;
 }
 
 .mobile-nav-bg.is-visible {
   opacity: 1;
+  transform: translate3d(0, 0, 0);
 }
 
 /* Mobile nav — logo + menu share one row so they align vertically. */
@@ -329,10 +355,19 @@ h6 {
   font-weight: 400;
   letter-spacing: -0.02em;
   color: #000000;
-  transition: opacity 0.15s ease;
+  opacity: 0;
+  transform: translate3d(0, -0.35em, 0);
+  transition:
+    opacity 0.9s ease,
+    transform 0.9s ease;
   text-box-trim: trim-both;
   text-box-edge: cap alphabetic;
   pointer-events: none;
+}
+
+.mobile-nav-logo.is-visible {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
 }
 
 .mobile-nav-menu {

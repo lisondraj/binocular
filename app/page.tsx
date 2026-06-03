@@ -107,11 +107,10 @@ export default function Home() {
   const [revealedImageCount, setRevealedImageCount] = useState(0);
   const [submitPressed, setSubmitPressed] = useState(false);
   const [scrollUnlocked, setScrollUnlocked] = useState(false);
-  const [promptShift, setPromptShift] = useState(0);
 
   const promptWrapRef = useRef<HTMLDivElement>(null);
   const secondSectionRef = useRef<HTMLDivElement>(null);
-  const shiftRef = useRef(0);
+  const promptMetricsRef = useRef({ naturalTop: 0, maxTravel: 0 });
 
   const introFade = (step: number) =>
     INTRO_UI_DELAY + step * (INTRO_FADE_MS + INTRO_GAP_MS);
@@ -236,49 +235,77 @@ export default function Home() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Pin the AI box on screen as you scroll, then let it settle near the
-  // bottom of the second section with comfortable padding.
+  // Move the AI box down with scroll after submit — cached layout + rAF keeps
+  // it smooth (no React re-render per scroll frame).
   useEffect(() => {
-    const update = () => {
-      const wrap = promptWrapRef.current;
+    const wrap = promptWrapRef.current;
+    if (!wrap) return;
+
+    const measure = () => {
       const section = secondSectionRef.current;
-      if (!wrap || !section) return;
+      if (!section) return;
 
-      // Wrapper carries the scroll transform, so subtract it to recover the
-      // box's natural (untransformed) document position.
-      const wrapRect = wrap.getBoundingClientRect();
-      const naturalTop = wrapRect.top + window.scrollY - shiftRef.current;
-      const boxHeight = wrapRect.height;
-
+      wrap.style.transform = "translate3d(0, 0, 0)";
+      const naturalTop = wrap.getBoundingClientRect().top + window.scrollY;
+      const boxHeight = wrap.offsetHeight;
       const sectionBottom =
         section.getBoundingClientRect().bottom + window.scrollY;
       const rootFontSize = window.innerWidth / 24.375;
       const bottomPadding = rootFontSize * 2;
       const finalTop = sectionBottom - bottomPadding - boxHeight;
 
-      const maxTravel = Math.max(0, finalTop - naturalTop);
-      const maxScroll = Math.max(
-        1,
-        document.documentElement.scrollHeight - window.innerHeight,
-      );
-      const progress = Math.min(Math.max(window.scrollY / maxScroll, 0), 1);
-      const next = progress * maxTravel;
-
-      shiftRef.current = next;
-      setPromptShift(next);
+      promptMetricsRef.current = {
+        naturalTop,
+        maxTravel: Math.max(0, finalTop - naturalTop),
+      };
     };
 
+    let frame = 0;
+
+    const applyShift = (shift: number) => {
+      wrap.style.transform =
+        shift > 0 ? `translate3d(0, ${shift}px, 0)` : "translate3d(0, 0, 0)";
+    };
+
+    const update = () => {
+      if (!scrollUnlocked) {
+        applyShift(0);
+        return;
+      }
+
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        const { maxTravel } = promptMetricsRef.current;
+        const maxScroll = Math.max(
+          1,
+          document.documentElement.scrollHeight - window.innerHeight,
+        );
+        const progress = Math.min(Math.max(window.scrollY / maxScroll, 0), 1);
+        applyShift(progress * maxTravel);
+      });
+    };
+
+    const onResize = () => {
+      measure();
+      update();
+    };
+
+    measure();
     update();
+
     window.addEventListener("scroll", update, { passive: true });
-    window.addEventListener("resize", update);
+    window.addEventListener("resize", onResize);
+
     return () => {
+      cancelAnimationFrame(frame);
       window.removeEventListener("scroll", update);
-      window.removeEventListener("resize", update);
+      window.removeEventListener("resize", onResize);
+      applyShift(0);
     };
-  }, []);
+  }, [scrollUnlocked, revealedImageCount]);
 
   return (
-    <main style={{ minHeight: "100vh" }}>
+    <main style={{ minHeight: "100vh", overflowX: "hidden", maxWidth: "100%" }}>
       {/* Desktop view — shown at iPad width (1024px) and above. */}
       <section className="desktop-view">
         <div
@@ -306,7 +333,12 @@ export default function Home() {
           size is in `em` so the whole view scales uniformly with the width. */}
       <section
         className="mobile-view"
-        style={{ position: "relative", fontSize: MOBILE_ROOT_FONT_SIZE }}
+        style={{
+          position: "relative",
+          fontSize: MOBILE_ROOT_FONT_SIZE,
+          overflowX: "hidden",
+          maxWidth: "100%",
+        }}
       >
         {/* Header fill — white background + thin bottom line, appears with the
             BINOCULAR logo once scrolled beyond the hero. */}
@@ -322,9 +354,8 @@ export default function Home() {
           style={{ fontSize: MOBILE_ROOT_FONT_SIZE }}
         >
           <span
-            className="mobile-nav-logo"
+            className={`mobile-nav-logo${showLogo ? " is-visible" : ""}`}
             aria-hidden={!showLogo}
-            style={{ opacity: showLogo ? 1 : 0 }}
           >
             BINOCULAR
           </span>
@@ -373,7 +404,6 @@ export default function Home() {
               inset: 0,
               zIndex: 0,
               pointerEvents: "none",
-              overflow: "visible",
             }}
           >
             {heroImages.map((img, i) => {
@@ -489,8 +519,7 @@ export default function Home() {
               marginTop: "1.5em",
               position: "relative",
               zIndex: 2,
-              transform: `translateY(${promptShift}px)`,
-              willChange: "transform",
+              willChange: scrollUnlocked ? "transform" : "auto",
             }}
           >
           {/* Frosted-glass prompt card — backdrop blur + dark overlay, with a
