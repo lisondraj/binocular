@@ -1,49 +1,354 @@
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* iPad portrait width — the upper bound for the iPhone/mobile view so even
+     the largest iPhones fall into it. At/above this we switch to desktop. */
+  --ipad-width: 1024px;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
-html {
-  height: 100%;
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 html,
 body {
-  max-width: 100vw;
-  overflow-x: hidden;
+  background-color: #ffffff;
+  color: #000000;
+  /* Inter is the default for all non-heading text. */
+  font-family: var(--font-inter), system-ui, sans-serif;
 }
 
-body {
-  min-height: 100%;
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  /* Headings use Geist Mono. */
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+}
+
+/* --- Separate views ------------------------------------------------------ */
+/* Mobile / iPhone view: visible up to iPad width. */
+.mobile-view {
+  display: block;
+}
+.desktop-view {
+  display: none;
+}
+
+/* Desktop view: at iPad width and above. */
+@media (min-width: 1024px) {
+  .mobile-view {
+    display: none;
+  }
+  .desktop-view {
+    display: block;
+  }
+}
+
+/* Hero title — trim text boxes to cap height / baseline for tight alignment. */
+.hero-title {
+  display: flex;
+  align-items: center;
+  gap: 0.2em;
+  line-height: 1;
+  width: 100%;
+  text-align: left;
+}
+
+.hero-title-word {
+  text-box-trim: trim-both;
+  text-box-edge: cap alphabetic;
+  flex-shrink: 0;
+}
+
+/* Hero entrance — fade in + hover up for nav, copy, buttons, and AI box. */
+.hero-intro-fade {
+  opacity: 0;
+  transform: translate3d(0, 1.1em, 0);
+  transition:
+    opacity 1.2s ease,
+    transform 1.2s ease;
+}
+
+.hero-intro-fade.is-visible {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+.hero-intro-content {
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  align-items: center;
+  gap: 0.75em;
+  width: 100%;
 }
 
-* {
-  box-sizing: border-box;
-  padding: 0;
-  margin: 0;
+/* Fade + rise in while prompt types. */
+.hero-image-rise {
+  --base-rotate: 0deg;
+  opacity: 0;
+  transform: rotate(var(--base-rotate)) translate3d(0, 1.1em, 0);
+  transition:
+    opacity 0.85s ease,
+    transform 0.85s ease;
 }
 
-a {
-  color: inherit;
-  text-decoration: none;
+.hero-image-rise.is-visible {
+  opacity: 1;
+  transform: rotate(var(--base-rotate)) translate3d(0, 0, 0);
 }
 
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
+.hero-prompt-send {
+  transition: transform 0.15s ease;
+}
+
+.hero-prompt-send.is-pressed {
+  transform: scale(0.88);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-intro-fade {
+    transition: none;
   }
+
+  .hero-intro-fade.is-visible {
+    transform: none;
+  }
+
+  .hero-image-rise {
+    transition: none;
+  }
+
+  .hero-image-rise.is-visible {
+    opacity: 1;
+    transform: rotate(var(--base-rotate)) translate3d(0, 0, 0);
+  }
+
+  .hero-prompt-send {
+    transition: none;
+  }
+}
+
+/* Hero AI prompt — inner typography and chip; blur box shell stays in JSX. */
+.hero-prompt-text {
+  position: relative;
+  margin: 0;
+  padding: 0;
+  font-size: 1.4em;
+  font-weight: 400;
+  line-height: 1.38;
+  letter-spacing: -0.01em;
+  color: #ffffff;
+}
+
+.hero-prompt-layout {
+  display: block;
+  color: transparent;
+  pointer-events: none;
+}
+
+/* Reserve chip space in the ghost layer without showing the pill box. */
+.hero-prompt-layout .hero-prompt-chip {
+  background: transparent;
+  border-color: transparent;
+}
+
+.hero-prompt-live {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+}
+
+.hero-prompt-reserve {
+  color: transparent;
+}
+
+.hero-prompt-at-wrap {
+  position: relative;
+  display: inline;
+  vertical-align: baseline;
+}
+
+.hero-prompt-at {
+  display: inline;
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: inherit;
+  letter-spacing: inherit;
+}
+
+.hero-prompt-typed {
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: inherit;
+}
+
+.hero-prompt-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35em;
+  padding: 0.22em 0.55em;
+  margin: 0 0.5em 0.12em 0;
+  border-radius: 0.5em;
+  background: rgba(255, 255, 255, 0.16);
+  border: 0.0625em solid rgba(255, 255, 255, 0.18);
+  font-size: 0.82em;
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+.hero-prompt-chip-icon {
+  width: 0.95em;
+  height: 0.95em;
+  flex-shrink: 0;
+  opacity: 0.9;
+}
+
+.hero-prompt-menu {
+  position: absolute;
+  top: 0;
+  left: 100%;
+  margin: 0 0 0 0.5em;
+  z-index: 2;
+  padding: 0.28em;
+  list-style: none;
+  min-width: 9.5em;
+  border-radius: 0.55em;
+  background: rgba(22, 20, 18, 0.92);
+  backdrop-filter: blur(0.75em);
+  -webkit-backdrop-filter: blur(0.75em);
+  border: 0.0625em solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 0.5em 1.5em rgba(0, 0, 0, 0.35);
+  animation: hero-prompt-menu-in 0.2s ease-out;
+}
+
+.hero-prompt-menu-item {
+  padding: 0.35em 0.5em;
+  border-radius: 0.4em;
+  font-size: 0.74em;
+  font-weight: 400;
+  line-height: 1.2;
+  color: rgba(255, 255, 255, 0.85);
+  white-space: nowrap;
+  transition: background 0.28s ease;
+}
+
+.hero-prompt-menu-item.is-highlighted {
+  background: rgba(255, 255, 255, 0.14);
+  color: #ffffff;
+}
+
+@keyframes hero-prompt-menu-in {
+  from {
+    opacity: 0;
+    transform: translateY(-0.25em) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Typing caret — zero layout width; bar centered on the text line. */
+.type-caret {
+  position: relative;
+  display: inline-block;
+  width: 0;
+  height: 1em;
+  vertical-align: middle;
+}
+
+.type-caret::after {
+  content: "";
+  position: absolute;
+  left: 0.05em;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0.08em;
+  height: 0.88em;
+  background: #ffffff;
+  animation: type-caret-blink 1s steps(1) infinite;
+}
+
+@keyframes type-caret-blink {
+  0%,
+  50% {
+    opacity: 1;
+  }
+  50.01%,
+  100% {
+    opacity: 0;
+  }
+}
+
+/* Header fill — full-width white backing with a thin bottom hairline that
+   fades in together with the BINOCULAR logo beyond the hero. */
+.mobile-nav-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 5.25em;
+  background: #ffffff;
+  border-bottom: 0.0625em solid rgba(0, 0, 0, 0.1);
+  z-index: 9;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  pointer-events: none;
+}
+
+.mobile-nav-bg.is-visible {
+  opacity: 1;
+}
+
+/* Mobile nav — logo + menu share one row so they align vertically. */
+.mobile-nav {
+  position: fixed;
+  top: 1.5em;
+  left: 1.5em;
+  right: 1.5em;
+  height: 2.25em;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.mobile-nav-logo {
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: calc(2.25em * 18 / 24);
+  line-height: 1;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  color: #000000;
+  transition: opacity 0.15s ease;
+  text-box-trim: trim-both;
+  text-box-edge: cap alphabetic;
+  pointer-events: none;
+}
+
+.mobile-nav-menu {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  color: #000000;
+  line-height: 0;
+  display: flex;
+  align-items: center;
+  pointer-events: auto;
+}
+
+.mobile-nav-menu svg {
+  width: 2.25em;
+  height: 2.25em;
+  display: block;
 }
