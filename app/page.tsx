@@ -98,7 +98,7 @@ const upRightArrow = (
 );
 
 const HERO_PROMPT =
-  "Show me top 50 of the nearest listings with a dishwasher, stairs, and a dog. Budget $500";
+  "Show me top 3 of the nearest listings with a dishwasher, stairs, and a dog. Budget $500";
 
 const FOLLOWUP_PROMPT =
   "Which one is available Mon-Fri from 12-3 PM?";
