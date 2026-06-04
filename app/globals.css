@@ -222,59 +222,140 @@ h6 {
 /* Phase 2 — separate overlay; portal into body so position:fixed is
    always relative to the viewport, not a transformed ancestor. */
 .kitchen-expand-overlay {
+  --listing-footer-bg: #f6f5f2;
   position: fixed;
   z-index: 9;
   box-sizing: border-box;
   border-radius: 1.15em;
   overflow: hidden;
   border: 0.0625em solid rgba(0, 0, 0, 0.08);
-  background: #f6f5f2;
+  background: var(--listing-footer-bg);
   box-shadow:
     0 0.22em 0.8em rgba(0, 0, 0, 0.09),
     0 0.04em 0.14em rgba(0, 0, 0, 0.05);
   display: flex;
   flex-direction: column;
+  isolation: isolate;
 }
 
-/* Taller footer so enlarged text has room. */
+/* Same photo → grey fade as compact listing cards. */
+.kitchen-expand-overlay .listing-card-media {
+  position: relative;
+  flex: 1.35 1 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.kitchen-expand-overlay .listing-card-image-fade {
+  height: 48%;
+  z-index: 1;
+}
+
+/* Taller footer so enlarged text and details have room. */
 .kitchen-expand-overlay__footer {
-  flex: 0 0 auto;
-  min-height: 5em;
-  padding: 0.65em 1.1em 0.9em 1.25em;
+  flex: 1 0 auto;
+  min-height: 8.5em;
+  padding: 0.75em 1.15em 1em 1.3em;
+  align-items: stretch;
+}
+
+.kitchen-expand-overlay__main {
+  width: 100%;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 0.85em;
+}
+
+.kitchen-expand-overlay__body {
+  gap: 0.32em;
+}
+
+.kitchen-expand-overlay__meta {
+  gap: 0.28em;
 }
 
 /* Larger text in the expanded card. */
 .kitchen-expand-overlay .listing-card-title {
-  font-size: 1.25em;
+  font-size: 1.55em;
   letter-spacing: -0.025em;
 }
 
 .kitchen-expand-overlay .listing-card-distance {
-  font-size: 0.95em;
+  font-size: 1.05em;
+}
+
+.kitchen-expand-availability {
+  margin: 0.12em 0 0;
+  font-family: var(--font-suisse), system-ui, sans-serif;
+  font-size: 1em;
+  font-weight: 500;
+  color: #1a1a1a;
+  letter-spacing: -0.01em;
+}
+
+.kitchen-expand-amenities {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35em;
+  margin: 0.35em 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.kitchen-expand-amenities li {
+  padding: 0.22em 0.5em;
+  border-radius: 0.45em;
+  background: rgba(0, 0, 0, 0.06);
+  font-family: var(--font-suisse), system-ui, sans-serif;
+  font-size: 0.78em;
+  font-weight: 400;
+  color: rgba(0, 0, 0, 0.62);
+  white-space: nowrap;
+}
+
+.kitchen-expand-hosts {
+  margin: 0.28em 0 0;
+  font-family: var(--font-suisse), system-ui, sans-serif;
+  font-size: 0.88em;
+  font-weight: 300;
+  color: rgba(0, 0, 0, 0.48);
+}
+
+.kitchen-expand-price {
+  font-family: var(--font-suisse), system-ui, sans-serif;
+  font-size: 1.12em;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  color: #1a1a1a;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+  line-height: 1.2;
 }
 
 .kitchen-expand-overlay .listing-card-sqft {
-  font-size: 0.82em;
+  font-size: 0.92em;
 }
 
 .kitchen-expand-overlay .listing-card-rating {
-  font-size: 1.1em;
+  font-size: 1.2em;
+}
+
+.kitchen-expand-review-count {
+  font-size: 0.72em;
+  font-weight: 400;
+  color: rgba(0, 0, 0, 0.42);
 }
 
 .kitchen-expand-overlay .listing-card-rating-star {
-  width: 0.85em;
-  height: 0.85em;
+  width: 0.9em;
+  height: 0.9em;
 }
 
 .kitchen-expand-overlay .listing-card-avatar {
-  width: 2.4em;
-  height: 2.4em;
-  font-size: 0.62em;
-}
-
-/* Keep the fade gradient proportionally taller to match bigger footer. */
-.kitchen-expand-overlay .listing-card-image-fade {
-  height: 38%;
+  width: 2.55em;
+  height: 2.55em;
+  font-size: 0.64em;
 }
 
 .listing-card {

@@ -74,6 +74,16 @@ const formatSqFt = (sqFt: number) =>
 /** Kitchen is the middle listing card — index 1 in LISTING_CARDS. */
 const KITCHEN_LISTING_INDEX = 1;
 
+/** Extra copy shown only on the expanded Kitchen overlay. */
+const KITCHEN_EXPANDED_DETAILS = {
+  neighborhood: "SoMa",
+  availability: "Mon–Fri · 12–3 PM",
+  pricePerHour: "$42/hr",
+  reviewCount: 128,
+  amenities: ["Dishwasher", "Stairs access", "Dog-friendly"] as const,
+  hostNames: ["Jordan S.", "Alex N."] as const,
+};
+
 const heroImages: HeroImage[] = [
   { src: "/images/kitchen.png", alt: "Kitchen", size: "6em", bottom: "4em", left: "-0.75em", rotate: "5deg" },
   { src: "/images/warehouse-1.png", alt: "Warehouse", size: "5.5em", bottom: "6.25em", left: "4.75em", rotate: "-4deg" },
@@ -1191,47 +1201,74 @@ export default function Home() {
                       <div className="listing-card-image-fade" aria-hidden />
                     </div>
                     <div className="listing-card-footer kitchen-expand-overlay__footer">
-                      <div className="listing-card-body">
-                        <h3 className="listing-card-title">{listing.title}</h3>
-                        <p className="listing-card-distance">
-                          {listing.distanceMi} mi away
-                        </p>
-                      </div>
-                      <div className="listing-card-meta">
-                        <span className="listing-card-sqft">
-                          {formatSqFt(listing.sqFt)}
-                        </span>
-                        <div className="listing-card-meta-row">
-                          <span
-                            className="listing-card-rating"
-                            aria-label={`Rating ${listing.rating}`}
+                      <div className="kitchen-expand-overlay__main">
+                        <div className="listing-card-body kitchen-expand-overlay__body">
+                          <h3 className="listing-card-title">{listing.title}</h3>
+                          <p className="listing-card-distance">
+                            {listing.distanceMi} mi away ·{" "}
+                            {KITCHEN_EXPANDED_DETAILS.neighborhood}
+                          </p>
+                          <p className="kitchen-expand-availability">
+                            {KITCHEN_EXPANDED_DETAILS.availability}
+                          </p>
+                          <ul
+                            className="kitchen-expand-amenities"
+                            aria-label="Amenities"
                           >
-                            {listing.rating}
-                            <svg
-                              className="listing-card-rating-star"
-                              viewBox="0 0 24 24"
-                              fill="currentColor"
-                              aria-hidden
-                            >
-                              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                            </svg>
-                          </span>
-                          <div className="listing-card-hosts" aria-label="Hosts">
-                            {listing.hosts.map((host, hostIndex) => (
-                              <span
-                                key={host.initials}
-                                className={`listing-card-avatar${
-                                  hostIndex === 0
-                                    ? " listing-card-avatar--back"
-                                    : " listing-card-avatar--front"
-                                }`}
-                                style={{
-                                  background: `linear-gradient(${host.gradient})`,
-                                }}
-                              >
-                                {host.initials}
-                              </span>
+                            {KITCHEN_EXPANDED_DETAILS.amenities.map((item) => (
+                              <li key={item}>{item}</li>
                             ))}
+                          </ul>
+                          <p className="kitchen-expand-hosts">
+                            Hosted by{" "}
+                            {KITCHEN_EXPANDED_DETAILS.hostNames.join(" & ")}
+                          </p>
+                        </div>
+                        <div className="listing-card-meta kitchen-expand-overlay__meta">
+                          <span className="kitchen-expand-price">
+                            {KITCHEN_EXPANDED_DETAILS.pricePerHour}
+                          </span>
+                          <span className="listing-card-sqft">
+                            {formatSqFt(listing.sqFt)}
+                          </span>
+                          <div className="listing-card-meta-row">
+                            <span
+                              className="listing-card-rating"
+                              aria-label={`Rating ${listing.rating} from ${KITCHEN_EXPANDED_DETAILS.reviewCount} reviews`}
+                            >
+                              {listing.rating}
+                              <svg
+                                className="listing-card-rating-star"
+                                viewBox="0 0 24 24"
+                                fill="currentColor"
+                                aria-hidden
+                              >
+                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                              </svg>
+                              <span className="kitchen-expand-review-count">
+                                ({KITCHEN_EXPANDED_DETAILS.reviewCount})
+                              </span>
+                            </span>
+                            <div
+                              className="listing-card-hosts"
+                              aria-label="Hosts"
+                            >
+                              {listing.hosts.map((host, hostIndex) => (
+                                <span
+                                  key={host.initials}
+                                  className={`listing-card-avatar${
+                                    hostIndex === 0
+                                      ? " listing-card-avatar--back"
+                                      : " listing-card-avatar--front"
+                                  }`}
+                                  style={{
+                                    background: `linear-gradient(${host.gradient})`,
+                                  }}
+                                >
+                                  {host.initials}
+                                </span>
+                              ))}
+                            </div>
                           </div>
                         </div>
                       </div>
