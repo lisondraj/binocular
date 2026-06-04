@@ -1,6 +1,13 @@
 "use client";
 
-import { useEffect, useRef, useState, type CSSProperties } from "react";
+import {
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+} from "react";
+import { createPortal } from "react-dom";
 
 // The mobile view is authored at a 390px design width. Setting the root
 // font-size to `100vw / 24.375` makes 1em === 16px at that width, so when the
@@ -22,6 +29,51 @@ type HeroImage = {
 // Decorative images scattered around the hero. `size` is in `em` so they
 // scale with the layout; larger ones read as "closer", smaller as "further".
 // Bottom arc — evenly spaced, sits below the AI box without overlapping it.
+const LISTING_CARDS = [
+  {
+    title: "Warehouse loft",
+    distanceMi: 0.8,
+    rating: 4.9,
+    sqFt: 4200,
+    hosts: [
+      { initials: "MR", gradient: "135deg, #5c7cfa 0%, #364fc7 100%" },
+      { initials: "KL", gradient: "135deg, #e64980 0%, #c2255c 100%" },
+    ],
+    image: "/images/warehouse-1.png",
+    alt: "Warehouse loft interior",
+  },
+  {
+    title: "Kitchen",
+    distanceMi: 1.2,
+    rating: 4.7,
+    sqFt: 1850,
+    hosts: [
+      { initials: "JS", gradient: "135deg, #38d9a9 0%, #12b886 100%" },
+      { initials: "AN", gradient: "135deg, #fcc419 0%, #f59f00 100%" },
+    ],
+    image: "/images/kitchen.png",
+    alt: "Kitchen",
+  },
+  {
+    title: "Garden terrace",
+    distanceMi: 2.1,
+    rating: 4.8,
+    sqFt: 960,
+    hosts: [
+      { initials: "DF", gradient: "135deg, #748ffc 0%, #5c7cfa 100%" },
+      { initials: "RP", gradient: "135deg, #da77f2 0%, #9c36b5 100%" },
+    ],
+    image: "/images/courtyard.png",
+    alt: "Garden terrace",
+  },
+] as const;
+
+const formatSqFt = (sqFt: number) =>
+  `${sqFt.toLocaleString("en-US")} sq ft`;
+
+/** Kitchen is the middle listing card — index 1 in LISTING_CARDS. */
+const KITCHEN_LISTING_INDEX = 1;
+
 const heroImages: HeroImage[] = [
   { src: "/images/kitchen.png", alt: "Kitchen", size: "6em", bottom: "4em", left: "-0.75em", rotate: "5deg" },
   { src: "/images/warehouse-1.png", alt: "Warehouse", size: "5.5em", bottom: "6.25em", left: "4.75em", rotate: "-4deg" },
@@ -48,6 +100,9 @@ const upRightArrow = (
 const HERO_PROMPT =
   "Show me top 50 of the nearest listings with a dishwasher, stairs, and a dog. Budget $500";
 
+const FOLLOWUP_PROMPT =
+  "Which one is available Mon-Fri from 12-3 PM?";
+
 const MENTION_OPTIONS = [
   "Astra Robotics",
   "Dr. Simon's Lab",
@@ -58,7 +113,15 @@ const MENTION_OPTIONS = [
 const SELECTED_MENTION = MENTION_OPTIONS.length - 1;
 const SELECTED_LABEL = MENTION_OPTIONS[SELECTED_MENTION];
 
-type PromptPhase = "at" | "menu" | "chip" | "typing" | "done";
+type PromptPhase =
+  | "at"
+  | "menu"
+  | "chip"
+  | "typing"
+  | "done"
+  | "followup-ready"
+  | "followup-typing"
+  | "followup-done";
 
 const INTRO_UI_DELAY = 200;
 const INTRO_FADE_MS = 1200;
@@ -107,10 +170,44 @@ export default function Home() {
   const [revealedImageCount, setRevealedImageCount] = useState(0);
   const [submitPressed, setSubmitPressed] = useState(false);
   const [scrollUnlocked, setScrollUnlocked] = useState(false);
+  const [promptAtBottom, setPromptAtBottom] = useState(false);
+  const [revealedListingCount, setRevealedListingCount] = useState(0);
+  const [kitchenCardFocused, setKitchenCardFocused] = useState(false);
+  const [kitchenCardExpanded, setKitchenCardExpanded] = useState(false);
+  const [promptFlowHeight, setPromptFlowHeight] = useState(0);
 
   const promptWrapRef = useRef<HTMLDivElement>(null);
   const secondSectionRef = useRef<HTMLDivElement>(null);
-  const promptMetricsRef = useRef({ naturalTop: 0, maxTravel: 0 });
+  const promptScrollRef = useRef({
+    initialTop: 0,
+    left: 0,
+    width: 0,
+    targetTop: 0,
+    scrollEnd: 1,
+    pinned: false,
+    // Captured before scroll unlock so pin uses pre-submit viewport position.
+    prePinTop: 0,
+    prePinLeft: 0,
+    prePinWidth: 0,
+  });
+  const listingRevealStartedRef = useRef(false);
+  const listingStackRef = useRef<HTMLDivElement>(null);
+  const listingInnerRef = useRef<HTMLDivElement>(null);
+  const kitchenSlotRef = useRef<HTMLDivElement>(null);
+  const kitchenOverlayRef = useRef<HTMLDivElement>(null);
+  // Stored snapshot so useLayoutEffect can apply coords after portal commits.
+  const kitchenFromRef = useRef<{
+    top: number;
+    left: number;
+    width: number;
+    height: number;
+  } | null>(null);
+  const kitchenTargetRef = useRef<{
+    top: number;
+    left: number;
+    width: number;
+    height: number;
+  } | null>(null);
 
   const introFade = (step: number) =>
     INTRO_UI_DELAY + step * (INTRO_FADE_MS + INTRO_GAP_MS);
@@ -170,19 +267,43 @@ export default function Home() {
   }, [promptAnimReady]);
 
   useEffect(() => {
-    if (promptPhase !== "typing") return;
+    if (promptPhase !== "typing" && promptPhase !== "followup-typing") return;
 
+    const text =
+      promptPhase === "typing" ? HERO_PROMPT : FOLLOWUP_PROMPT;
     let i = 0;
     const id = setInterval(() => {
       i += 1;
-      setTyped(HERO_PROMPT.slice(0, i));
-      if (i >= HERO_PROMPT.length) {
+      setTyped(text.slice(0, i));
+      if (i >= text.length) {
         clearInterval(id);
-        setPromptPhase("done");
+        setPromptPhase(
+          promptPhase === "typing" ? "done" : "followup-done",
+        );
       }
     }, 45);
     return () => clearInterval(id);
   }, [promptPhase]);
+
+  // Brief caret after chip, then type the follow-up question.
+  useEffect(() => {
+    if (promptPhase !== "followup-ready") return;
+
+    const timer = setTimeout(() => setPromptPhase("followup-typing"), 400);
+    return () => clearTimeout(timer);
+  }, [promptPhase]);
+
+  // After all listing cards: hold 2s, clear prompt, show caret beside chip.
+  useEffect(() => {
+    if (revealedListingCount < LISTING_CARDS.length) return;
+
+    const timer = setTimeout(() => {
+      setTyped("");
+      setPromptPhase("followup-ready");
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, [revealedListingCount]);
 
   // After full text: simulate submit click, unlock scrolling, then reveal
   // the scattered images one by one.
@@ -194,6 +315,13 @@ export default function Home() {
     timers.push(
       setTimeout(() => {
         setSubmitPressed(false);
+        const wrap = promptWrapRef.current;
+        if (wrap) {
+          const rect = wrap.getBoundingClientRect();
+          promptScrollRef.current.prePinTop = rect.top;
+          promptScrollRef.current.prePinLeft = rect.left;
+          promptScrollRef.current.prePinWidth = rect.width;
+        }
         setScrollUnlocked(true);
       }, 780),
     );
@@ -206,6 +334,108 @@ export default function Home() {
 
     return () => timers.forEach(clearTimeout);
   }, [promptPhase]);
+
+  // Follow-up submit → fade others, then overlay Kitchen card expands.
+  useEffect(() => {
+    if (promptPhase !== "followup-done") return;
+
+    const timers: ReturnType<typeof setTimeout>[] = [];
+    timers.push(setTimeout(() => setSubmitPressed(true), 650));
+    timers.push(setTimeout(() => setSubmitPressed(false), 950));
+    timers.push(setTimeout(() => setKitchenCardFocused(true), 1050));
+
+    timers.push(
+      setTimeout(() => {
+        const slot = kitchenSlotRef.current;
+        const wrap = promptWrapRef.current;
+        const stack = listingStackRef.current;
+
+        if (!slot || !wrap || !stack) {
+          setKitchenCardExpanded(true);
+          return;
+        }
+
+        // Snapshot coords before any DOM change.
+        const from = slot.getBoundingClientRect();
+        const stackRect = stack.getBoundingClientRect();
+        const promptCard = wrap.querySelector<Element>(".hero-prompt-card");
+        const boxRect =
+          promptCard?.getBoundingClientRect() ?? wrap.getBoundingClientRect();
+
+        const rootEm = window.innerWidth / 24.375;
+        const padV = rootEm * 0.55;
+
+        const nav = document.querySelector(".mobile-nav");
+        const navBg = document.querySelector(".mobile-nav-bg");
+        const navBottom = Math.max(
+          nav?.getBoundingClientRect().bottom ?? 0,
+          navBg?.getBoundingClientRect().bottom ?? 0,
+        );
+
+        const targetTop = Math.max(navBottom + padV, stackRect.top + padV);
+        const targetBottom = stackRect.bottom - padV;
+        const targetLeft = boxRect.left;
+        const targetWidth = boxRect.width;
+        const targetHeight = Math.max(0, targetBottom - targetTop);
+
+        // Store for useLayoutEffect — it reads these after the portal commits.
+        kitchenFromRef.current = {
+          top: from.top,
+          left: from.left,
+          width: from.width,
+          height: from.height,
+        };
+        kitchenTargetRef.current = {
+          top: targetTop,
+          left: targetLeft,
+          width: targetWidth,
+          height: targetHeight,
+        };
+
+        // Mount the portal overlay. React commits as a microtask, then
+        // useLayoutEffect fires synchronously — ref is guaranteed set there.
+        setKitchenCardExpanded(true);
+      }, 2000),
+    );
+
+    return () => timers.forEach(clearTimeout);
+  }, [promptPhase]);
+
+  // After the portal commits to the DOM, useLayoutEffect fires synchronously
+  // (before paint), so kitchenOverlayRef.current is guaranteed to be set.
+  // We position the overlay at 'from' with no transition, then in the next
+  // rAF we enable the transition and set the target coords.
+  useLayoutEffect(() => {
+    if (!kitchenCardExpanded) return;
+    const overlay = kitchenOverlayRef.current;
+    const from = kitchenFromRef.current;
+    const target = kitchenTargetRef.current;
+    if (!overlay || !from || !target) return;
+
+    // Synchronously place at 'from' before first paint.
+    overlay.style.transition = "none";
+    overlay.style.top = `${from.top}px`;
+    overlay.style.left = `${from.left}px`;
+    overlay.style.width = `${from.width}px`;
+    overlay.style.height = `${from.height}px`;
+
+    // Next frame: browser has painted at 'from', now animate to target.
+    const id = requestAnimationFrame(() => {
+      void overlay.offsetWidth; // force layout so transition fires
+      const ease = "cubic-bezier(0.16, 1, 0.3, 1)";
+      overlay.style.transition = [
+        `top 1.35s ${ease}`,
+        `left 1.35s ${ease}`,
+        `width 1.35s ${ease}`,
+        `height 1.35s ${ease}`,
+      ].join(", ");
+      overlay.style.top = `${target.top}px`;
+      overlay.style.left = `${target.left}px`;
+      overlay.style.width = `${target.width}px`;
+      overlay.style.height = `${target.height}px`;
+    });
+    return () => cancelAnimationFrame(id);
+  }, [kitchenCardExpanded]);
 
   // Lock page scroll until the submit button has been pressed.
   useEffect(() => {
@@ -235,62 +465,136 @@ export default function Home() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Move the AI box down with scroll after submit — cached layout + rAF keeps
-  // it smooth (no React re-render per scroll frame).
+  // After the prompt animation + submit: pin the AI box in the viewport and
+  // lerp it to the bottom of the phone as the user scrolls into section two.
   useEffect(() => {
     const wrap = promptWrapRef.current;
-    if (!wrap) return;
+    const section = secondSectionRef.current;
+    if (!wrap || !section) return;
 
-    const measure = () => {
-      const section = secondSectionRef.current;
-      if (!section) return;
+    const rootFontSize = () => window.innerWidth / 24.375;
 
-      wrap.style.transform = "translate3d(0, 0, 0)";
-      const naturalTop = wrap.getBoundingClientRect().top + window.scrollY;
+    const clearPin = () => {
+      wrap.style.position = "";
+      wrap.style.top = "";
+      wrap.style.left = "";
+      wrap.style.width = "";
+      wrap.style.transform = "";
+      wrap.style.zIndex = "";
+      promptScrollRef.current.pinned = false;
+    };
+
+    const measureScrollEnd = () => {
+      const sectionTop = section.getBoundingClientRect().top + window.scrollY;
+      return Math.max(
+        1,
+        sectionTop + section.offsetHeight - window.innerHeight,
+      );
+    };
+
+    const pinPrompt = () => {
+      const rect = wrap.getBoundingClientRect();
+      const bottomPadding = rootFontSize() * 2;
       const boxHeight = wrap.offsetHeight;
-      const sectionBottom =
-        section.getBoundingClientRect().bottom + window.scrollY;
-      const rootFontSize = window.innerWidth / 24.375;
-      const bottomPadding = rootFontSize * 2;
-      const finalTop = sectionBottom - bottomPadding - boxHeight;
+      const targetTop = window.innerHeight - bottomPadding - boxHeight;
+      const metrics = promptScrollRef.current;
 
-      promptMetricsRef.current = {
-        naturalTop,
-        maxTravel: Math.max(0, finalTop - naturalTop),
+      // Use coords captured before unlock so removing marginTop doesn't jump.
+      const pinTop = metrics.prePinTop || rect.top;
+      const pinLeft = metrics.prePinLeft || rect.left;
+      const pinWidth = metrics.prePinWidth || rect.width;
+
+      wrap.style.position = "fixed";
+      wrap.style.left = `${pinLeft}px`;
+      wrap.style.width = `${pinWidth}px`;
+      wrap.style.top = `${pinTop}px`;
+      wrap.style.transform = "none";
+      wrap.style.zIndex = "10";
+      wrap.style.marginTop = "0";
+
+      setPromptFlowHeight(boxHeight + rootFontSize() * 1.5);
+
+      promptScrollRef.current = {
+        ...metrics,
+        initialTop: pinTop,
+        left: pinLeft,
+        width: pinWidth,
+        targetTop,
+        scrollEnd: measureScrollEnd(),
+        pinned: true,
       };
+
+      document.documentElement.style.setProperty(
+        "--prompt-box-height",
+        `${boxHeight}px`,
+      );
+      document.documentElement.style.setProperty(
+        "--prompt-bottom-padding",
+        `${bottomPadding}px`,
+      );
     };
 
     let frame = 0;
 
-    const applyShift = (shift: number) => {
-      wrap.style.transform =
-        shift > 0 ? `translate3d(0, ${shift}px, 0)` : "translate3d(0, 0, 0)";
-    };
-
     const update = () => {
       if (!scrollUnlocked) {
-        applyShift(0);
+        clearPin();
+        setPromptAtBottom(false);
         return;
+      }
+
+      if (!promptScrollRef.current.pinned) {
+        pinPrompt();
       }
 
       cancelAnimationFrame(frame);
       frame = requestAnimationFrame(() => {
-        const { maxTravel } = promptMetricsRef.current;
-        const maxScroll = Math.max(
+        const metrics = promptScrollRef.current;
+        if (!metrics.pinned) return;
+
+        metrics.scrollEnd = measureScrollEnd();
+
+        const progress = Math.min(
+          Math.max(window.scrollY / metrics.scrollEnd, 0),
           1,
-          document.documentElement.scrollHeight - window.innerHeight,
         );
-        const progress = Math.min(Math.max(window.scrollY / maxScroll, 0), 1);
-        applyShift(progress * maxTravel);
+        const top =
+          metrics.initialTop +
+          (metrics.targetTop - metrics.initialTop) * progress;
+        wrap.style.top = `${top}px`;
+
+        const atBottom = progress >= 0.98;
+        setPromptAtBottom(atBottom);
       });
     };
 
     const onResize = () => {
-      measure();
+      if (!scrollUnlocked || !promptScrollRef.current.pinned) return;
+
+      const bottomPadding = rootFontSize() * 2;
+      const boxHeight = wrap.offsetHeight;
+      const targetTop = window.innerHeight - bottomPadding - boxHeight;
+      const rect = wrap.getBoundingClientRect();
+
+      promptScrollRef.current.targetTop = targetTop;
+      promptScrollRef.current.scrollEnd = measureScrollEnd();
+      promptScrollRef.current.left = rect.left;
+      promptScrollRef.current.width = rect.width;
+      wrap.style.left = `${rect.left}px`;
+      wrap.style.width = `${rect.width}px`;
+
+      document.documentElement.style.setProperty(
+        "--prompt-box-height",
+        `${boxHeight}px`,
+      );
+      document.documentElement.style.setProperty(
+        "--prompt-bottom-padding",
+        `${bottomPadding}px`,
+      );
+
       update();
     };
 
-    measure();
     update();
 
     window.addEventListener("scroll", update, { passive: true });
@@ -300,9 +604,133 @@ export default function Home() {
       cancelAnimationFrame(frame);
       window.removeEventListener("scroll", update);
       window.removeEventListener("resize", onResize);
-      applyShift(0);
+      clearPin();
     };
-  }, [scrollUnlocked, revealedImageCount]);
+  }, [scrollUnlocked]);
+
+  // Pin synchronously on unlock — before paint — so margin/layout changes never flash.
+  useLayoutEffect(() => {
+    if (!scrollUnlocked) return;
+    const wrap = promptWrapRef.current;
+    const section = secondSectionRef.current;
+    if (!wrap || !section || promptScrollRef.current.pinned) return;
+
+    const rootFontSize = () => window.innerWidth / 24.375;
+    const rect = wrap.getBoundingClientRect();
+    const metrics = promptScrollRef.current;
+    const pinTop = metrics.prePinTop || rect.top;
+    const pinLeft = metrics.prePinLeft || rect.left;
+    const pinWidth = metrics.prePinWidth || rect.width;
+    const bottomPadding = rootFontSize() * 2;
+    const boxHeight = wrap.offsetHeight;
+    const targetTop = window.innerHeight - bottomPadding - boxHeight;
+    const sectionTop = section.getBoundingClientRect().top + window.scrollY;
+    const scrollEnd = Math.max(
+      1,
+      sectionTop + section.offsetHeight - window.innerHeight,
+    );
+
+    wrap.style.position = "fixed";
+    wrap.style.left = `${pinLeft}px`;
+    wrap.style.width = `${pinWidth}px`;
+    wrap.style.top = `${pinTop}px`;
+    wrap.style.transform = "none";
+    wrap.style.zIndex = "10";
+    wrap.style.marginTop = "0";
+
+    setPromptFlowHeight(boxHeight + rootFontSize() * 1.5);
+
+    promptScrollRef.current = {
+      ...metrics,
+      initialTop: pinTop,
+      left: pinLeft,
+      width: pinWidth,
+      targetTop,
+      scrollEnd,
+      pinned: true,
+    };
+
+    document.documentElement.style.setProperty(
+      "--prompt-box-height",
+      `${boxHeight}px`,
+    );
+    document.documentElement.style.setProperty(
+      "--prompt-bottom-padding",
+      `${bottomPadding}px`,
+    );
+  }, [scrollUnlocked]);
+
+  // Listing cards — one by one, only after the AI box hits the phone bottom.
+  useEffect(() => {
+    if (!promptAtBottom || listingRevealStartedRef.current) return;
+
+    listingRevealStartedRef.current = true;
+
+    const timers = LISTING_CARDS.map((_, i) =>
+      setTimeout(() => setRevealedListingCount(i + 1), 200 + i * 260),
+    );
+
+    return () => timers.forEach(clearTimeout);
+  }, [promptAtBottom]);
+
+  // Fit listing stack in the band between nav and the settled AI box.
+  useEffect(() => {
+    if (!promptAtBottom) return;
+
+    const fitListingStack = () => {
+      const stack = listingStackRef.current;
+      const inner = listingInnerRef.current;
+      if (!stack || !inner) return;
+
+      const nav = document.querySelector(".mobile-nav");
+      const navBg = document.querySelector(".mobile-nav-bg");
+      const navBottom = Math.max(
+        nav?.getBoundingClientRect().bottom ?? 0,
+        navBg?.getBoundingClientRect().bottom ?? 0,
+      );
+      const rootEm = window.innerWidth / 24.375;
+      const safeTop = Math.max(navBottom, rootEm * 5.5) + 10;
+
+      document.documentElement.style.setProperty(
+        "--listing-stack-top",
+        `${safeTop}px`,
+      );
+
+      inner.style.zoom = "1";
+      inner.style.transformOrigin = "center center";
+
+      if (kitchenCardFocused || kitchenCardExpanded) return;
+
+      const available = stack.clientHeight - 12;
+      const needed = inner.scrollHeight;
+      if (needed > available && needed > 0) {
+        const scale = Math.max(0.58, available / needed);
+        inner.style.zoom = String(scale);
+      }
+    };
+
+    fitListingStack();
+    requestAnimationFrame(fitListingStack);
+    const ro = new ResizeObserver(fitListingStack);
+    if (listingStackRef.current) ro.observe(listingStackRef.current);
+    if (listingInnerRef.current) ro.observe(listingInnerRef.current);
+    window.addEventListener("resize", fitListingStack);
+
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", fitListingStack);
+      if (listingInnerRef.current) {
+        listingInnerRef.current.style.zoom = "";
+      }
+      document.documentElement.style.removeProperty("--listing-stack-top");
+    };
+  }, [
+    promptAtBottom,
+    revealedListingCount,
+    showLogo,
+    kitchenCardFocused,
+    kitchenCardExpanded,
+  ]);
 
   return (
     <main style={{ minHeight: "100vh", overflowX: "hidden", maxWidth: "100%" }}>
@@ -509,8 +937,16 @@ export default function Home() {
           </div>
           </div>
 
-          {/* Scroll-driven wrapper — pins the AI box on screen as you scroll,
-              then lets it settle near the bottom of the second section. */}
+          {/* Spacer keeps hero layout height once the AI box is position:fixed. */}
+          {scrollUnlocked && promptFlowHeight > 0 ? (
+            <div
+              aria-hidden
+              style={{ alignSelf: "stretch", height: promptFlowHeight }}
+            />
+          ) : null}
+
+          {/* Fixed on scroll — stays in hero until unlock, then glides to
+              the bottom of the second-section viewport. */}
           <div
             ref={promptWrapRef}
             style={{
@@ -519,7 +955,7 @@ export default function Home() {
               marginTop: "1.5em",
               position: "relative",
               zIndex: 2,
-              willChange: scrollUnlocked ? "transform" : "auto",
+              willChange: scrollUnlocked ? "top" : "auto",
             }}
           >
           {/* Frosted-glass prompt card — backdrop blur + dark overlay, with a
@@ -574,16 +1010,21 @@ export default function Home() {
                     )}
                   </span>
                 ) : (
-                  <span className="hero-prompt-chip">
-                    {labIcon}
-                    {SELECTED_LABEL}
-                  </span>
+                  <>
+                    <span className="hero-prompt-chip">
+                      {labIcon}
+                      {SELECTED_LABEL}
+                    </span>
+                    {promptPhase === "chip" && (
+                      <span className="type-caret" aria-hidden />
+                    )}
+                  </>
                 )}
 
                 {(promptPhase === "typing" || promptPhase === "done") && (
                   <>
                     <span className="hero-prompt-typed">{typed}</span>
-                    {promptPhase !== "done" && (
+                    {promptPhase === "typing" && (
                       <span className="type-caret" aria-hidden />
                     )}
                     <span className="hero-prompt-reserve">
@@ -592,9 +1033,23 @@ export default function Home() {
                   </>
                 )}
 
-                {promptPhase !== "done" && promptPhase !== "typing" && (
+                {promptPhase === "followup-ready" && (
                   <span className="type-caret" aria-hidden />
                 )}
+
+                {(promptPhase === "followup-typing" ||
+                  promptPhase === "followup-done") && (
+                  <>
+                    <span className="hero-prompt-typed">{typed}</span>
+                    {promptPhase === "followup-typing" && (
+                      <span className="type-caret" aria-hidden />
+                    )}
+                    <span className="hero-prompt-reserve">
+                      {FOLLOWUP_PROMPT.slice(typed.length)}
+                    </span>
+                  </>
+                )}
+
               </span>
             </p>
 
@@ -625,16 +1080,168 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Second section — full-height white. */}
-        <div
-          ref={secondSectionRef}
-          style={{
-            position: "relative",
-            zIndex: 0,
-            minHeight: "100vh",
-            backgroundColor: "#ffffff",
-          }}
-        />
+        {/* Second section — full-height scroll target for the AI box glide. */}
+        <div ref={secondSectionRef} className="second-section" />
+
+        {/* Listings — fixed above the AI box, only in section two at bottom. */}
+        {promptAtBottom ? (
+          <div
+            ref={listingStackRef}
+            className={`listing-stack${
+              kitchenCardFocused ? " listing-stack--kitchen-focused" : ""
+            }`}
+            aria-label="Listing results"
+            style={{ fontSize: MOBILE_ROOT_FONT_SIZE }}
+          >
+            <div ref={listingInnerRef} className="listing-stack-inner">
+            {LISTING_CARDS.map((listing, i) => (
+              <div
+                key={listing.title}
+                ref={
+                  i === KITCHEN_LISTING_INDEX ? kitchenSlotRef : undefined
+                }
+                className={`listing-card-slot listing-card-slot--${i}${
+                  i < revealedListingCount ? " is-visible" : ""
+                }${i === KITCHEN_LISTING_INDEX && kitchenCardExpanded ? " is-kitchen-hidden" : ""}`}
+              >
+                <article className="listing-card">
+                  <div className="listing-card-media">
+                    <img
+                      src={listing.image}
+                      alt={listing.alt}
+                      className="listing-card-image"
+                    />
+                    <div className="listing-card-image-fade" aria-hidden />
+                  </div>
+                  <div className="listing-card-footer">
+                    <div className="listing-card-body">
+                      <h3 className="listing-card-title">{listing.title}</h3>
+                      <p className="listing-card-distance">
+                        {listing.distanceMi} mi away
+                      </p>
+                    </div>
+                    <div className="listing-card-meta">
+                      <span className="listing-card-sqft">
+                        {formatSqFt(listing.sqFt)}
+                      </span>
+                      <div className="listing-card-meta-row">
+                        <span
+                          className="listing-card-rating"
+                          aria-label={`Rating ${listing.rating}`}
+                        >
+                          {listing.rating}
+                          <svg
+                            className="listing-card-rating-star"
+                            viewBox="0 0 24 24"
+                            fill="currentColor"
+                            aria-hidden
+                          >
+                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                          </svg>
+                        </span>
+                        <div
+                          className="listing-card-hosts"
+                          aria-label="Hosts"
+                        >
+                          {listing.hosts.map((host, hostIndex) => (
+                            <span
+                              key={host.initials}
+                              className={`listing-card-avatar${
+                                hostIndex === 0
+                                  ? " listing-card-avatar--back"
+                                  : " listing-card-avatar--front"
+                              }`}
+                              style={{
+                                background: `linear-gradient(${host.gradient})`,
+                              }}
+                            >
+                              {host.initials}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </article>
+              </div>
+            ))}
+            </div>
+          </div>
+        ) : null}
+
+        {/* Kitchen expansion overlay — rendered in a portal to document.body
+            so position:fixed is always relative to the viewport, never to a
+            transformed ancestor. */}
+        {kitchenCardExpanded && typeof document !== "undefined"
+          ? createPortal(
+              (() => {
+                const listing = LISTING_CARDS[KITCHEN_LISTING_INDEX];
+                return (
+                  <div
+                    ref={kitchenOverlayRef}
+                    className="kitchen-expand-overlay"
+                    style={{ fontSize: MOBILE_ROOT_FONT_SIZE }}
+                  >
+                    <div className="listing-card-media">
+                      <img
+                        src={listing.image}
+                        alt={listing.alt}
+                        className="listing-card-image"
+                      />
+                      <div className="listing-card-image-fade" aria-hidden />
+                    </div>
+                    <div className="listing-card-footer kitchen-expand-overlay__footer">
+                      <div className="listing-card-body">
+                        <h3 className="listing-card-title">{listing.title}</h3>
+                        <p className="listing-card-distance">
+                          {listing.distanceMi} mi away
+                        </p>
+                      </div>
+                      <div className="listing-card-meta">
+                        <span className="listing-card-sqft">
+                          {formatSqFt(listing.sqFt)}
+                        </span>
+                        <div className="listing-card-meta-row">
+                          <span
+                            className="listing-card-rating"
+                            aria-label={`Rating ${listing.rating}`}
+                          >
+                            {listing.rating}
+                            <svg
+                              className="listing-card-rating-star"
+                              viewBox="0 0 24 24"
+                              fill="currentColor"
+                              aria-hidden
+                            >
+                              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                            </svg>
+                          </span>
+                          <div className="listing-card-hosts" aria-label="Hosts">
+                            {listing.hosts.map((host, hostIndex) => (
+                              <span
+                                key={host.initials}
+                                className={`listing-card-avatar${
+                                  hostIndex === 0
+                                    ? " listing-card-avatar--back"
+                                    : " listing-card-avatar--front"
+                                }`}
+                                style={{
+                                  background: `linear-gradient(${host.gradient})`,
+                                }}
+                              >
+                                {host.initials}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })(),
+              document.body,
+            )
+          : null}
       </section>
     </main>
   );

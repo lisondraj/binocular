@@ -15,6 +15,7 @@ body {
   background-color: #ffffff;
   color: #000000;
   overflow-x: hidden;
+  scrollbar-gutter: stable;
   max-width: 100%;
   /* Inter is the default for all non-heading text. */
   font-family: var(--font-inter), system-ui, sans-serif;
@@ -35,6 +36,7 @@ h6 {
 .mobile-view {
   display: block;
   overflow-x: hidden;
+  scrollbar-gutter: stable;
   max-width: 100%;
 }
 .desktop-view {
@@ -115,11 +117,332 @@ h6 {
 }
 
 .hero-prompt-send {
-  transition: transform 0.15s ease;
+  transition: transform 0.22s ease;
 }
 
 .hero-prompt-send.is-pressed {
   transform: scale(0.88);
+}
+
+/* Second section — staggered listing cards above the settled AI box. */
+.second-section {
+  position: relative;
+  z-index: 0;
+  min-height: 100vh;
+  background-color: #ffffff;
+}
+
+.listing-stack {
+  position: fixed;
+  top: var(--listing-stack-top, 5.5em);
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(100%, var(--ipad-width));
+  max-width: 100%;
+  bottom: calc(
+    var(--prompt-box-height, 10rem) + var(--prompt-bottom-padding, 2rem) + 1em
+  );
+  padding: 0.5em 1.5em;
+  box-sizing: border-box;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  overflow: hidden;
+  z-index: 8;
+  pointer-events: none;
+}
+
+.listing-stack-inner {
+  width: 100%;
+  max-height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: auto;
+}
+
+.listing-card-slot {
+  --listing-tilt: 0deg;
+  width: 70%;
+  max-width: 17.5em;
+  flex-shrink: 0;
+  opacity: 0;
+  transform: rotate(var(--listing-tilt)) translate3d(0, 1.1em, 0);
+  transition:
+    opacity 0.85s ease,
+    transform 0.85s ease;
+}
+
+.listing-card-slot.is-visible {
+  opacity: 1;
+  transform: rotate(var(--listing-tilt)) translate3d(0, 0, 0);
+}
+
+.listing-card-slot--0 {
+  --listing-tilt: 1.15deg;
+  align-self: flex-end;
+  margin-right: 0.3em;
+  z-index: 1;
+}
+
+.listing-card-slot--1 {
+  --listing-tilt: -1.35deg;
+  align-self: flex-start;
+  margin-left: 0.3em;
+  margin-top: -0.6em;
+  z-index: 2;
+}
+
+.listing-card-slot--2 {
+  --listing-tilt: 0.9deg;
+  align-self: flex-end;
+  margin-right: 0.55em;
+  margin-top: -0.6em;
+  z-index: 3;
+}
+
+/* Phase 1 — others fade; kitchen stays in its natural staggered position. */
+.listing-stack--kitchen-focused
+  .listing-card-slot:not(.listing-card-slot--1) {
+  opacity: 0 !important;
+  transform: rotate(var(--listing-tilt)) scale(0.96) !important;
+  pointer-events: none;
+  transition:
+    opacity 1.2s ease-out,
+    transform 1.2s ease-out;
+}
+
+/* Kitchen slot hides once the overlay takes over. */
+.listing-card-slot--1.is-kitchen-hidden {
+  opacity: 0 !important;
+  pointer-events: none;
+}
+
+/* Phase 2 — separate overlay; portal into body so position:fixed is
+   always relative to the viewport, not a transformed ancestor. */
+.kitchen-expand-overlay {
+  position: fixed;
+  z-index: 9;
+  box-sizing: border-box;
+  border-radius: 1.15em;
+  overflow: hidden;
+  border: 0.0625em solid rgba(0, 0, 0, 0.08);
+  background: #f6f5f2;
+  box-shadow:
+    0 0.22em 0.8em rgba(0, 0, 0, 0.09),
+    0 0.04em 0.14em rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Taller footer so enlarged text has room. */
+.kitchen-expand-overlay__footer {
+  flex: 0 0 auto;
+  min-height: 5em;
+  padding: 0.65em 1.1em 0.9em 1.25em;
+}
+
+/* Larger text in the expanded card. */
+.kitchen-expand-overlay .listing-card-title {
+  font-size: 1.25em;
+  letter-spacing: -0.025em;
+}
+
+.kitchen-expand-overlay .listing-card-distance {
+  font-size: 0.95em;
+}
+
+.kitchen-expand-overlay .listing-card-sqft {
+  font-size: 0.82em;
+}
+
+.kitchen-expand-overlay .listing-card-rating {
+  font-size: 1.1em;
+}
+
+.kitchen-expand-overlay .listing-card-rating-star {
+  width: 0.85em;
+  height: 0.85em;
+}
+
+.kitchen-expand-overlay .listing-card-avatar {
+  width: 2.4em;
+  height: 2.4em;
+  font-size: 0.62em;
+}
+
+/* Keep the fade gradient proportionally taller to match bigger footer. */
+.kitchen-expand-overlay .listing-card-image-fade {
+  height: 38%;
+}
+
+.listing-card {
+  --listing-footer-bg: #f6f5f2;
+  --listing-ease: cubic-bezier(0.33, 1, 0.68, 1);
+  position: relative;
+  width: 100%;
+  height: 9em;
+  box-sizing: border-box;
+  padding: 0;
+  border-radius: 1.15em;
+  border: 0.0625em solid rgba(0, 0, 0, 0.08);
+  background: var(--listing-footer-bg);
+  box-shadow:
+    0 0.12em 0.45em rgba(0, 0, 0, 0.05),
+    0 0.04em 0.12em rgba(0, 0, 0, 0.03);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.listing-card-media {
+  position: relative;
+  flex: 2 1 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.listing-card-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.listing-card-image-fade {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 48%;
+  background: linear-gradient(
+    to bottom,
+    rgba(246, 245, 242, 0) 0%,
+    rgba(246, 245, 242, 0.55) 62%,
+    var(--listing-footer-bg) 100%
+  );
+  pointer-events: none;
+}
+
+.listing-card-footer {
+  position: relative;
+  flex: 1 1 0;
+  min-height: 3.25em;
+  margin-top: -0.0625em;
+  padding: 0.35em 0.85em 0.55em 1em;
+  background: var(--listing-footer-bg);
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 0.5em;
+}
+
+.listing-card-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.2em;
+}
+
+.listing-card-meta {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: flex-end;
+  gap: 0.12em;
+}
+
+.listing-card-sqft {
+  font-family: var(--font-suisse), system-ui, sans-serif;
+  font-size: 0.68em;
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+  color: rgba(0, 0, 0, 0.42);
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  line-height: 1.2;
+}
+
+.listing-card-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+}
+
+.listing-card-hosts {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  padding-left: 0.1em;
+}
+
+.listing-card-avatar {
+  width: 2em;
+  height: 2em;
+  border-radius: 50%;
+  border: 0.1em solid #ffffff;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-suisse), system-ui, sans-serif;
+  font-size: 0.58em;
+  font-weight: 600;
+  color: #ffffff;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  text-transform: uppercase;
+  box-shadow: 0 0.12em 0.35em rgba(0, 0, 0, 0.14);
+}
+
+.listing-card-avatar--back {
+  margin-right: -0.62em;
+  z-index: 1;
+}
+
+.listing-card-avatar--front {
+  z-index: 2;
+}
+
+.listing-card-title {
+  margin: 0;
+  font-family: var(--font-suisse), system-ui, sans-serif;
+  font-size: 0.88em;
+  font-weight: 500;
+  color: #1a1a1a;
+  letter-spacing: -0.02em;
+}
+
+.listing-card-distance {
+  margin: 0;
+  font-family: var(--font-suisse), system-ui, sans-serif;
+  font-size: 0.75em;
+  font-weight: 300;
+  color: rgba(0, 0, 0, 0.5);
+}
+
+.listing-card-rating {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.18em;
+  font-family: var(--font-suisse), system-ui, sans-serif;
+  font-size: 0.88em;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  color: #1a1a1a;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+.listing-card-rating-star {
+  width: 0.72em;
+  height: 0.72em;
+  flex-shrink: 0;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -138,6 +461,23 @@ h6 {
   .hero-image-rise.is-visible {
     opacity: 1;
     transform: rotate(var(--base-rotate)) translate3d(0, 0, 0);
+  }
+
+  .listing-card-slot {
+    transition: none;
+  }
+
+  .listing-card-slot.is-visible {
+    opacity: 1;
+    transform: rotate(var(--listing-tilt)) translate3d(0, 0, 0);
+  }
+
+  .listing-stack--kitchen-focused .listing-card-slot:not(.listing-card-slot--1) {
+    transition: none;
+  }
+
+  .listing-stack--kitchen-focused .listing-card-slot:not(.listing-card-slot--1) {
+    transition: none;
   }
 
   .hero-prompt-send {
