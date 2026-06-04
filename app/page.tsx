@@ -71,6 +71,28 @@ const LISTING_CARDS = [
 const formatSqFt = (sqFt: number) =>
   `${sqFt.toLocaleString("en-US")} sq ft`;
 
+/** Pin element inside second section at its current viewport position. */
+const anchorToSecondSection = (
+  el: HTMLElement,
+  section: HTMLElement,
+  zIndex?: number,
+) => {
+  const sectionRect = section.getBoundingClientRect();
+  const rect = el.getBoundingClientRect();
+
+  el.style.position = "absolute";
+  el.style.top = `${rect.top - sectionRect.top}px`;
+  el.style.bottom = "auto";
+  el.style.left = `${rect.left - sectionRect.left}px`;
+  el.style.right = "auto";
+  el.style.width = `${rect.width}px`;
+  el.style.height = `${rect.height}px`;
+  el.style.transform = "none";
+  if (zIndex !== undefined) {
+    el.style.zIndex = String(zIndex);
+  }
+};
+
 /** Kitchen is the middle listing card — index 1 in LISTING_CARDS. */
 const KITCHEN_LISTING_INDEX = 1;
 
@@ -80,8 +102,13 @@ const KITCHEN_EXPANDED_DETAILS = {
   availability: "Mon–Fri · 12–3 PM",
   pricePerHour: "$42/hr",
   reviewCount: 128,
-  amenities: ["Dishwasher", "Stairs access", "Dog-friendly"] as const,
-  hostNames: ["Jordan S.", "Alex N."] as const,
+  amenities: [
+    "Dishwasher",
+    "Stairs access",
+    "Dog-friendly",
+    "Wi-Fi",
+  ] as const,
+  hostName: "Jordan S.",
 };
 
 const heroImages: HeroImage[] = [
@@ -195,6 +222,10 @@ export default function Home() {
     targetTop: 0,
     scrollEnd: 1,
     pinned: false,
+    // Once the box reaches the bottom it stays there — scroll-up can't move it.
+    lockedAtBottom: false,
+    // After first listing card: absolute in section two (scrolls with page).
+    lockedInSection: false,
     // Captured before scroll unlock so pin uses pre-submit viewport position.
     prePinTop: 0,
     prePinLeft: 0,
@@ -388,16 +419,24 @@ export default function Home() {
         const targetWidth = boxRect.width;
         const targetHeight = Math.max(0, targetBottom - targetTop);
 
-        // Store for useLayoutEffect — it reads these after the portal commits.
+        const section = secondSectionRef.current;
+        const sectionRect = section?.getBoundingClientRect() ?? {
+          top: 0,
+          left: 0,
+        };
+        const sectionTop = sectionRect.top;
+        const sectionLeft = sectionRect.left;
+
+        // Coords relative to second section (portal target).
         kitchenFromRef.current = {
-          top: from.top,
-          left: from.left,
+          top: from.top - sectionTop,
+          left: from.left - sectionLeft,
           width: from.width,
           height: from.height,
         };
         kitchenTargetRef.current = {
-          top: targetTop,
-          left: targetLeft,
+          top: targetTop - sectionTop,
+          left: targetLeft - sectionLeft,
           width: targetWidth,
           height: targetHeight,
         };
@@ -485,6 +524,13 @@ export default function Home() {
     const rootFontSize = () => window.innerWidth / 24.375;
 
     const clearPin = () => {
+      // Never clear once anchored in section two or locked at the bottom.
+      if (
+        promptScrollRef.current.lockedAtBottom ||
+        promptScrollRef.current.lockedInSection
+      ) {
+        return;
+      }
       wrap.style.position = "";
       wrap.style.top = "";
       wrap.style.left = "";
@@ -532,6 +578,9 @@ export default function Home() {
         targetTop,
         scrollEnd: measureScrollEnd(),
         pinned: true,
+        // Preserve lock flags across re-pins (e.g. resize).
+        lockedAtBottom: metrics.lockedAtBottom,
+        lockedInSection: metrics.lockedInSection,
       };
 
       document.documentElement.style.setProperty(
@@ -562,6 +611,15 @@ export default function Home() {
         const metrics = promptScrollRef.current;
         if (!metrics.pinned) return;
 
+        // Anchored in section two — native scroll, no viewport lerp.
+        if (metrics.lockedInSection) return;
+
+        // Once locked at the bottom, clamp to targetTop and don't move.
+        if (metrics.lockedAtBottom) {
+          wrap.style.top = `${metrics.targetTop}px`;
+          return;
+        }
+
         metrics.scrollEnd = measureScrollEnd();
 
         const progress = Math.min(
@@ -573,13 +631,30 @@ export default function Home() {
           (metrics.targetTop - metrics.initialTop) * progress;
         wrap.style.top = `${top}px`;
 
-        const atBottom = progress >= 0.98;
-        setPromptAtBottom(atBottom);
+        if (progress >= 0.98) {
+          metrics.lockedAtBottom = true;
+          wrap.style.top = `${metrics.targetTop}px`;
+          setPromptAtBottom(true);
+        }
       });
     };
 
     const onResize = () => {
       if (!scrollUnlocked || !promptScrollRef.current.pinned) return;
+
+      const metrics = promptScrollRef.current;
+
+      if (metrics.lockedInSection) {
+        const section = secondSectionRef.current;
+        if (section) {
+          anchorToSecondSection(wrap, section, 10);
+          const stack = listingStackRef.current;
+          if (stack) anchorToSecondSection(stack, section, 8);
+          const overlay = kitchenOverlayRef.current;
+          if (overlay) anchorToSecondSection(overlay, section, 9);
+        }
+        return;
+      }
 
       const bottomPadding = rootFontSize() * 2;
       const boxHeight = wrap.offsetHeight;
@@ -658,6 +733,8 @@ export default function Home() {
       targetTop,
       scrollEnd,
       pinned: true,
+      lockedAtBottom: metrics.lockedAtBottom,
+      lockedInSection: metrics.lockedInSection,
     };
 
     document.documentElement.style.setProperty(
@@ -682,6 +759,28 @@ export default function Home() {
 
     return () => timers.forEach(clearTimeout);
   }, [promptAtBottom]);
+
+  // First listing card: reparent UI into second section and anchor there.
+  useLayoutEffect(() => {
+    if (revealedListingCount < 1) return;
+
+    const metrics = promptScrollRef.current;
+    if (metrics.lockedInSection) return;
+
+    const section = secondSectionRef.current;
+    const wrap = promptWrapRef.current;
+    const stack = listingStackRef.current;
+    if (!section || !wrap) return;
+
+    // Move prompt from hero into section two (stack already lives in section).
+    if (wrap.parentElement !== section) {
+      section.appendChild(wrap);
+    }
+
+    anchorToSecondSection(wrap, section, 10);
+    if (stack) anchorToSecondSection(stack, section, 8);
+    metrics.lockedInSection = true;
+  }, [revealedListingCount]);
 
   // Fit listing stack in the band between nav and the settled AI box.
   useEffect(() => {
@@ -1090,21 +1189,19 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Second section — full-height scroll target for the AI box glide. */}
-        <div ref={secondSectionRef} className="second-section" />
-
-        {/* Listings — fixed above the AI box, only in section two at bottom. */}
-        {promptAtBottom ? (
-          <div
-            ref={listingStackRef}
-            className={`listing-stack${
-              kitchenCardFocused ? " listing-stack--kitchen-focused" : ""
-            }`}
-            aria-label="Listing results"
-            style={{ fontSize: MOBILE_ROOT_FONT_SIZE }}
-          >
-            <div ref={listingInnerRef} className="listing-stack-inner">
-            {LISTING_CARDS.map((listing, i) => (
+        {/* Second section — listings + AI box live here once settled. */}
+        <div ref={secondSectionRef} className="second-section">
+          {promptAtBottom ? (
+            <div
+              ref={listingStackRef}
+              className={`listing-stack${
+                kitchenCardFocused ? " listing-stack--kitchen-focused" : ""
+              }`}
+              aria-label="Listing results"
+              style={{ fontSize: MOBILE_ROOT_FONT_SIZE }}
+            >
+              <div ref={listingInnerRef} className="listing-stack-inner">
+              {LISTING_CARDS.map((listing, i) => (
               <div
                 key={listing.title}
                 ref={
@@ -1175,14 +1272,13 @@ export default function Home() {
                 </article>
               </div>
             ))}
+              </div>
             </div>
-          </div>
-        ) : null}
+          ) : null}
+        </div>
 
-        {/* Kitchen expansion overlay — rendered in a portal to document.body
-            so position:fixed is always relative to the viewport, never to a
-            transformed ancestor. */}
-        {kitchenCardExpanded && typeof document !== "undefined"
+        {/* Kitchen expansion overlay — portaled into second section. */}
+        {kitchenCardExpanded && secondSectionRef.current
           ? createPortal(
               (() => {
                 const listing = LISTING_CARDS[KITCHEN_LISTING_INDEX];
@@ -1220,8 +1316,7 @@ export default function Home() {
                             ))}
                           </ul>
                           <p className="kitchen-expand-hosts">
-                            Hosted by{" "}
-                            {KITCHEN_EXPANDED_DETAILS.hostNames.join(" & ")}
+                            Hosted by {KITCHEN_EXPANDED_DETAILS.hostName}
                           </p>
                         </div>
                         <div className="listing-card-meta kitchen-expand-overlay__meta">
@@ -1276,7 +1371,7 @@ export default function Home() {
                   </div>
                 );
               })(),
-              document.body,
+              secondSectionRef.current,
             )
           : null}
       </section>
