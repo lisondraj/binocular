@@ -1280,7 +1280,7 @@ export default function Home() {
               width: "100%",
             }}
           >
-            We’re building a marketplace for embodied AI.
+            Book environments for physical intelligence.
           </p>
           <div
             className="hero-actions"
