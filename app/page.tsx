@@ -568,30 +568,28 @@ export default function Home() {
     return window.scrollY >= glideStart && sec3Top < window.innerHeight;
   };
 
-  /** Place overlay in section three so its top edge sits at viewportTop. */
-  const positionKitchenInThirdSection = (
-    overlay: HTMLElement,
-    sec3: HTMLElement,
-    viewportTop: number,
-    metrics: { left: number; width: number; height: number },
-  ) => {
-    const secRect = sec3.getBoundingClientRect();
+  /** Pin once on body; scroll only updates transform (avoids layout thrash / shake). */
+  const pinKitchenGlideOnBody = (overlay: HTMLElement) => {
+    const g = kitchenGlideRef.current;
     overlay.style.transition = "none";
-    overlay.style.position = "absolute";
-    overlay.style.top = `${viewportTop - secRect.top}px`;
-    overlay.style.left = `${metrics.left - secRect.left}px`;
-    overlay.style.width = `${metrics.width}px`;
-    overlay.style.height = `${metrics.height}px`;
+    overlay.style.position = "fixed";
+    overlay.style.top = `${g.settledTop}px`;
+    overlay.style.left = `${g.left}px`;
+    overlay.style.width = `${g.width}px`;
+    overlay.style.height = `${g.height}px`;
     overlay.style.zIndex = "11";
     overlay.style.margin = "0";
-    overlay.style.transform = "none";
+    overlay.style.transform = "translate3d(0, 0, 0)";
+    overlay.style.willChange = "transform";
   };
 
-  /** Scroll-linked glide — stays in section three, no body reparent. */
+  /** Scroll-linked glide — transform-only while fixed on body. */
   const applyKitchenGlideFromScroll = () => {
     const overlay = kitchenOverlayRef.current;
-    const sec3 = thirdSectionRef.current;
-    if (!overlay || !sec3 || kitchenGlideLockedRef.current) return;
+    if (!overlay || kitchenGlideLockedRef.current) return;
+    if (!kitchenInThirdSectionRef.current || kitchenAnchoredInThirdRef.current) {
+      return;
+    }
 
     const { glideStart, glideEnd } = getThirdSectionGlideBounds();
     const glideSpan = Math.max(glideEnd - glideStart, 1);
@@ -604,8 +602,8 @@ export default function Home() {
     const useP = Math.max(p, kitchenGlideMaxProgressRef.current);
     kitchenGlideMaxProgressRef.current = useP;
 
-    const viewportTop = g.settledTop + (finalTop - g.settledTop) * useP;
-    positionKitchenInThirdSection(overlay, sec3, viewportTop, g);
+    const deltaY = Math.round((finalTop - g.settledTop) * useP * 100) / 100;
+    overlay.style.transform = `translate3d(0, ${deltaY}px, 0)`;
 
     if (useP >= 1) {
       kitchenGlideLockedRef.current = true;
@@ -681,9 +679,12 @@ export default function Home() {
     return () => window.removeEventListener("resize", apply);
   }, [sectionTwoComplete, kitchenInThirdSection, kitchenAnchoredInThird]);
 
-  // After portal moves into section three, place at the current scroll position.
+  // After portal moves to body, pin once then apply current scroll offset.
   useLayoutEffect(() => {
     if (!kitchenInThirdSection || kitchenAnchoredInThird) return;
+    const overlay = kitchenOverlayRef.current;
+    if (!overlay) return;
+    pinKitchenGlideOnBody(overlay);
     applyKitchenGlideFromScroll();
   }, [kitchenInThirdSection, kitchenAnchoredInThird]);
 
@@ -691,7 +692,9 @@ export default function Home() {
   useEffect(() => {
     if (!sectionTwoComplete || kitchenAnchoredInThird) return;
 
-    const onScroll = () => {
+    let glideRaf = 0;
+
+    const runGlide = () => {
       const sec3 = thirdSectionRef.current;
       if (!sec3) return;
 
@@ -723,9 +726,15 @@ export default function Home() {
       applyKitchenGlideFromScroll();
     };
 
+    const onScroll = () => {
+      cancelAnimationFrame(glideRaf);
+      glideRaf = requestAnimationFrame(runGlide);
+    };
+
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onScroll);
     return () => {
+      cancelAnimationFrame(glideRaf);
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onScroll);
     };
@@ -751,6 +760,7 @@ export default function Home() {
       overlay.style.zIndex = "11";
       overlay.style.margin = "0";
       overlay.style.transform = "none";
+      overlay.style.willChange = "auto";
     };
 
     apply();
@@ -1568,18 +1578,26 @@ export default function Home() {
           ) : null}
         </div>
 
-        {/* Kitchen overlay — section two after expand, section three during glide + landing. */}
+        {/* Kitchen overlay — section two, body during glide, section three when landed. */}
         {kitchenCardExpanded &&
-        (kitchenInThirdSection || kitchenAnchoredInThird
+        (kitchenAnchoredInThird
           ? thirdSectionRef.current
-          : secondSectionRef.current)
+          : kitchenInThirdSection
+            ? typeof document !== "undefined"
+              ? document.body
+              : null
+            : secondSectionRef.current)
           ? createPortal(
               (() => {
                 const listing = LISTING_CARDS[KITCHEN_LISTING_INDEX];
                 return (
                   <div
                     ref={kitchenOverlayRef}
-                    className="kitchen-expand-overlay"
+                    className={`kitchen-expand-overlay${
+                      kitchenInThirdSection && !kitchenAnchoredInThird
+                        ? " is-floating"
+                        : ""
+                    }`}
                     style={{ fontSize: MOBILE_ROOT_FONT_SIZE }}
                   >
                     <div className="listing-card-media kitchen-expand-overlay__media">
@@ -1666,9 +1684,11 @@ export default function Home() {
                   </div>
                 );
               })(),
-              kitchenInThirdSection || kitchenAnchoredInThird
+              kitchenAnchoredInThird
                 ? thirdSectionRef.current!
-                : secondSectionRef.current!,
+                : kitchenInThirdSection
+                  ? document.body
+                  : secondSectionRef.current!,
             )
           : null}
 
@@ -1676,9 +1696,7 @@ export default function Home() {
           <div
             ref={thirdSectionRef}
             className={`third-section${
-              kitchenInThirdSection || kitchenAnchoredInThird
-                ? " third-section--kitchen-active"
-                : ""
+              kitchenAnchoredInThird ? " third-section--kitchen-active" : ""
             }`}
           />
         ) : null}

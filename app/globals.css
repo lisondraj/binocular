@@ -171,6 +171,7 @@ h6 {
   position: fixed;
   z-index: 11;
   pointer-events: auto;
+  will-change: transform;
 }
 
 /* Mobile page footer — half viewport, black rounded box, wordmark at bottom. */
