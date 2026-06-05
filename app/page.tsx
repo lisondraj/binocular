@@ -559,6 +559,15 @@ export default function Home() {
     };
   };
 
+  const canStartKitchenGlide = () => {
+    const sec3 = thirdSectionRef.current;
+    if (!sec3) return false;
+    const { glideStart } = getThirdSectionGlideBounds();
+    // Wait until section three has actually begun entering the viewport.
+    const sec3Top = sec3.getBoundingClientRect().top;
+    return window.scrollY >= glideStart && sec3Top < window.innerHeight;
+  };
+
   /** Place overlay in section three so its top edge sits at viewportTop. */
   const positionKitchenInThirdSection = (
     overlay: HTMLElement,
@@ -686,13 +695,11 @@ export default function Home() {
       const sec3 = thirdSectionRef.current;
       if (!sec3) return;
 
-      const { glideStart } = getThirdSectionGlideBounds();
-
       if (kitchenGlideLockedRef.current) {
         return;
       }
 
-      if (window.scrollY < glideStart) {
+      if (!canStartKitchenGlide()) {
         return;
       }
 
@@ -716,7 +723,6 @@ export default function Home() {
       applyKitchenGlideFromScroll();
     };
 
-    onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onScroll);
     return () => {
@@ -1667,7 +1673,14 @@ export default function Home() {
           : null}
 
         {sectionTwoComplete ? (
-          <div ref={thirdSectionRef} className="third-section" />
+          <div
+            ref={thirdSectionRef}
+            className={`third-section${
+              kitchenInThirdSection || kitchenAnchoredInThird
+                ? " third-section--kitchen-active"
+                : ""
+            }`}
+          />
         ) : null}
       </section>
     </main>
