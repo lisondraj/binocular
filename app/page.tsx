@@ -211,7 +211,7 @@ export default function Home() {
   const [kitchenCardExpanded, setKitchenCardExpanded] = useState(false);
   const [sectionTwoComplete, setSectionTwoComplete] = useState(false);
   const [kitchenAnchoredInThird, setKitchenAnchoredInThird] = useState(false);
-  const [kitchenGlideStarted, setKitchenGlideStarted] = useState(false);
+  const [kitchenInThirdSection, setKitchenInThirdSection] = useState(false);
   const [promptFlowHeight, setPromptFlowHeight] = useState(0);
 
   const promptWrapRef = useRef<HTMLDivElement>(null);
@@ -262,9 +262,8 @@ export default function Home() {
   const sectionTwoCompleteRef = useRef(false);
   const kitchenGlideLockedRef = useRef(false);
   const kitchenAnchoredInThirdRef = useRef(false);
-  const kitchenGlideStartedRef = useRef(false);
+  const kitchenInThirdSectionRef = useRef(false);
   const kitchenGlideMaxProgressRef = useRef(0);
-  const kitchenGlidePinnedRef = useRef(false);
 
   const introFade = (step: number) =>
     INTRO_UI_DELAY + step * (INTRO_FADE_MS + INTRO_GAP_MS);
@@ -560,10 +559,30 @@ export default function Home() {
     };
   };
 
-  /** Update fixed kitchen overlay from scroll — viewport coords only. */
+  /** Place overlay in section three so its top edge sits at viewportTop. */
+  const positionKitchenInThirdSection = (
+    overlay: HTMLElement,
+    sec3: HTMLElement,
+    viewportTop: number,
+    metrics: { left: number; width: number; height: number },
+  ) => {
+    const secRect = sec3.getBoundingClientRect();
+    overlay.style.transition = "none";
+    overlay.style.position = "absolute";
+    overlay.style.top = `${viewportTop - secRect.top}px`;
+    overlay.style.left = `${metrics.left - secRect.left}px`;
+    overlay.style.width = `${metrics.width}px`;
+    overlay.style.height = `${metrics.height}px`;
+    overlay.style.zIndex = "11";
+    overlay.style.margin = "0";
+    overlay.style.transform = "none";
+  };
+
+  /** Scroll-linked glide — stays in section three, no body reparent. */
   const applyKitchenGlideFromScroll = () => {
     const overlay = kitchenOverlayRef.current;
-    if (!overlay || kitchenGlideLockedRef.current) return;
+    const sec3 = thirdSectionRef.current;
+    if (!overlay || !sec3 || kitchenGlideLockedRef.current) return;
 
     const { glideStart, glideEnd } = getThirdSectionGlideBounds();
     const glideSpan = Math.max(glideEnd - glideStart, 1);
@@ -576,11 +595,11 @@ export default function Home() {
     const useP = Math.max(p, kitchenGlideMaxProgressRef.current);
     kitchenGlideMaxProgressRef.current = useP;
 
-    overlay.style.top = `${g.settledTop + (finalTop - g.settledTop) * useP}px`;
+    const viewportTop = g.settledTop + (finalTop - g.settledTop) * useP;
+    positionKitchenInThirdSection(overlay, sec3, viewportTop, g);
 
     if (useP >= 1) {
       kitchenGlideLockedRef.current = true;
-      overlay.style.top = `${finalTop}px`;
       kitchenAnchoredInThirdRef.current = true;
       setKitchenAnchoredInThird(true);
     }
@@ -622,11 +641,11 @@ export default function Home() {
     };
   }, [sectionTwoComplete]);
 
-  // Keep expanded kitchen card pinned in section two until scroll enters section three.
+  // Keep expanded kitchen card pinned in section two until the glide into section three.
   useLayoutEffect(() => {
     if (
       !sectionTwoComplete ||
-      kitchenGlideStarted ||
+      kitchenInThirdSection ||
       kitchenAnchoredInThird
     ) {
       return;
@@ -651,35 +670,13 @@ export default function Home() {
     apply();
     window.addEventListener("resize", apply);
     return () => window.removeEventListener("resize", apply);
-  }, [sectionTwoComplete, kitchenGlideStarted, kitchenAnchoredInThird]);
+  }, [sectionTwoComplete, kitchenInThirdSection, kitchenAnchoredInThird]);
 
-  // Reparent to body and pin with fixed coords captured before the portal move.
+  // After portal moves into section three, place at the current scroll position.
   useLayoutEffect(() => {
-    if (!kitchenGlideStarted || kitchenAnchoredInThird) {
-      kitchenGlidePinnedRef.current = false;
-      return;
-    }
-    const overlay = kitchenOverlayRef.current;
-    if (!overlay) return;
-
-    const g = kitchenGlideRef.current;
-    overlay.style.transition = "none";
-    overlay.style.position = "fixed";
-    overlay.style.top = `${g.settledTop}px`;
-    overlay.style.left = `${g.left}px`;
-    overlay.style.width = `${g.width}px`;
-    overlay.style.height = `${g.height}px`;
-    overlay.style.zIndex = "11";
-    overlay.style.margin = "0";
-    overlay.style.transform = "none";
-
-    kitchenGlidePinnedRef.current = true;
+    if (!kitchenInThirdSection || kitchenAnchoredInThird) return;
     applyKitchenGlideFromScroll();
-
-    return () => {
-      kitchenGlidePinnedRef.current = false;
-    };
-  }, [kitchenGlideStarted, kitchenAnchoredInThird]);
+  }, [kitchenInThirdSection, kitchenAnchoredInThird]);
 
   // Glide: card moves 1:1 with scroll toward viewport center once section three enters.
   useEffect(() => {
@@ -702,7 +699,7 @@ export default function Home() {
       const overlay = kitchenOverlayRef.current;
       if (!overlay) return;
 
-      if (!kitchenGlideStartedRef.current) {
+      if (!kitchenInThirdSectionRef.current) {
         const rect = overlay.getBoundingClientRect();
         kitchenGlideRef.current = {
           settledTop: rect.top,
@@ -710,13 +707,11 @@ export default function Home() {
           width: rect.width,
           height: rect.height,
         };
-        kitchenGlideStartedRef.current = true;
         kitchenGlideMaxProgressRef.current = 0;
-        setKitchenGlideStarted(true);
+        kitchenInThirdSectionRef.current = true;
+        setKitchenInThirdSection(true);
         return;
       }
-
-      if (!kitchenGlidePinnedRef.current) return;
 
       applyKitchenGlideFromScroll();
     };
@@ -728,7 +723,7 @@ export default function Home() {
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onScroll);
     };
-  }, [sectionTwoComplete, kitchenGlideStarted, kitchenAnchoredInThird]);
+  }, [sectionTwoComplete, kitchenInThirdSection, kitchenAnchoredInThird]);
 
   // Anchor the kitchen card inside section three so it scrolls with the page.
   useLayoutEffect(() => {
@@ -1567,24 +1562,18 @@ export default function Home() {
           ) : null}
         </div>
 
-        {/* Kitchen overlay — section two after expand, body during glide, section three when landed. */}
+        {/* Kitchen overlay — section two after expand, section three during glide + landing. */}
         {kitchenCardExpanded &&
-        (kitchenAnchoredInThird
+        (kitchenInThirdSection || kitchenAnchoredInThird
           ? thirdSectionRef.current
-          : kitchenGlideStarted
-            ? document.body
-            : secondSectionRef.current)
+          : secondSectionRef.current)
           ? createPortal(
               (() => {
                 const listing = LISTING_CARDS[KITCHEN_LISTING_INDEX];
                 return (
                   <div
                     ref={kitchenOverlayRef}
-                    className={`kitchen-expand-overlay${
-                      kitchenGlideStarted && !kitchenAnchoredInThird
-                        ? " is-floating"
-                        : ""
-                    }`}
+                    className="kitchen-expand-overlay"
                     style={{ fontSize: MOBILE_ROOT_FONT_SIZE }}
                   >
                     <div className="listing-card-media kitchen-expand-overlay__media">
@@ -1671,11 +1660,9 @@ export default function Home() {
                   </div>
                 );
               })(),
-              kitchenAnchoredInThird
+              kitchenInThirdSection || kitchenAnchoredInThird
                 ? thirdSectionRef.current!
-                : kitchenGlideStarted
-                  ? document.body
-                  : secondSectionRef.current!,
+                : secondSectionRef.current!,
             )
           : null}
 
