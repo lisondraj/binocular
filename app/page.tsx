@@ -98,7 +98,6 @@ const KITCHEN_LISTING_INDEX = 1;
 
 /** Extra copy shown only on the expanded Kitchen overlay. */
 const KITCHEN_EXPANDED_DETAILS = {
-  neighborhood: "SoMa",
   availability: "Mon–Fri · 12–3 PM",
   pricePerHour: "$42/hr",
   reviewCount: 128,
@@ -108,7 +107,6 @@ const KITCHEN_EXPANDED_DETAILS = {
     "Dog-friendly",
     "Wi-Fi",
   ] as const,
-  hostName: "Jordan S.",
 };
 
 const heroImages: HeroImage[] = [
@@ -211,10 +209,14 @@ export default function Home() {
   const [revealedListingCount, setRevealedListingCount] = useState(0);
   const [kitchenCardFocused, setKitchenCardFocused] = useState(false);
   const [kitchenCardExpanded, setKitchenCardExpanded] = useState(false);
+  const [sectionTwoComplete, setSectionTwoComplete] = useState(false);
+  const [kitchenAnchoredInThird, setKitchenAnchoredInThird] = useState(false);
+  const [kitchenGlideStarted, setKitchenGlideStarted] = useState(false);
   const [promptFlowHeight, setPromptFlowHeight] = useState(0);
 
   const promptWrapRef = useRef<HTMLDivElement>(null);
   const secondSectionRef = useRef<HTMLDivElement>(null);
+  const thirdSectionRef = useRef<HTMLDivElement>(null);
   const promptScrollRef = useRef({
     initialTop: 0,
     left: 0,
@@ -232,6 +234,8 @@ export default function Home() {
     prePinWidth: 0,
   });
   const listingRevealStartedRef = useRef(false);
+  const listingsReplayStartedRef = useRef(false);
+  const followupPromptTriggeredRef = useRef(false);
   const listingStackRef = useRef<HTMLDivElement>(null);
   const listingInnerRef = useRef<HTMLDivElement>(null);
   const kitchenSlotRef = useRef<HTMLDivElement>(null);
@@ -249,6 +253,16 @@ export default function Home() {
     width: number;
     height: number;
   } | null>(null);
+  const kitchenGlideRef = useRef({
+    settledTop: 0,
+    left: 0,
+    width: 0,
+    height: 0,
+  });
+  const sectionTwoCompleteRef = useRef(false);
+  const kitchenGlideLockedRef = useRef(false);
+  const kitchenAnchoredInThirdRef = useRef(false);
+  const kitchenGlideStartedRef = useRef(false);
 
   const introFade = (step: number) =>
     INTRO_UI_DELAY + step * (INTRO_FADE_MS + INTRO_GAP_MS);
@@ -335,8 +349,12 @@ export default function Home() {
   }, [promptPhase]);
 
   // After all listing cards: hold 2s, clear prompt, show caret beside chip.
+  // Only once — listing replay in section two must not retype the follow-up.
   useEffect(() => {
     if (revealedListingCount < LISTING_CARDS.length) return;
+    if (followupPromptTriggeredRef.current) return;
+
+    followupPromptTriggeredRef.current = true;
 
     const timer = setTimeout(() => {
       setTyped("");
@@ -424,19 +442,17 @@ export default function Home() {
           top: 0,
           left: 0,
         };
-        const sectionTop = sectionRect.top;
-        const sectionLeft = sectionRect.left;
 
-        // Coords relative to second section (portal target).
+        // Section-two coords — overlay scrolls with section two after expand.
         kitchenFromRef.current = {
-          top: from.top - sectionTop,
-          left: from.left - sectionLeft,
+          top: from.top - sectionRect.top,
+          left: from.left - sectionRect.left,
           width: from.width,
           height: from.height,
         };
         kitchenTargetRef.current = {
-          top: targetTop - sectionTop,
-          left: targetLeft - sectionLeft,
+          top: targetTop - sectionRect.top,
+          left: targetLeft - sectionRect.left,
           width: targetWidth,
           height: targetHeight,
         };
@@ -461,12 +477,33 @@ export default function Home() {
     const target = kitchenTargetRef.current;
     if (!overlay || !from || !target) return;
 
-    // Synchronously place at 'from' before first paint.
+    // Synchronously place at 'from' before first paint (absolute in section two).
     overlay.style.transition = "none";
+    overlay.style.position = "absolute";
     overlay.style.top = `${from.top}px`;
     overlay.style.left = `${from.left}px`;
     overlay.style.width = `${from.width}px`;
     overlay.style.height = `${from.height}px`;
+    overlay.style.zIndex = "11";
+    overlay.style.margin = "0";
+    overlay.style.transform = "none";
+
+    let completeTimer: ReturnType<typeof setTimeout> | undefined;
+    const onExpandComplete = () => {
+      const rect = overlay.getBoundingClientRect();
+      kitchenGlideRef.current = {
+        settledTop: rect.top,
+        left: rect.left,
+        width: rect.width,
+        height: rect.height,
+      };
+      setSectionTwoComplete(true);
+    };
+
+    const onTransitionEnd = (e: TransitionEvent) => {
+      if (e.target !== overlay || e.propertyName !== "height") return;
+      onExpandComplete();
+    };
 
     // Next frame: browser has painted at 'from', now animate to target.
     const id = requestAnimationFrame(() => {
@@ -482,9 +519,212 @@ export default function Home() {
       overlay.style.left = `${target.left}px`;
       overlay.style.width = `${target.width}px`;
       overlay.style.height = `${target.height}px`;
+
+      overlay.addEventListener("transitionend", onTransitionEnd);
+      completeTimer = setTimeout(onExpandComplete, 1500);
     });
-    return () => cancelAnimationFrame(id);
+
+    return () => {
+      cancelAnimationFrame(id);
+      overlay.removeEventListener("transitionend", onTransitionEnd);
+      if (completeTimer) clearTimeout(completeTimer);
+    };
   }, [kitchenCardExpanded]);
+
+  useEffect(() => {
+    sectionTwoCompleteRef.current = sectionTwoComplete;
+  }, [sectionTwoComplete]);
+
+  const getThirdSectionGlideBounds = () => {
+    const sec3 = thirdSectionRef.current;
+    const vh = window.innerHeight;
+    if (!sec3) {
+      return { glideStart: 0, glideEnd: 0 };
+    }
+    const sec3DocTop = sec3.getBoundingClientRect().top + window.scrollY;
+    const sec3Height = sec3.offsetHeight;
+    const glideStart = sec3DocTop - vh;
+    const glideEnd = sec3DocTop + sec3Height / 2 - vh / 2;
+    return { glideStart, glideEnd };
+  };
+
+  // Hide listings once kitchen expand finishes; replay after section two scrolls off screen.
+  useEffect(() => {
+    if (!sectionTwoComplete) return;
+    setRevealedListingCount(0);
+  }, [sectionTwoComplete]);
+
+  useEffect(() => {
+    if (!sectionTwoComplete || listingsReplayStartedRef.current) return;
+
+    const sec2 = secondSectionRef.current;
+    if (!sec2) return;
+
+    let timers: ReturnType<typeof setTimeout>[] = [];
+
+    const tryReplay = () => {
+      if (listingsReplayStartedRef.current) return;
+      if (sec2.getBoundingClientRect().bottom > 0) return;
+
+      listingsReplayStartedRef.current = true;
+      setKitchenCardFocused(false);
+      setRevealedListingCount(0);
+      timers = LISTING_CARDS.map((_, i) =>
+        setTimeout(() => setRevealedListingCount(i + 1), 200 + i * 260),
+      );
+    };
+
+    tryReplay();
+    window.addEventListener("scroll", tryReplay, { passive: true });
+    window.addEventListener("resize", tryReplay);
+    return () => {
+      window.removeEventListener("scroll", tryReplay);
+      window.removeEventListener("resize", tryReplay);
+      timers.forEach(clearTimeout);
+    };
+  }, [sectionTwoComplete]);
+
+  // Keep expanded kitchen card pinned in section two until scroll enters section three.
+  useLayoutEffect(() => {
+    if (
+      !sectionTwoComplete ||
+      kitchenGlideStarted ||
+      kitchenAnchoredInThird
+    ) {
+      return;
+    }
+    const overlay = kitchenOverlayRef.current;
+    const sec2 = secondSectionRef.current;
+    const target = kitchenTargetRef.current;
+    if (!overlay || !sec2 || !target) return;
+
+    const apply = () => {
+      overlay.style.transition = "none";
+      overlay.style.position = "absolute";
+      overlay.style.top = `${target.top}px`;
+      overlay.style.left = `${target.left}px`;
+      overlay.style.width = `${target.width}px`;
+      overlay.style.height = `${target.height}px`;
+      overlay.style.zIndex = "11";
+      overlay.style.margin = "0";
+      overlay.style.transform = "none";
+    };
+
+    apply();
+    window.addEventListener("resize", apply);
+    return () => window.removeEventListener("resize", apply);
+  }, [sectionTwoComplete, kitchenGlideStarted, kitchenAnchoredInThird]);
+
+  // Pin to body for the section-three glide only.
+  useLayoutEffect(() => {
+    if (!kitchenGlideStarted || kitchenAnchoredInThird) return;
+    const overlay = kitchenOverlayRef.current;
+    if (!overlay) return;
+
+    const g = kitchenGlideRef.current;
+    overlay.style.transition = "none";
+    overlay.style.position = "fixed";
+    overlay.style.top = `${g.settledTop}px`;
+    overlay.style.left = `${g.left}px`;
+    overlay.style.width = `${g.width}px`;
+    overlay.style.height = `${g.height}px`;
+    overlay.style.zIndex = "11";
+    overlay.style.margin = "0";
+    overlay.style.transform = "none";
+  }, [kitchenGlideStarted, kitchenAnchoredInThird]);
+
+  // Glide: card moves 1:1 with scroll toward viewport center once section three enters.
+  useEffect(() => {
+    if (!sectionTwoComplete || kitchenAnchoredInThird) return;
+
+    const onScroll = () => {
+      const sec3 = thirdSectionRef.current;
+      if (!sec3) return;
+
+      const { glideStart, glideEnd } = getThirdSectionGlideBounds();
+      const glideSpan = Math.max(glideEnd - glideStart, 1);
+
+      if (window.scrollY > glideEnd) {
+        window.scrollTo(0, glideEnd);
+      }
+
+      // Scroll back up — return card to section two.
+      if (
+        window.scrollY < glideStart &&
+        kitchenGlideStartedRef.current &&
+        !kitchenGlideLockedRef.current
+      ) {
+        kitchenGlideStartedRef.current = false;
+        setKitchenGlideStarted(false);
+        return;
+      }
+
+      if (window.scrollY < glideStart || kitchenGlideLockedRef.current) {
+        return;
+      }
+
+      const overlay = kitchenOverlayRef.current;
+      if (!overlay) return;
+
+      if (!kitchenGlideStartedRef.current) {
+        const rect = overlay.getBoundingClientRect();
+        kitchenGlideRef.current = {
+          settledTop: rect.top,
+          left: rect.left,
+          width: rect.width,
+          height: rect.height,
+        };
+        kitchenGlideStartedRef.current = true;
+        setKitchenGlideStarted(true);
+        return;
+      }
+
+      const g = kitchenGlideRef.current;
+      const vh = window.innerHeight;
+      const finalTop = (vh - g.height) / 2;
+
+      const scrollY = Math.min(window.scrollY, glideEnd);
+      const p = Math.min(Math.max((scrollY - glideStart) / glideSpan, 0), 1);
+
+      overlay.style.top = `${g.settledTop + (finalTop - g.settledTop) * p}px`;
+
+      if (p >= 1) {
+        kitchenGlideLockedRef.current = true;
+        overlay.style.top = `${finalTop}px`;
+        kitchenAnchoredInThirdRef.current = true;
+        setKitchenAnchoredInThird(true);
+      }
+    };
+
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+    };
+  }, [sectionTwoComplete, kitchenGlideStarted, kitchenAnchoredInThird]);
+
+  // Anchor the kitchen card inside section three so it scrolls with the page.
+  useLayoutEffect(() => {
+    if (!kitchenAnchoredInThird) return;
+    const overlay = kitchenOverlayRef.current;
+    const sec3 = thirdSectionRef.current;
+    if (!overlay || !sec3) return;
+
+    const g = kitchenGlideRef.current;
+    const secRect = sec3.getBoundingClientRect();
+
+    overlay.style.transition = "none";
+    overlay.style.position = "absolute";
+    overlay.style.top = `${(sec3.offsetHeight - g.height) / 2}px`;
+    overlay.style.left = `${g.left - secRect.left}px`;
+    overlay.style.width = `${g.width}px`;
+    overlay.style.height = `${g.height}px`;
+    overlay.style.zIndex = "11";
+    overlay.style.margin = "0";
+    overlay.style.transform = "none";
+  }, [kitchenAnchoredInThird]);
 
   // Lock page scroll until the submit button has been pressed.
   useEffect(() => {
@@ -650,8 +890,6 @@ export default function Home() {
           anchorToSecondSection(wrap, section, 10);
           const stack = listingStackRef.current;
           if (stack) anchorToSecondSection(stack, section, 8);
-          const overlay = kitchenOverlayRef.current;
-          if (overlay) anchorToSecondSection(overlay, section, 9);
         }
         return;
       }
@@ -808,7 +1046,12 @@ export default function Home() {
       inner.style.zoom = "1";
       inner.style.transformOrigin = "center center";
 
-      if (kitchenCardFocused || kitchenCardExpanded) return;
+      if (
+        (kitchenCardFocused || kitchenCardExpanded) &&
+        !sectionTwoCompleteRef.current
+      ) {
+        return;
+      }
 
       const available = stack.clientHeight - 12;
       const needed = inner.scrollHeight;
@@ -839,6 +1082,7 @@ export default function Home() {
     showLogo,
     kitchenCardFocused,
     kitchenCardExpanded,
+    sectionTwoComplete,
   ]);
 
   return (
@@ -919,7 +1163,8 @@ export default function Home() {
         <div
           style={{
             position: "relative",
-            zIndex: 1,
+            zIndex:
+              scrollUnlocked && revealedListingCount < 1 ? 3 : 1,
             maxWidth: "var(--ipad-width)",
             margin: "0 auto",
             display: "flex",
@@ -1064,6 +1309,7 @@ export default function Home() {
               marginTop: "1.5em",
               position: "relative",
               zIndex: 2,
+              overflow: "visible",
               willChange: scrollUnlocked ? "top" : "auto",
             }}
           >
@@ -1190,12 +1436,19 @@ export default function Home() {
         </div>
 
         {/* Second section — listings + AI box live here once settled. */}
-        <div ref={secondSectionRef} className="second-section">
+        <div
+          ref={secondSectionRef}
+          className={`second-section${
+            sectionTwoComplete ? " second-section--elevated" : ""
+          }`}
+        >
           {promptAtBottom ? (
             <div
               ref={listingStackRef}
               className={`listing-stack${
-                kitchenCardFocused ? " listing-stack--kitchen-focused" : ""
+                kitchenCardFocused && !sectionTwoComplete
+                  ? " listing-stack--kitchen-focused"
+                  : ""
               }`}
               aria-label="Listing results"
               style={{ fontSize: MOBILE_ROOT_FONT_SIZE }}
@@ -1209,7 +1462,13 @@ export default function Home() {
                 }
                 className={`listing-card-slot listing-card-slot--${i}${
                   i < revealedListingCount ? " is-visible" : ""
-                }${i === KITCHEN_LISTING_INDEX && kitchenCardExpanded ? " is-kitchen-hidden" : ""}`}
+                }${
+                  i === KITCHEN_LISTING_INDEX &&
+                  kitchenCardExpanded &&
+                  !sectionTwoComplete
+                    ? " is-kitchen-hidden"
+                    : ""
+                }`}
               >
                 <article className="listing-card">
                   <div className="listing-card-media">
@@ -1277,103 +1536,121 @@ export default function Home() {
           ) : null}
         </div>
 
-        {/* Kitchen expansion overlay — portaled into second section. */}
-        {kitchenCardExpanded && secondSectionRef.current
+        {/* Kitchen overlay — section two after expand, body during glide, section three when landed. */}
+        {kitchenCardExpanded &&
+        (kitchenAnchoredInThird
+          ? thirdSectionRef.current
+          : kitchenGlideStarted
+            ? document.body
+            : secondSectionRef.current)
           ? createPortal(
               (() => {
                 const listing = LISTING_CARDS[KITCHEN_LISTING_INDEX];
                 return (
                   <div
                     ref={kitchenOverlayRef}
-                    className="kitchen-expand-overlay"
+                    className={`kitchen-expand-overlay${
+                      kitchenGlideStarted && !kitchenAnchoredInThird
+                        ? " is-floating"
+                        : ""
+                    }`}
                     style={{ fontSize: MOBILE_ROOT_FONT_SIZE }}
                   >
-                    <div className="listing-card-media">
+                    <div className="listing-card-media kitchen-expand-overlay__media">
                       <img
                         src={listing.image}
                         alt={listing.alt}
                         className="listing-card-image"
                       />
+                      <span className="kitchen-expand-price-badge">
+                        {KITCHEN_EXPANDED_DETAILS.pricePerHour}
+                      </span>
                       <div className="listing-card-image-fade" aria-hidden />
                     </div>
                     <div className="listing-card-footer kitchen-expand-overlay__footer">
-                      <div className="kitchen-expand-overlay__main">
+                      <div className="kitchen-expand-overlay__head">
                         <div className="listing-card-body kitchen-expand-overlay__body">
                           <h3 className="listing-card-title">{listing.title}</h3>
-                          <p className="listing-card-distance">
-                            {listing.distanceMi} mi away ·{" "}
-                            {KITCHEN_EXPANDED_DETAILS.neighborhood}
-                          </p>
-                          <p className="kitchen-expand-availability">
-                            {KITCHEN_EXPANDED_DETAILS.availability}
-                          </p>
-                          <ul
-                            className="kitchen-expand-amenities"
-                            aria-label="Amenities"
-                          >
-                            {KITCHEN_EXPANDED_DETAILS.amenities.map((item) => (
-                              <li key={item}>{item}</li>
-                            ))}
-                          </ul>
-                          <p className="kitchen-expand-hosts">
-                            Hosted by {KITCHEN_EXPANDED_DETAILS.hostName}
-                          </p>
-                        </div>
-                        <div className="listing-card-meta kitchen-expand-overlay__meta">
-                          <span className="kitchen-expand-price">
-                            {KITCHEN_EXPANDED_DETAILS.pricePerHour}
-                          </span>
                           <span className="listing-card-sqft">
                             {formatSqFt(listing.sqFt)}
                           </span>
-                          <div className="listing-card-meta-row">
-                            <span
-                              className="listing-card-rating"
-                              aria-label={`Rating ${listing.rating} from ${KITCHEN_EXPANDED_DETAILS.reviewCount} reviews`}
-                            >
-                              {listing.rating}
-                              <svg
-                                className="listing-card-rating-star"
-                                viewBox="0 0 24 24"
-                                fill="currentColor"
-                                aria-hidden
+                          <p className="kitchen-expand-availability">
+                            {KITCHEN_EXPANDED_DETAILS.availability}
+                          </p>
+                        </div>
+                        <ul
+                          className="kitchen-expand-amenities"
+                          aria-label="Amenities"
+                        >
+                          {KITCHEN_EXPANDED_DETAILS.amenities.map((item) => (
+                            <li key={item}>{item}</li>
+                          ))}
+                        </ul>
+                      </div>
+                      <div className="kitchen-expand-overlay__bottom">
+                        <div
+                          className="kitchen-expand-hosts-row"
+                          aria-label="Hosts"
+                        >
+                          <span className="kitchen-expand-hosts-label">
+                            Hosts
+                          </span>
+                          <div className="listing-card-hosts kitchen-expand-hosts-avatars">
+                            {listing.hosts.map((host, hostIndex) => (
+                              <span
+                                key={host.initials}
+                                className={`listing-card-avatar${
+                                  hostIndex === 0
+                                    ? " listing-card-avatar--back"
+                                    : " listing-card-avatar--front"
+                                }`}
+                                style={{
+                                  background: `linear-gradient(${host.gradient})`,
+                                }}
                               >
-                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                              </svg>
-                              <span className="kitchen-expand-review-count">
-                                ({KITCHEN_EXPANDED_DETAILS.reviewCount})
+                                {host.initials}
                               </span>
-                            </span>
-                            <div
-                              className="listing-card-hosts"
-                              aria-label="Hosts"
-                            >
-                              {listing.hosts.map((host, hostIndex) => (
-                                <span
-                                  key={host.initials}
-                                  className={`listing-card-avatar${
-                                    hostIndex === 0
-                                      ? " listing-card-avatar--back"
-                                      : " listing-card-avatar--front"
-                                  }`}
-                                  style={{
-                                    background: `linear-gradient(${host.gradient})`,
-                                  }}
-                                >
-                                  {host.initials}
-                                </span>
-                              ))}
-                            </div>
+                            ))}
                           </div>
+                        </div>
+                        <div className="listing-card-meta kitchen-expand-overlay__meta">
+                          <p className="listing-card-distance">
+                            {listing.distanceMi} mi away
+                          </p>
+                          <span
+                            className="listing-card-rating"
+                            aria-label={`Rating ${listing.rating} from ${KITCHEN_EXPANDED_DETAILS.reviewCount} reviews`}
+                          >
+                            {listing.rating}
+                            <svg
+                              className="listing-card-rating-star"
+                              viewBox="0 0 24 24"
+                              fill="currentColor"
+                              aria-hidden
+                            >
+                              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                            </svg>
+                            <span className="kitchen-expand-review-count">
+                              ({KITCHEN_EXPANDED_DETAILS.reviewCount})
+                            </span>
+                          </span>
                         </div>
                       </div>
                     </div>
                   </div>
                 );
               })(),
-              secondSectionRef.current,
+              kitchenAnchoredInThird
+                ? thirdSectionRef.current!
+                : kitchenGlideStarted
+                  ? document.body
+                  : secondSectionRef.current!,
             )
           : null}
+
+        {sectionTwoComplete ? (
+          <div ref={thirdSectionRef} className="third-section" />
+        ) : null}
       </section>
     </main>
   );
