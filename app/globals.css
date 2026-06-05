@@ -360,6 +360,11 @@ h6 {
   transform-origin: top center;
 }
 
+/* After section-three animation, kitchen must not cover fourth section on scroll. */
+.third-section--animation-complete .kitchen-expand-overlay {
+  z-index: 1;
+}
+
 /* Compact kitchen — top pinned, bottom edge rises; simpler footer copy. */
 .kitchen-expand-overlay.is-compact .listing-card-media {
   flex: 1.45 1 0;
@@ -869,13 +874,14 @@ h6 {
   will-change: transform;
 }
 
-/* Fourth section — staggered fade-in per block. */
+/* Fourth section — scroll-linked fade + rise per block. */
 .fourth-section-reveal {
   opacity: 0;
-  transform: translate3d(0, 0.85em, 0);
+  transform: translate3d(0, 2.25em, 0);
   transition:
-    opacity 0.9s cubic-bezier(0.33, 1, 0.68, 1),
-    transform 0.9s cubic-bezier(0.33, 1, 0.68, 1);
+    opacity 1.1s cubic-bezier(0.33, 1, 0.68, 1),
+    transform 1.1s cubic-bezier(0.33, 1, 0.68, 1);
+  will-change: opacity, transform;
 }
 
 .fourth-section-reveal.is-visible {
@@ -890,7 +896,7 @@ h6 {
   --fourth-bundle-stack-step: 0.52em;
   --fourth-bundle-stack-offset: 1.04em;
   position: relative;
-  z-index: 0;
+  z-index: 12;
   min-height: 100vh;
   background-color: #ffffff;
   padding: 0.65em 1em 2em;
@@ -952,6 +958,10 @@ h6 {
 .fourth-section__btn--primary {
   background: #000000;
   color: #ffffff;
+}
+
+a.fourth-section__btn {
+  text-decoration: none;
 }
 
 .fourth-section__ai-composer {
@@ -1034,6 +1044,11 @@ h6 {
   justify-content: flex-end;
   padding: 0 1em 0.5em;
   box-sizing: border-box;
+  pointer-events: none;
+}
+
+.fourth-section__listings-toolbar > * {
+  pointer-events: auto;
 }
 
 .fourth-section__filter-btn {
@@ -1058,39 +1073,38 @@ h6 {
 
 .fourth-section__filter-dropdown {
   position: absolute;
-  top: calc(100% - 0.12em);
-  left: 0;
-  right: 0;
-  z-index: 11;
-  padding: 0 1em;
+  top: calc(100% + 0.22em);
+  left: 1em;
+  right: 1em;
+  z-index: 13;
   box-sizing: border-box;
 }
 
 .fourth-section__filter-dropdown-panel {
   border: 0.0625em solid rgba(0, 0, 0, 0.1);
-  border-radius: 0.55em;
+  border-radius: 0.5em;
   background: #ffffff;
   box-shadow:
     0 0.35em 1.1em rgba(0, 0, 0, 0.08),
     0 0.08em 0.25em rgba(0, 0, 0, 0.04);
-  overflow: hidden;
+  padding: 0.78em 0.85em 0.82em;
 }
 
-.fourth-section__filter-budget-trigger {
-  width: 100%;
-  display: grid;
-  grid-template-columns: 1fr auto auto;
-  align-items: center;
-  gap: 0.65em;
-  padding: 0.72em 0.85em;
-  border: none;
-  background: #ffffff;
-  font-family: var(--font-suisse), system-ui, sans-serif;
-  text-align: left;
-  cursor: pointer;
+.fourth-section__filter-budget {
+  display: flex;
+  flex-direction: column;
+  gap: 0.62em;
+}
+
+.fourth-section__filter-budget-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75em;
 }
 
 .fourth-section__filter-budget-label {
+  font-family: var(--font-suisse), system-ui, sans-serif;
   font-size: 0.82em;
   font-weight: 400;
   color: #000000;
@@ -1098,6 +1112,7 @@ h6 {
 }
 
 .fourth-section__filter-budget-value {
+  font-family: var(--font-suisse), system-ui, sans-serif;
   font-size: 0.78em;
   font-weight: 500;
   font-variant-numeric: tabular-nums;
@@ -1105,61 +1120,69 @@ h6 {
   letter-spacing: -0.02em;
 }
 
-.fourth-section__filter-budget-chevron {
-  display: inline-flex;
-  color: rgba(0, 0, 0, 0.42);
-  transition: transform 0.2s ease;
-}
-
-.fourth-section__filter-budget-trigger.is-expanded
-  .fourth-section__filter-budget-chevron {
-  transform: rotate(180deg);
-}
-
-.fourth-section__filter-budget-panel {
-  padding: 0 0.85em 0.82em;
-  border-top: 0.0625em solid rgba(0, 0, 0, 0.06);
-}
-
-.fourth-section__filter-budget-visual {
+.fourth-section__filter-budget-meter {
   position: relative;
-  height: 0.42em;
-  margin-top: 0.55em;
+  height: 1.45em;
+}
+
+.fourth-section__filter-budget-meter-track {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 0.46em;
+  transform: translateY(-50%);
   border-radius: 999px;
   background: rgba(0, 0, 0, 0.06);
-  overflow: hidden;
+  overflow: visible;
 }
 
-.fourth-section__filter-budget-fill {
+.fourth-section__filter-budget-meter-fill {
+  position: absolute;
+  left: 0;
+  top: 0;
   height: 100%;
   border-radius: inherit;
   background: #000000;
-  transition: width 0.15s ease;
+  transition: width 0.12s ease;
 }
 
-.fourth-section__filter-budget-range {
+.fourth-section__filter-budget-meter-thumb {
+  position: absolute;
+  top: 50%;
+  width: 0.72em;
+  height: 1.15em;
+  border-radius: 0.22em;
+  border: 0.0625em solid rgba(0, 0, 0, 0.14);
+  background: #ffffff;
+  box-shadow: 0 0.08em 0.22em rgba(0, 0, 0, 0.12);
+  transform: translate(-50%, -50%);
+  transition: left 0.12s ease;
+  pointer-events: none;
+}
+
+.fourth-section__filter-budget-meter-input {
+  position: absolute;
+  inset: 0;
   width: 100%;
-  margin: 0.62em 0 0;
-  accent-color: #000000;
-  cursor: pointer;
-}
-
-.fourth-section__filter-budget-hint {
-  margin: 0.42em 0 0;
-  font-family: var(--font-suisse), system-ui, sans-serif;
-  font-size: 0.68em;
-  font-weight: 300;
-  color: rgba(0, 0, 0, 0.42);
-  letter-spacing: -0.01em;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: ew-resize;
+  -webkit-appearance: none;
+  appearance: none;
 }
 
 .fourth-section__listings-block {
+  position: relative;
+  z-index: 1;
   width: 100%;
   align-self: stretch;
   box-sizing: border-box;
 }
 
-.fourth-section__listings-block + .fourth-section__listings-block {
+.fourth-section__listings-block + .fourth-section__listings-block,
+.fourth-section__listings-anchor + .fourth-section__listings-block {
   margin-top: 1.35em;
 }
 
@@ -2246,4 +2269,25 @@ h6 {
   width: 2.25em;
   height: 2.25em;
   display: block;
+}
+
+.mobile-nav--static {
+  opacity: 1;
+  transform: none;
+}
+
+/* Standalone /book page — full nav clearance, all content visible. */
+.book-page {
+  background-color: #ffffff;
+}
+
+.book-page .fourth-section--standalone {
+  z-index: 0;
+  min-height: auto;
+  padding-top: 5.5em;
+}
+
+.book-page .fourth-section--standalone .fourth-section-reveal {
+  opacity: 1;
+  transform: none;
 }
