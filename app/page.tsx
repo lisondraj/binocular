@@ -1280,7 +1280,7 @@ export default function Home() {
               width: "100%",
             }}
           >
-            Book environments for physical intelligence.
+            Book spaces for physical intelligence.
           </p>
           <div
             className="hero-actions"
