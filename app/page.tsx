@@ -979,7 +979,7 @@ export default function Home() {
     thirdSectionAnimationCompleteRef.current = thirdSectionAnimationComplete;
   }, [thirdSectionAnimationComplete]);
 
-  // Fade kitchen out as the fourth section scrolls into view (fixes iOS sticky overlay).
+  // Fade kitchen while fourth section overlaps; restore when scrolling back up.
   useEffect(() => {
     if (!thirdSectionAnimationComplete || !kitchenCardExpanded) return;
 
@@ -992,8 +992,9 @@ export default function Home() {
 
       const fourthTop = fourth.getBoundingClientRect().top;
       const vh = window.innerHeight;
-      const start = vh * 0.92;
-      const end = vh * 0.42;
+      // Start fading only once fourth section has clearly entered the viewport.
+      const start = vh * 0.62;
+      const end = vh * 0.18;
       const t = Math.min(Math.max((start - fourthTop) / (start - end), 0), 1);
 
       if (t <= 0) {
@@ -1010,11 +1011,7 @@ export default function Home() {
       overlay.style.opacity = String(1 - t);
       overlay.style.transform = `translate3d(0, ${-t * 32}px, 0)`;
       overlay.style.pointerEvents = t > 0.35 ? "none" : "";
-      overlay.style.visibility = t >= 0.98 ? "hidden" : "";
-
-      if (t >= 0.98) {
-        setKitchenCardExpanded(false);
-      }
+      overlay.style.visibility = t >= 0.98 ? "hidden" : "visible";
     };
 
     const onScroll = () => {
@@ -1029,6 +1026,14 @@ export default function Home() {
       cancelAnimationFrame(raf);
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onScroll);
+      const overlay = kitchenOverlayRef.current;
+      if (overlay) {
+        overlay.style.transition = "";
+        overlay.style.opacity = "";
+        overlay.style.transform = "";
+        overlay.style.pointerEvents = "";
+        overlay.style.visibility = "";
+      }
     };
   }, [thirdSectionAnimationComplete, kitchenCardExpanded]);
 

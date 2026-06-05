@@ -360,9 +360,9 @@ h6 {
   transform-origin: top center;
 }
 
-/* After section-three animation, kitchen must not cover fourth section on scroll. */
+/* After section-three animation, keep kitchen visible in section three. */
 .third-section--animation-complete .kitchen-expand-overlay {
-  z-index: 1;
+  z-index: 11;
 }
 
 /* Compact kitchen — top pinned, bottom edge rises; simpler footer copy. */
