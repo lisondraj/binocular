@@ -65,6 +65,7 @@ const LISTING_CARDS = [
   {
     title: "Warehouse loft",
     distanceMi: 0.8,
+    pricePerHour: "$85/hr",
     rating: 4.9,
     sqFt: 4200,
     hosts: [
@@ -77,6 +78,7 @@ const LISTING_CARDS = [
   {
     title: "Kitchen",
     distanceMi: 1.2,
+    pricePerHour: "$42/hr",
     rating: 4.7,
     sqFt: 1850,
     hosts: [
@@ -89,6 +91,7 @@ const LISTING_CARDS = [
   {
     title: "Garden terrace",
     distanceMi: 2.1,
+    pricePerHour: "$28/hr",
     rating: 4.8,
     sqFt: 960,
     hosts: [
@@ -100,8 +103,171 @@ const LISTING_CARDS = [
   },
 ] as const;
 
+const FOURTH_SECTION_BY_SPACE = [
+  {
+    title: "Open warehouse",
+    subtitle: "Locomotion testing",
+    pricePerHour: "$72",
+    image: "/images/warehouse-1.png",
+    alt: "Open warehouse floor",
+  },
+  {
+    title: "Kitchen lab",
+    subtitle: "Manipulation testing",
+    pricePerHour: "$48",
+    image: "/images/kitchen.png",
+    alt: "Kitchen lab",
+  },
+  {
+    title: "Garden terrain",
+    subtitle: "Mobility testing",
+    pricePerHour: "$34",
+    image: "/images/courtyard.png",
+    alt: "Garden terrain",
+  },
+] as const;
+
+const FOURTH_SECTION_BY_PRICE = [
+  {
+    title: "Garden terrace",
+    subtitle: "Mobility testing",
+    pricePerHour: "$28",
+    image: "/images/courtyard.png",
+    alt: "Garden terrace",
+  },
+  {
+    title: "Garden terrain",
+    subtitle: "Outdoor testing",
+    pricePerHour: "$34",
+    image: "/images/courtyard.png",
+    alt: "Garden terrain",
+  },
+  {
+    title: "Kitchen",
+    subtitle: "Manipulation testing",
+    pricePerHour: "$42",
+    image: "/images/kitchen.png",
+    alt: "Kitchen",
+  },
+  {
+    title: "Kitchen lab",
+    subtitle: "Lab environment",
+    pricePerHour: "$48",
+    image: "/images/kitchen.png",
+    alt: "Kitchen lab",
+  },
+  {
+    title: "Open warehouse",
+    subtitle: "Locomotion testing",
+    pricePerHour: "$72",
+    image: "/images/warehouse-1.png",
+    alt: "Open warehouse floor",
+  },
+] as const;
+
+const FOURTH_SECTION_BY_BUNDLE = [
+  {
+    title: "Full terrain pack",
+    subtitle: "3 spaces bundled",
+    pricePerHour: "$128",
+    image: "/images/warehouse-1.png",
+    alt: "Full terrain pack bundle",
+    spaces: [
+      {
+        title: "Warehouse loft",
+        pricePerHour: "$85",
+        image: "/images/warehouse-1.png",
+        alt: "Warehouse loft",
+      },
+      {
+        title: "Kitchen",
+        pricePerHour: "$42",
+        image: "/images/kitchen.png",
+        alt: "Kitchen",
+      },
+      {
+        title: "Garden terrace",
+        pricePerHour: "$28",
+        image: "/images/courtyard.png",
+        alt: "Garden terrace",
+      },
+    ],
+  },
+  {
+    title: "Indoor lab loop",
+    subtitle: "3 spaces bundled",
+    pricePerHour: "$112",
+    image: "/images/kitchen.png",
+    alt: "Indoor lab loop bundle",
+    spaces: [
+      {
+        title: "Kitchen lab",
+        pricePerHour: "$48",
+        image: "/images/kitchen.png",
+        alt: "Kitchen lab",
+      },
+      {
+        title: "Open warehouse",
+        pricePerHour: "$72",
+        image: "/images/warehouse-1.png",
+        alt: "Open warehouse",
+      },
+      {
+        title: "Kitchen",
+        pricePerHour: "$42",
+        image: "/images/kitchen.png",
+        alt: "Kitchen",
+      },
+    ],
+  },
+  {
+    title: "Outdoor mobility set",
+    subtitle: "3 spaces bundled",
+    pricePerHour: "$96",
+    image: "/images/courtyard.png",
+    alt: "Outdoor mobility set bundle",
+    spaces: [
+      {
+        title: "Garden terrain",
+        pricePerHour: "$34",
+        image: "/images/courtyard.png",
+        alt: "Garden terrain",
+      },
+      {
+        title: "Warehouse loft",
+        pricePerHour: "$85",
+        image: "/images/warehouse-1.png",
+        alt: "Warehouse loft",
+      },
+      {
+        title: "Garden terrace",
+        pricePerHour: "$28",
+        image: "/images/courtyard.png",
+        alt: "Garden terrace",
+      },
+    ],
+  },
+] as const;
+
+const FOURTH_SECTION_BUDGET_MIN = 50;
+const FOURTH_SECTION_BUDGET_MAX = 500;
+const FOURTH_SECTION_REVEAL_INITIAL_MS = 180;
+const FOURTH_SECTION_REVEAL_STAGGER_MS = 420;
+const FOURTH_SECTION_REVEAL_STEPS = 6;
+
 const formatSqFt = (sqFt: number) =>
   `${sqFt.toLocaleString("en-US")} sq ft`;
+
+function FourthSectionPrice({ price }: { price: string }) {
+  const amount = price.replace(/\/hr$/, "");
+
+  return (
+    <span className="fourth-section-listing-card__price">
+      <span className="fourth-section-listing-card__price-amount">{amount}</span>
+      <span className="fourth-section-listing-card__price-currency">USD</span>
+    </span>
+  );
+}
 
 /** Pin element inside second section at its current viewport position. */
 const anchorToSecondSection = (
@@ -140,6 +306,82 @@ const KITCHEN_EXPANDED_DETAILS = {
     "Wi-Fi",
   ] as const,
 };
+
+/** Frosted prompt bars revealed under the compact kitchen card in section three. */
+const THIRD_SECTION_PROMPT_BARS = 4;
+
+const THIRD_SECTION_CONFIRM_DETAILS = [
+  "36″ kitchen counter",
+  "Hardwood floors",
+  "South-facing windows",
+  "Dog bowls ready",
+];
+
+const THIRD_SECTION_DETAIL_CONFIRM_DELAY_MS = 700;
+const THIRD_SECTION_DETAIL_CONFIRM_STAGGER_MS = 850;
+
+const THIRD_SECTION_BAR_LABELS: (string | null)[] = [
+  null, // bar 0 has custom content
+  "Reviewing listing rules",
+  "Checking host availability",
+  "Setting up your booking",
+];
+
+const THIRD_SECTION_CLOSED_LABELS = [
+  "Space meets your preferences",
+  "Project complies with listing rules",
+  "Availability confirmed",
+  "Booked",
+];
+
+const THIRD_SECTION_BAR_CLOSE_ANIM_MS = 850;
+const THIRD_SECTION_BAR_THINKING_MS = 3400;
+const THIRD_SECTION_BAR0_CLOSE_DELAY_MS = 1400;
+
+const THIRD_SECTION_WEEK_DAYS = [
+  "Mo",
+  "Tu",
+  "We",
+  "Th",
+  "Fr",
+  "Sa",
+  "Su",
+] as const;
+
+const THIRD_SECTION_TODAY_INDEX = 3;
+
+const thirdSectionThinkingCircle = (
+  <svg
+    className="third-section-thinking-circle"
+    viewBox="0 0 20 20"
+    aria-hidden
+  >
+    <circle
+      className="third-section-thinking-circle__track"
+      cx="10"
+      cy="10"
+      r="8"
+    />
+    <circle
+      className="third-section-thinking-circle__arc"
+      cx="10"
+      cy="10"
+      r="8"
+    />
+  </svg>
+);
+
+const thirdSectionHeaderCheck = (
+  <span className="third-section-header-check" aria-hidden>
+    <svg viewBox="0 0 20 20">
+      <circle className="third-section-header-check__ring" cx="10" cy="10" r="8" />
+      <path
+        className="third-section-header-check__mark"
+        d="M6.25 10.15 8.85 12.75 13.85 7.55"
+      />
+    </svg>
+  </span>
+);
 
 const HERO_KITCHEN_HOSTS = LISTING_CARDS[KITCHEN_LISTING_INDEX].hosts;
 
@@ -308,6 +550,56 @@ const upArrow = (
   </svg>
 );
 
+const chevronDownIcon = (
+  <svg
+    style={{ width: "0.85em", height: "0.85em" }}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <polyline points="6 9 12 15 18 9" />
+  </svg>
+);
+
+const filterIcon = (
+  <svg
+    style={{ width: "0.9em", height: "0.9em" }}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <line x1="4" y1="6" x2="20" y2="6" />
+    <line x1="6" y1="12" x2="18" y2="12" />
+    <line x1="8" y1="18" x2="16" y2="18" />
+    <circle cx="9" cy="6" r="2" />
+    <circle cx="15" cy="12" r="2" />
+    <circle cx="11" cy="18" r="2" />
+  </svg>
+);
+
+const microphoneIcon = (
+  <svg
+    style={{ width: "0.95em", height: "0.95em" }}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M12 1a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
+    <path d="M19 10v1a7 7 0 0 1-14 0v-1" />
+    <line x1="12" y1="19" x2="12" y2="23" />
+    <line x1="8" y1="23" x2="16" y2="23" />
+  </svg>
+);
+
 export default function Home() {
   const [showLogo, setShowLogo] = useState(false);
   const [showHeroUi, setShowHeroUi] = useState(false);
@@ -328,7 +620,22 @@ export default function Home() {
   const [sectionTwoComplete, setSectionTwoComplete] = useState(false);
   const [kitchenAnchoredInThird, setKitchenAnchoredInThird] = useState(false);
   const [kitchenInThirdSection, setKitchenInThirdSection] = useState(false);
+  const [kitchenCompact, setKitchenCompact] = useState(false);
+  const [revealedThirdBarCount, setRevealedThirdBarCount] = useState(0);
+  const [confirmedDetailCount, setConfirmedDetailCount] = useState(0);
+  const [closedBarCount, setClosedBarCount] = useState(0);
+  const [thirdSectionAnimationComplete, setThirdSectionAnimationComplete] =
+    useState(false);
+  const [filterOpen, setFilterOpen] = useState(false);
+  const [budgetExpanded, setBudgetExpanded] = useState(false);
+  const [budgetMax, setBudgetMax] = useState(200);
+  const [fourthSectionRevealStep, setFourthSectionRevealStep] = useState(-1);
   const [promptFlowHeight, setPromptFlowHeight] = useState(0);
+
+  const budgetFillPct =
+    ((budgetMax - FOURTH_SECTION_BUDGET_MIN) /
+      (FOURTH_SECTION_BUDGET_MAX - FOURTH_SECTION_BUDGET_MIN)) *
+    100;
 
   const promptWrapRef = useRef<HTMLDivElement>(null);
   const promptSlotRef = useRef<HTMLDivElement>(null);
@@ -382,6 +689,8 @@ export default function Home() {
   const kitchenAnchoredInThirdRef = useRef(false);
   const kitchenInThirdSectionRef = useRef(false);
   const kitchenGlideMaxProgressRef = useRef(0);
+  const thirdSectionAnimationCompleteRef = useRef(false);
+  const kitchenCompactHeightRef = useRef(0);
 
   const introFade = (step: number) =>
     INTRO_UI_DELAY + step * (INTRO_FADE_MS + INTRO_GAP_MS);
@@ -650,9 +959,14 @@ export default function Home() {
       // reveal rather than just stretching with the container.
       const img = overlay.querySelector<HTMLElement>(".listing-card-image");
       if (img) {
+        // Set starting scale with no transition, then enable and animate to 1.
+        img.style.transition = "none";
         img.style.transform = "scale(1.12)";
         requestAnimationFrame(() => {
-          img.style.transform = "scale(1.0)";
+          requestAnimationFrame(() => {
+            img.style.transition = `transform 1.8s cubic-bezier(0.16, 1, 0.3, 1)`;
+            img.style.transform = "scale(1.0)";
+          });
         });
       }
 
@@ -885,23 +1199,150 @@ export default function Home() {
     const apply = () => {
       const g = kitchenGlideRef.current;
       const secRect = sec3.getBoundingClientRect();
+      const top = (sec3.offsetHeight - g.height) / 2;
+      const left = g.left - secRect.left;
+      const rootEm = window.innerWidth / 24.375;
+      const compactHeight = Math.max(g.height * 0.38, rootEm * 11);
+
+      kitchenCompactHeightRef.current = compactHeight;
 
       overlay.style.transition = "none";
       overlay.style.position = "absolute";
-      overlay.style.top = `${(sec3.offsetHeight - g.height) / 2}px`;
-      overlay.style.left = `${g.left - secRect.left}px`;
+      overlay.style.top = `${top}px`;
+      overlay.style.left = `${left}px`;
       overlay.style.width = `${g.width}px`;
       overlay.style.height = `${g.height}px`;
       overlay.style.zIndex = "11";
       overlay.style.margin = "0";
       overlay.style.transform = "none";
       overlay.style.willChange = "auto";
+
+      sec3.style.setProperty("--kitchen-top", `${top}px`);
+      sec3.style.setProperty("--kitchen-left", `${left}px`);
+      sec3.style.setProperty("--kitchen-width", `${g.width}px`);
+      sec3.style.setProperty("--kitchen-height", `${g.height}px`);
+      sec3.style.setProperty("--kitchen-compact-height", `${compactHeight}px`);
     };
 
     apply();
     window.addEventListener("resize", apply);
     return () => window.removeEventListener("resize", apply);
   }, [kitchenAnchoredInThird]);
+
+  useEffect(() => {
+    thirdSectionAnimationCompleteRef.current = thirdSectionAnimationComplete;
+  }, [thirdSectionAnimationComplete]);
+
+  useEffect(() => {
+    if (!thirdSectionAnimationComplete) {
+      setFourthSectionRevealStep(-1);
+      return;
+    }
+
+    const timers: ReturnType<typeof setTimeout>[] = [];
+
+    for (let step = 0; step < FOURTH_SECTION_REVEAL_STEPS; step++) {
+      timers.push(
+        setTimeout(
+          () => setFourthSectionRevealStep(step),
+          FOURTH_SECTION_REVEAL_INITIAL_MS + step * FOURTH_SECTION_REVEAL_STAGGER_MS,
+        ),
+      );
+    }
+
+    return () => timers.forEach(clearTimeout);
+  }, [thirdSectionAnimationComplete]);
+
+  // Section-three sequence: shrink kitchen from top, then reveal frosted bars.
+  useEffect(() => {
+    if (!kitchenAnchoredInThird) return;
+
+    const overlay = kitchenOverlayRef.current;
+    const sec3 = thirdSectionRef.current;
+    if (!overlay || !sec3) return;
+
+    const timers: ReturnType<typeof setTimeout>[] = [];
+    const compactHeight = kitchenCompactHeightRef.current;
+
+    const kitchenCompactDelayMs = 500;
+    const kitchenCompactDurationMs = 1700;
+    const bar0AppearMs = kitchenCompactDelayMs + kitchenCompactDurationMs + 280;
+    const BAR_CLOSE_ANIM_MS = THIRD_SECTION_BAR_CLOSE_ANIM_MS;
+    const BAR_THINKING_MS = THIRD_SECTION_BAR_THINKING_MS;
+    const BAR0_CLOSE_DELAY_MS = THIRD_SECTION_BAR0_CLOSE_DELAY_MS;
+
+    timers.push(
+      setTimeout(() => {
+        overlay.style.transition = `height ${kitchenCompactDurationMs}ms cubic-bezier(0.33, 1, 0.68, 1)`;
+        overlay.style.height = `${compactHeight}px`;
+        setKitchenCompact(true);
+        sec3.style.setProperty("--kitchen-compact-height", `${compactHeight}px`);
+      }, kitchenCompactDelayMs),
+    );
+
+    // Bar 0 appears once kitchen compact is done
+    timers.push(setTimeout(() => setRevealedThirdBarCount(1), bar0AppearMs));
+
+    // Bar 0 details confirm one by one
+    for (let i = 0; i < THIRD_SECTION_CONFIRM_DETAILS.length; i++) {
+      timers.push(
+        setTimeout(
+          () => setConfirmedDetailCount(i + 1),
+          bar0AppearMs +
+            THIRD_SECTION_DETAIL_CONFIRM_DELAY_MS +
+            i * THIRD_SECTION_DETAIL_CONFIRM_STAGGER_MS,
+        ),
+      );
+    }
+
+    // Bar 0 closes 1 second after all details confirmed
+    const allConfirmedMs =
+      bar0AppearMs +
+      THIRD_SECTION_DETAIL_CONFIRM_DELAY_MS +
+      (THIRD_SECTION_CONFIRM_DETAILS.length - 1) * THIRD_SECTION_DETAIL_CONFIRM_STAGGER_MS;
+    const bar0CloseMs = allConfirmedMs + BAR0_CLOSE_DELAY_MS;
+    timers.push(setTimeout(() => setClosedBarCount(1), bar0CloseMs));
+
+    // Bars 1-3 appear and close sequentially after bar 0 closes
+    let prevCloseMs = bar0CloseMs;
+    for (let i = 1; i < THIRD_SECTION_PROMPT_BARS; i++) {
+      const barAppearMs = prevCloseMs + BAR_CLOSE_ANIM_MS;
+      const barCloseMs = barAppearMs + BAR_THINKING_MS;
+      timers.push(setTimeout(() => setRevealedThirdBarCount(i + 1), barAppearMs));
+      timers.push(setTimeout(() => setClosedBarCount(i + 1), barCloseMs));
+      prevCloseMs = barCloseMs;
+    }
+
+    timers.push(
+      setTimeout(
+        () => setThirdSectionAnimationComplete(true),
+        prevCloseMs + BAR_CLOSE_ANIM_MS + 400,
+      ),
+    );
+
+    return () => {
+      timers.forEach(clearTimeout);
+      setConfirmedDetailCount(0);
+      setClosedBarCount(0);
+      setRevealedThirdBarCount(0);
+    };
+  }, [kitchenAnchoredInThird]);
+
+  // Hold scroll at section-three center until the landing animation finishes.
+  useEffect(() => {
+    if (!kitchenAnchoredInThird || thirdSectionAnimationComplete) return;
+
+    const onScroll = () => {
+      const { glideEnd } = getThirdSectionGlideBounds();
+      if (window.scrollY > glideEnd) {
+        window.scrollTo(0, glideEnd);
+      }
+    };
+
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [kitchenAnchoredInThird, thirdSectionAnimationComplete]);
 
   // Lock page scroll until the submit button has been pressed.
   useEffect(() => {
@@ -1856,7 +2297,9 @@ export default function Home() {
                       kitchenInThirdSection && !kitchenAnchoredInThird
                         ? " is-floating"
                         : ""
-                    }${kitchenContentReady ? " content-ready" : ""}`}
+                    }${kitchenContentReady ? " content-ready" : ""}${
+                      kitchenCompact ? " is-compact" : ""
+                    }`}
                     style={{ fontSize: MOBILE_ROOT_FONT_SIZE }}
                   >
                     <div className="listing-card-media kitchen-expand-overlay__media">
@@ -1871,74 +2314,89 @@ export default function Home() {
                       <div className="listing-card-image-fade" aria-hidden />
                     </div>
                     <div className="listing-card-footer kitchen-expand-overlay__footer">
-                      <div className="kitchen-expand-overlay__head">
-                        <div className="listing-card-body kitchen-expand-overlay__body">
+                      {kitchenCompact ? (
+                        <div className="kitchen-expand-overlay__compact-body">
                           <h3 className="listing-card-title">{listing.title}</h3>
-                          <span className="listing-card-sqft">
-                            {formatSqFt(listing.sqFt)}
-                          </span>
                           <p className="kitchen-expand-availability">
                             {KITCHEN_EXPANDED_DETAILS.availability}
                           </p>
                         </div>
-                        <ul
-                          className="kitchen-expand-amenities"
-                          aria-label="Amenities"
-                        >
-                          {KITCHEN_EXPANDED_DETAILS.amenities.map((item) => (
-                            <li key={item}>{item}</li>
-                          ))}
-                        </ul>
-                      </div>
-                      <div className="kitchen-expand-overlay__bottom">
-                        <div
-                          className="kitchen-expand-hosts-row"
-                          aria-label="Hosts"
-                        >
-                          <span className="kitchen-expand-hosts-label">
-                            Hosts
-                          </span>
-                          <div className="listing-card-hosts kitchen-expand-hosts-avatars">
-                            {listing.hosts.map((host, hostIndex) => (
-                              <span
-                                key={host.initials}
-                                className={`listing-card-avatar${
-                                  hostIndex === 0
-                                    ? " listing-card-avatar--back"
-                                    : " listing-card-avatar--front"
-                                }`}
-                                style={{
-                                  background: `linear-gradient(${host.gradient})`,
-                                }}
-                              >
-                                {host.initials}
+                      ) : (
+                        <>
+                          <div className="kitchen-expand-overlay__head">
+                            <div className="listing-card-body kitchen-expand-overlay__body">
+                              <h3 className="listing-card-title">
+                                {listing.title}
+                              </h3>
+                              <span className="listing-card-sqft">
+                                {formatSqFt(listing.sqFt)}
                               </span>
-                            ))}
-                          </div>
-                        </div>
-                        <div className="listing-card-meta kitchen-expand-overlay__meta">
-                          <p className="listing-card-distance">
-                            {listing.distanceMi} mi away
-                          </p>
-                          <span
-                            className="listing-card-rating"
-                            aria-label={`Rating ${listing.rating} from ${KITCHEN_EXPANDED_DETAILS.reviewCount} reviews`}
-                          >
-                            {listing.rating}
-                            <svg
-                              className="listing-card-rating-star"
-                              viewBox="0 0 24 24"
-                              fill="currentColor"
-                              aria-hidden
+                              <p className="kitchen-expand-availability">
+                                {KITCHEN_EXPANDED_DETAILS.availability}
+                              </p>
+                            </div>
+                            <ul
+                              className="kitchen-expand-amenities"
+                              aria-label="Amenities"
                             >
-                              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                            </svg>
-                            <span className="kitchen-expand-review-count">
-                              ({KITCHEN_EXPANDED_DETAILS.reviewCount})
-                            </span>
-                          </span>
-                        </div>
-                      </div>
+                              {KITCHEN_EXPANDED_DETAILS.amenities.map(
+                                (item) => (
+                                  <li key={item}>{item}</li>
+                                ),
+                              )}
+                            </ul>
+                          </div>
+                          <div className="kitchen-expand-overlay__bottom">
+                            <div
+                              className="kitchen-expand-hosts-row"
+                              aria-label="Hosts"
+                            >
+                              <span className="kitchen-expand-hosts-label">
+                                Hosts
+                              </span>
+                              <div className="listing-card-hosts kitchen-expand-hosts-avatars">
+                                {listing.hosts.map((host, hostIndex) => (
+                                  <span
+                                    key={host.initials}
+                                    className={`listing-card-avatar${
+                                      hostIndex === 0
+                                        ? " listing-card-avatar--back"
+                                        : " listing-card-avatar--front"
+                                    }`}
+                                    style={{
+                                      background: `linear-gradient(${host.gradient})`,
+                                    }}
+                                  >
+                                    {host.initials}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+                            <div className="listing-card-meta kitchen-expand-overlay__meta">
+                              <p className="listing-card-distance">
+                                {listing.distanceMi} mi away
+                              </p>
+                              <span
+                                className="listing-card-rating"
+                                aria-label={`Rating ${listing.rating} from ${KITCHEN_EXPANDED_DETAILS.reviewCount} reviews`}
+                              >
+                                {listing.rating}
+                                <svg
+                                  className="listing-card-rating-star"
+                                  viewBox="0 0 24 24"
+                                  fill="currentColor"
+                                  aria-hidden
+                                >
+                                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                                </svg>
+                                <span className="kitchen-expand-review-count">
+                                  ({KITCHEN_EXPANDED_DETAILS.reviewCount})
+                                </span>
+                              </span>
+                            </div>
+                          </div>
+                        </>
+                      )}
                     </div>
                   </div>
                 );
@@ -1957,7 +2415,469 @@ export default function Home() {
             className={`third-section${
               kitchenAnchoredInThird ? " third-section--kitchen-active" : ""
             }`}
-          />
+          >
+            {kitchenAnchoredInThird ? (
+              <div
+                className="third-section-bars"
+                aria-hidden={revealedThirdBarCount === 0}
+                style={{ fontSize: MOBILE_ROOT_FONT_SIZE }}
+              >
+                {Array.from({ length: THIRD_SECTION_PROMPT_BARS }, (_, i) => {
+                  const isClosed = i < closedBarCount;
+                  const isVisible = i < revealedThirdBarCount;
+                  const label = THIRD_SECTION_BAR_LABELS[i];
+
+                  return (
+                    <div
+                      key={i}
+                      className={`third-section-prompt-bar third-section-prompt-bar--${i}${
+                        isVisible ? " is-visible" : ""
+                      }${isClosed ? " is-closed" : ""}`}
+                    >
+                      <div
+                        className={`third-section-prompt-bar__content${
+                          i > 0 && !isClosed
+                            ? " third-section-prompt-bar__content--step"
+                            : ""
+                        }`}
+                      >
+                        {isClosed ? (
+                          <div
+                            className="third-section-prompt-bar__closed"
+                            aria-live={i === 0 ? "polite" : undefined}
+                          >
+                            {thirdSectionHeaderCheck}
+                            <p className="third-section-prompt-bar__summary">
+                              {THIRD_SECTION_CLOSED_LABELS[i]}
+                            </p>
+                          </div>
+                        ) : i === 0 ? (
+                            <>
+                              <div
+                                className="third-section-prompt-bar__header"
+                                aria-live="polite"
+                              >
+                                {thirdSectionThinkingCircle}
+                                <p className="third-section-prompt-bar__text">
+                                  Confirming space meet preferences
+                                </p>
+                              </div>
+                              <ul className="third-section-prompt-bar__details">
+                                {THIRD_SECTION_CONFIRM_DETAILS.map(
+                                  (detail, detailIndex) => {
+                                    const isConfirmed =
+                                      detailIndex < confirmedDetailCount;
+                                    return (
+                                      <li
+                                        key={detail}
+                                        className={isConfirmed ? " is-confirmed" : ""}
+                                      >
+                                        <span className="third-section-prompt-bar__detail-text">
+                                          {detail}
+                                        </span>
+                                        {isConfirmed ? (
+                                          <span className="third-section-detail-check" aria-hidden>
+                                            <svg viewBox="0 0 20 20">
+                                              <circle className="third-section-detail-check__ring" cx="10" cy="10" r="8" />
+                                              <path className="third-section-detail-check__mark" d="M6.25 10.15 8.85 12.75 13.85 7.55" />
+                                            </svg>
+                                          </span>
+                                        ) : (
+                                          <span className="third-section-thinking-circle third-section-thinking-circle--detail">
+                                            <svg viewBox="0 0 20 20" aria-hidden>
+                                              <circle className="third-section-thinking-circle__track" cx="10" cy="10" r="8" />
+                                              <circle className="third-section-thinking-circle__arc" cx="10" cy="10" r="8" />
+                                            </svg>
+                                          </span>
+                                        )}
+                                      </li>
+                                    );
+                                  },
+                                )}
+                              </ul>
+                            </>
+                        ) : i === 1 ? (
+                          <>
+                            <div className="third-section-prompt-bar__header">
+                              {thirdSectionThinkingCircle}
+                              <p className="third-section-prompt-bar__text">
+                                {label}
+                              </p>
+                            </div>
+                            <div className="tsbar-chips">
+                              <span className="tsbar-chip">No music after 10pm</span>
+                              <span className="tsbar-chip">Up to 8 guests</span>
+                              <span className="tsbar-chip tsbar-chip--ok">
+                                Dog-friendly
+                              </span>
+                            </div>
+                          </>
+                        ) : i === 2 ? (
+                          <>
+                            <div className="third-section-prompt-bar__header">
+                              {thirdSectionThinkingCircle}
+                              <p className="third-section-prompt-bar__text">
+                                {label}
+                              </p>
+                            </div>
+                            <div className="tsbar-avail">
+                              <p className="tsbar-avail__slot">Thu · 2pm – 5pm</p>
+                              <div className="tsbar-cal" aria-hidden>
+                                {THIRD_SECTION_WEEK_DAYS.map((day, dayIndex) => (
+                                  <span
+                                    key={day}
+                                    className={`tsbar-cal__day${
+                                      dayIndex === THIRD_SECTION_TODAY_INDEX
+                                        ? " is-today"
+                                        : dayIndex < THIRD_SECTION_TODAY_INDEX
+                                          ? " is-past"
+                                          : " is-available"
+                                    }`}
+                                  >
+                                    {day}
+                                  </span>
+                                ))}
+                              </div>
+                              <p className="tsbar-avail__caption">Available</p>
+                            </div>
+                          </>
+                        ) : (
+                          <>
+                            <div className="third-section-prompt-bar__header">
+                              {thirdSectionThinkingCircle}
+                              <p className="third-section-prompt-bar__text">
+                                {label}
+                              </p>
+                            </div>
+                            <div className="tsbar-booking-card">
+                              <p className="tsbar-booking-card__title">
+                                Kitchen Studio
+                              </p>
+                              <p className="tsbar-booking-card__meta">
+                                Today, 2pm – 5pm · $120 USD
+                              </p>
+                              <p className="tsbar-booking-card__status">
+                                <span
+                                  className="tsbar-booking-card__status-dot"
+                                  aria-hidden
+                                />
+                                Payment sending…
+                              </p>
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : null}
+          </div>
+        ) : null}
+        {thirdSectionAnimationComplete ? (
+          <section
+            className="fourth-section"
+            style={{ fontSize: MOBILE_ROOT_FONT_SIZE }}
+          >
+            <div
+              className={`fourth-section__intro fourth-section-reveal${
+                fourthSectionRevealStep >= 0 ? " is-visible" : ""
+              }`}
+            >
+              <p className="fourth-section__description">
+                Book spaces for
+                <br />
+                physical intelligence.
+              </p>
+              <div className="fourth-section__ai-composer">
+                <input
+                  type="text"
+                  className="fourth-section__ai-input"
+                  placeholder="Find a space..."
+                  aria-label="Find a space"
+                />
+                <div className="fourth-section__ai-composer-actions">
+                  <button
+                    type="button"
+                    className="fourth-section__ai-composer-btn"
+                    aria-label="Voice input"
+                  >
+                    {microphoneIcon}
+                  </button>
+                  <button
+                    type="button"
+                    className="fourth-section__ai-composer-btn fourth-section__ai-composer-btn--submit"
+                    aria-label="Submit"
+                  >
+                    {upArrow}
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div
+              className={`fourth-section__listings-anchor fourth-section-reveal${
+                fourthSectionRevealStep >= 1 ? " is-visible" : ""
+              }`}
+            >
+              <div className="fourth-section__listings-toolbar">
+                <button
+                  type="button"
+                  className={`fourth-section__filter-btn${filterOpen ? " is-open" : ""}`}
+                  aria-label="Filter listings"
+                  aria-expanded={filterOpen}
+                  onClick={() => {
+                    setFilterOpen((open) => {
+                      if (open) setBudgetExpanded(false);
+                      return !open;
+                    });
+                  }}
+                >
+                  {filterIcon}
+                  Filter
+                </button>
+              </div>
+
+              {filterOpen ? (
+                <div className="fourth-section__filter-dropdown">
+                  <div className="fourth-section__filter-dropdown-panel">
+                    <button
+                      type="button"
+                      className={`fourth-section__filter-budget-trigger${budgetExpanded ? " is-expanded" : ""}`}
+                      aria-expanded={budgetExpanded}
+                      onClick={() => setBudgetExpanded((expanded) => !expanded)}
+                    >
+                      <span className="fourth-section__filter-budget-label">
+                        Budget
+                      </span>
+                      <span className="fourth-section__filter-budget-value">
+                        ${budgetMax} USD
+                      </span>
+                      <span className="fourth-section__filter-budget-chevron">
+                        {chevronDownIcon}
+                      </span>
+                    </button>
+                    {budgetExpanded ? (
+                      <div className="fourth-section__filter-budget-panel">
+                        <div className="fourth-section__filter-budget-visual">
+                          <div
+                            className="fourth-section__filter-budget-fill"
+                            style={{ width: `${budgetFillPct}%` }}
+                          />
+                        </div>
+                        <input
+                          type="range"
+                          className="fourth-section__filter-budget-range"
+                          min={FOURTH_SECTION_BUDGET_MIN}
+                          max={FOURTH_SECTION_BUDGET_MAX}
+                          step={25}
+                          value={budgetMax}
+                          aria-label="Maximum budget"
+                          onChange={(event) =>
+                            setBudgetMax(Number(event.target.value))
+                          }
+                        />
+                        <p className="fourth-section__filter-budget-hint">
+                          Drag to increase budget
+                        </p>
+                      </div>
+                    ) : null}
+                  </div>
+                </div>
+              ) : null}
+
+              <div className="fourth-section__listings-block">
+                <p className="fourth-section__category">By distance</p>
+              <div
+                className="fourth-section__listings-scroll fourth-section__listings-scroll--row"
+                aria-label="Listings by distance"
+              >
+                <div className="fourth-section__listings fourth-section__listings--row">
+                  {LISTING_CARDS.map((listing) => (
+                    <div
+                      key={`fourth-distance-${listing.title}`}
+                      className="fourth-section-listing-card-wrap fourth-section-listing-card-wrap--distance"
+                    >
+                      <article className="fourth-section-listing-card fourth-section-listing-card--distance">
+                        <div className="listing-card-media fourth-section-listing-card__media">
+                          <img
+                            src={listing.image}
+                            alt={listing.alt}
+                            className="listing-card-image"
+                          />
+                          <FourthSectionPrice price={listing.pricePerHour} />
+                          <div className="listing-card-image-fade" aria-hidden />
+                        </div>
+                        <div className="listing-card-footer fourth-section-listing-card__footer">
+                          <div className="listing-card-body">
+                            <h3 className="listing-card-title">{listing.title}</h3>
+                            <p className="listing-card-distance">
+                              {listing.distanceMi} mi away
+                            </p>
+                          </div>
+                        </div>
+                      </article>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+            </div>
+
+            <div
+              className={`fourth-section__listings-block fourth-section-reveal${
+                fourthSectionRevealStep >= 2 ? " is-visible" : ""
+              }`}
+            >
+              <p className="fourth-section__category">By space</p>
+              <div
+                className="fourth-section__listings-scroll fourth-section__listings-scroll--row"
+                aria-label="Listings by space"
+              >
+                <div className="fourth-section__listings fourth-section__listings--row">
+                  {FOURTH_SECTION_BY_SPACE.map((listing) => (
+                    <div
+                      key={`fourth-space-${listing.title}`}
+                      className="fourth-section-listing-card-wrap fourth-section-listing-card-wrap--space"
+                    >
+                      <article className="fourth-section-listing-card fourth-section-listing-card--space">
+                        <div className="listing-card-media fourth-section-listing-card__media">
+                          <img
+                            src={listing.image}
+                            alt={listing.alt}
+                            className="listing-card-image"
+                          />
+                          <FourthSectionPrice price={listing.pricePerHour} />
+                          <div className="listing-card-image-fade" aria-hidden />
+                        </div>
+                        <div className="listing-card-footer fourth-section-listing-card__footer">
+                          <div className="listing-card-body">
+                            <h3 className="listing-card-title">{listing.title}</h3>
+                            <p className="listing-card-distance">{listing.subtitle}</p>
+                          </div>
+                        </div>
+                      </article>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div
+              className={`fourth-section__listings-block fourth-section-reveal${
+                fourthSectionRevealStep >= 3 ? " is-visible" : ""
+              }`}
+            >
+              <p className="fourth-section__category">By price</p>
+              <div
+                className="fourth-section__listings-scroll fourth-section__listings-scroll--row"
+                aria-label="Listings by price"
+              >
+                <div className="fourth-section__listings fourth-section__listings--row">
+                  {FOURTH_SECTION_BY_PRICE.map((listing) => (
+                    <div
+                      key={`fourth-price-${listing.title}`}
+                      className="fourth-section-listing-card-wrap fourth-section-listing-card-wrap--distance"
+                    >
+                      <article className="fourth-section-listing-card fourth-section-listing-card--distance">
+                        <div className="listing-card-media fourth-section-listing-card__media">
+                          <img
+                            src={listing.image}
+                            alt={listing.alt}
+                            className="listing-card-image"
+                          />
+                          <FourthSectionPrice price={listing.pricePerHour} />
+                          <div className="listing-card-image-fade" aria-hidden />
+                        </div>
+                        <div className="listing-card-footer fourth-section-listing-card__footer">
+                          <div className="listing-card-body">
+                            <h3 className="listing-card-title">{listing.title}</h3>
+                            <p className="listing-card-distance">{listing.subtitle}</p>
+                          </div>
+                        </div>
+                      </article>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div
+              className={`fourth-section__listings-block fourth-section-reveal${
+                fourthSectionRevealStep >= 4 ? " is-visible" : ""
+              }`}
+            >
+              <p className="fourth-section__category">By bundle</p>
+              <div
+                className="fourth-section__listings-scroll fourth-section__listings-scroll--row"
+                aria-label="Listings by bundle"
+              >
+                <div className="fourth-section__listings fourth-section__listings--row">
+                  {FOURTH_SECTION_BY_BUNDLE.map((bundle) => (
+                    <div
+                      key={`fourth-bundle-${bundle.title}`}
+                      className="fourth-section-listing-card-wrap fourth-section-listing-card-wrap--bundle"
+                    >
+                      <div className="fourth-section-bundle">
+                        <article className="fourth-section-listing-card fourth-section-listing-card--distance fourth-section-bundle__main">
+                          <div className="listing-card-media fourth-section-listing-card__media">
+                            <img
+                              src={bundle.image}
+                              alt={bundle.alt}
+                              className="listing-card-image"
+                            />
+                            <FourthSectionPrice price={bundle.pricePerHour} />
+                            <div className="listing-card-image-fade" aria-hidden />
+                          </div>
+                          <div className="listing-card-footer fourth-section-listing-card__footer">
+                            <div className="listing-card-body">
+                              <h3 className="listing-card-title">{bundle.title}</h3>
+                              <p className="listing-card-distance">{bundle.subtitle}</p>
+                            </div>
+                          </div>
+                        </article>
+                        <div className="fourth-section-bundle__stack" aria-hidden>
+                          {[0, 1].map((stackIndex) => (
+                            <article
+                              key={`${bundle.title}-stack-${stackIndex}`}
+                              className={`fourth-section-bundle__mini fourth-section-bundle__mini--${stackIndex}`}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div
+              className={`fourth-section__outro fourth-section-reveal${
+                fourthSectionRevealStep >= 5 ? " is-visible" : ""
+              }`}
+            >
+              <div className="fourth-section__actions">
+                <button type="button" className="fourth-section__btn fourth-section__btn--primary">
+                  Host
+                  {upRightArrow}
+                </button>
+                <button type="button" className="fourth-section__btn">
+                  Book
+                  {upRightArrow}
+                </button>
+              </div>
+            </div>
+          </section>
+        ) : null}
+        {thirdSectionAnimationComplete ? (
+          <footer
+            className="mobile-site-footer"
+            style={{ fontSize: MOBILE_ROOT_FONT_SIZE }}
+          >
+            <div className="mobile-site-footer__box">
+              <p className="mobile-site-footer__wordmark">BINOCULAR</p>
+            </div>
+          </footer>
         ) : null}
       </section>
     </main>
