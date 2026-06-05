@@ -263,6 +263,7 @@ export default function Home() {
   const kitchenGlideLockedRef = useRef(false);
   const kitchenAnchoredInThirdRef = useRef(false);
   const kitchenGlideStartedRef = useRef(false);
+  const kitchenGlideMaxProgressRef = useRef(0);
 
   const introFade = (step: number) =>
     INTRO_UI_DELAY + step * (INTRO_FADE_MS + INTRO_GAP_MS);
@@ -535,6 +536,12 @@ export default function Home() {
     sectionTwoCompleteRef.current = sectionTwoComplete;
   }, [sectionTwoComplete]);
 
+  const isSectionTwoFullyOffscreen = () => {
+    const sec2 = secondSectionRef.current;
+    if (!sec2) return false;
+    return sec2.getBoundingClientRect().bottom <= 0;
+  };
+
   const getThirdSectionGlideBounds = () => {
     const sec3 = thirdSectionRef.current;
     const vh = window.innerHeight;
@@ -543,9 +550,13 @@ export default function Home() {
     }
     const sec3DocTop = sec3.getBoundingClientRect().top + window.scrollY;
     const sec3Height = sec3.offsetHeight;
+    // Glide while section three enters until its vertical center hits the viewport center.
     const glideStart = sec3DocTop - vh;
     const glideEnd = sec3DocTop + sec3Height / 2 - vh / 2;
-    return { glideStart, glideEnd };
+    return {
+      glideStart,
+      glideEnd: Math.max(glideEnd, glideStart + 1),
+    };
   };
 
   // Hide listings once kitchen expand finishes; replay after section two scrolls off screen.
@@ -564,7 +575,7 @@ export default function Home() {
 
     const tryReplay = () => {
       if (listingsReplayStartedRef.current) return;
-      if (sec2.getBoundingClientRect().bottom > 0) return;
+      if (!isSectionTwoFullyOffscreen()) return;
 
       listingsReplayStartedRef.current = true;
       setKitchenCardFocused(false);
@@ -644,22 +655,11 @@ export default function Home() {
       const { glideStart, glideEnd } = getThirdSectionGlideBounds();
       const glideSpan = Math.max(glideEnd - glideStart, 1);
 
-      if (window.scrollY > glideEnd) {
-        window.scrollTo(0, glideEnd);
-      }
-
-      // Scroll back up — return card to section two.
-      if (
-        window.scrollY < glideStart &&
-        kitchenGlideStartedRef.current &&
-        !kitchenGlideLockedRef.current
-      ) {
-        kitchenGlideStartedRef.current = false;
-        setKitchenGlideStarted(false);
+      if (kitchenGlideLockedRef.current) {
         return;
       }
 
-      if (window.scrollY < glideStart || kitchenGlideLockedRef.current) {
+      if (window.scrollY < glideStart) {
         return;
       }
 
@@ -675,20 +675,23 @@ export default function Home() {
           height: rect.height,
         };
         kitchenGlideStartedRef.current = true;
+        kitchenGlideMaxProgressRef.current = 0;
         setKitchenGlideStarted(true);
-        return;
       }
 
       const g = kitchenGlideRef.current;
       const vh = window.innerHeight;
       const finalTop = (vh - g.height) / 2;
 
-      const scrollY = Math.min(window.scrollY, glideEnd);
+      const scrollY = window.scrollY;
       const p = Math.min(Math.max((scrollY - glideStart) / glideSpan, 0), 1);
+      // One-way glide — scrolling back up does not pull the card toward section two.
+      const useP = Math.max(p, kitchenGlideMaxProgressRef.current);
+      kitchenGlideMaxProgressRef.current = useP;
 
-      overlay.style.top = `${g.settledTop + (finalTop - g.settledTop) * p}px`;
+      overlay.style.top = `${g.settledTop + (finalTop - g.settledTop) * useP}px`;
 
-      if (p >= 1) {
+      if (useP >= 1) {
         kitchenGlideLockedRef.current = true;
         overlay.style.top = `${finalTop}px`;
         kitchenAnchoredInThirdRef.current = true;
@@ -712,18 +715,24 @@ export default function Home() {
     const sec3 = thirdSectionRef.current;
     if (!overlay || !sec3) return;
 
-    const g = kitchenGlideRef.current;
-    const secRect = sec3.getBoundingClientRect();
+    const apply = () => {
+      const g = kitchenGlideRef.current;
+      const secRect = sec3.getBoundingClientRect();
 
-    overlay.style.transition = "none";
-    overlay.style.position = "absolute";
-    overlay.style.top = `${(sec3.offsetHeight - g.height) / 2}px`;
-    overlay.style.left = `${g.left - secRect.left}px`;
-    overlay.style.width = `${g.width}px`;
-    overlay.style.height = `${g.height}px`;
-    overlay.style.zIndex = "11";
-    overlay.style.margin = "0";
-    overlay.style.transform = "none";
+      overlay.style.transition = "none";
+      overlay.style.position = "absolute";
+      overlay.style.top = `${(sec3.offsetHeight - g.height) / 2}px`;
+      overlay.style.left = `${g.left - secRect.left}px`;
+      overlay.style.width = `${g.width}px`;
+      overlay.style.height = `${g.height}px`;
+      overlay.style.zIndex = "11";
+      overlay.style.margin = "0";
+      overlay.style.transform = "none";
+    };
+
+    apply();
+    window.addEventListener("resize", apply);
+    return () => window.removeEventListener("resize", apply);
   }, [kitchenAnchoredInThird]);
 
   // Lock page scroll until the submit button has been pressed.
