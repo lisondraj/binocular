@@ -264,6 +264,7 @@ export default function Home() {
   const kitchenAnchoredInThirdRef = useRef(false);
   const kitchenGlideStartedRef = useRef(false);
   const kitchenGlideMaxProgressRef = useRef(0);
+  const kitchenGlidePinnedRef = useRef(false);
 
   const introFade = (step: number) =>
     INTRO_UI_DELAY + step * (INTRO_FADE_MS + INTRO_GAP_MS);
@@ -559,6 +560,32 @@ export default function Home() {
     };
   };
 
+  /** Update fixed kitchen overlay from scroll — viewport coords only. */
+  const applyKitchenGlideFromScroll = () => {
+    const overlay = kitchenOverlayRef.current;
+    if (!overlay || kitchenGlideLockedRef.current) return;
+
+    const { glideStart, glideEnd } = getThirdSectionGlideBounds();
+    const glideSpan = Math.max(glideEnd - glideStart, 1);
+    const g = kitchenGlideRef.current;
+    const vh = window.innerHeight;
+    const finalTop = (vh - g.height) / 2;
+
+    const scrollY = window.scrollY;
+    const p = Math.min(Math.max((scrollY - glideStart) / glideSpan, 0), 1);
+    const useP = Math.max(p, kitchenGlideMaxProgressRef.current);
+    kitchenGlideMaxProgressRef.current = useP;
+
+    overlay.style.top = `${g.settledTop + (finalTop - g.settledTop) * useP}px`;
+
+    if (useP >= 1) {
+      kitchenGlideLockedRef.current = true;
+      overlay.style.top = `${finalTop}px`;
+      kitchenAnchoredInThirdRef.current = true;
+      setKitchenAnchoredInThird(true);
+    }
+  };
+
   // Hide listings once kitchen expand finishes; replay after section two scrolls off screen.
   useEffect(() => {
     if (!sectionTwoComplete) return;
@@ -626,9 +653,12 @@ export default function Home() {
     return () => window.removeEventListener("resize", apply);
   }, [sectionTwoComplete, kitchenGlideStarted, kitchenAnchoredInThird]);
 
-  // Pin to body for the section-three glide only.
+  // Reparent to body and pin with fixed coords captured before the portal move.
   useLayoutEffect(() => {
-    if (!kitchenGlideStarted || kitchenAnchoredInThird) return;
+    if (!kitchenGlideStarted || kitchenAnchoredInThird) {
+      kitchenGlidePinnedRef.current = false;
+      return;
+    }
     const overlay = kitchenOverlayRef.current;
     if (!overlay) return;
 
@@ -642,6 +672,13 @@ export default function Home() {
     overlay.style.zIndex = "11";
     overlay.style.margin = "0";
     overlay.style.transform = "none";
+
+    kitchenGlidePinnedRef.current = true;
+    applyKitchenGlideFromScroll();
+
+    return () => {
+      kitchenGlidePinnedRef.current = false;
+    };
   }, [kitchenGlideStarted, kitchenAnchoredInThird]);
 
   // Glide: card moves 1:1 with scroll toward viewport center once section three enters.
@@ -652,8 +689,7 @@ export default function Home() {
       const sec3 = thirdSectionRef.current;
       if (!sec3) return;
 
-      const { glideStart, glideEnd } = getThirdSectionGlideBounds();
-      const glideSpan = Math.max(glideEnd - glideStart, 1);
+      const { glideStart } = getThirdSectionGlideBounds();
 
       if (kitchenGlideLockedRef.current) {
         return;
@@ -677,26 +713,12 @@ export default function Home() {
         kitchenGlideStartedRef.current = true;
         kitchenGlideMaxProgressRef.current = 0;
         setKitchenGlideStarted(true);
+        return;
       }
 
-      const g = kitchenGlideRef.current;
-      const vh = window.innerHeight;
-      const finalTop = (vh - g.height) / 2;
+      if (!kitchenGlidePinnedRef.current) return;
 
-      const scrollY = window.scrollY;
-      const p = Math.min(Math.max((scrollY - glideStart) / glideSpan, 0), 1);
-      // One-way glide — scrolling back up does not pull the card toward section two.
-      const useP = Math.max(p, kitchenGlideMaxProgressRef.current);
-      kitchenGlideMaxProgressRef.current = useP;
-
-      overlay.style.top = `${g.settledTop + (finalTop - g.settledTop) * useP}px`;
-
-      if (useP >= 1) {
-        kitchenGlideLockedRef.current = true;
-        overlay.style.top = `${finalTop}px`;
-        kitchenAnchoredInThirdRef.current = true;
-        setKitchenAnchoredInThird(true);
-      }
+      applyKitchenGlideFromScroll();
     };
 
     onScroll();
