@@ -4,6 +4,7 @@ import Link from "next/link";
 import {
   forwardRef,
   useEffect,
+  useRef,
   useState,
   type Ref,
 } from "react";
@@ -105,21 +106,28 @@ export const FourthSection = forwardRef(function FourthSection(
 ) {
   const [filterOpen, setFilterOpen] = useState(false);
   const [budgetMax, setBudgetMax] = useState(200);
+  const sectionRef = useRef<HTMLElement | null>(null);
 
   const budgetFillPct =
     ((budgetMax - FOURTH_SECTION_BUDGET_MIN) /
       (FOURTH_SECTION_BUDGET_MAX - FOURTH_SECTION_BUDGET_MIN)) *
     100;
 
+  const setSectionRef = (node: HTMLElement | null) => {
+    sectionRef.current = node;
+    if (typeof ref === "function") {
+      ref(node);
+    } else if (ref) {
+      ref.current = node;
+    }
+  };
+
   useEffect(() => {
     if (!scrollReveal) return;
 
     let observer: IntersectionObserver | null = null;
     const raf = requestAnimationFrame(() => {
-      const section =
-        ref && typeof ref !== "function" && ref.current
-          ? ref.current
-          : null;
+      const section = sectionRef.current;
       if (!section) return;
 
       const nodes = section.querySelectorAll<HTMLElement>(".fourth-section-reveal");
@@ -141,11 +149,11 @@ export const FourthSection = forwardRef(function FourthSection(
       cancelAnimationFrame(raf);
       observer?.disconnect();
     };
-  }, [scrollReveal, ref]);
+  }, [scrollReveal]);
 
   return (
     <section
-      ref={ref}
+      ref={setSectionRef}
       className={`fourth-section${className ? ` ${className}` : ""}`}
       style={{ fontSize: MOBILE_ROOT_FONT_SIZE }}
     >

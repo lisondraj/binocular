@@ -36,7 +36,7 @@ export default function BookPage() {
         }}
       >
         <MobileNavBar staticNav />
-        <FourthSection className="fourth-section--standalone" />
+        <FourthSection scrollReveal className="fourth-section--standalone" />
         <footer
           className="mobile-site-footer"
           style={{ fontSize: MOBILE_ROOT_FONT_SIZE }}
