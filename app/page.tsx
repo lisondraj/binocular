@@ -1274,13 +1274,16 @@ export default function Home() {
             className="hero-description"
             style={{
               fontFamily: "var(--font-suisse), system-ui, sans-serif",
-              fontSize: "2.35em",
+              fontSize: "2.08em",
               fontWeight: 300,
+              lineHeight: 1.18,
               textAlign: "left",
               width: "100%",
             }}
           >
-            Book spaces for physical intelligence.
+            Book spaces for
+            <br />
+            physical intelligence.
           </p>
           <div
             className="hero-actions"
