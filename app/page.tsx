@@ -15,16 +15,48 @@ import { createPortal } from "react-dom";
 // because every dimension below is expressed in `em`.
 const MOBILE_ROOT_FONT_SIZE = "calc(100vw / 24.375)";
 
-type HeroImage = {
+type HeroDeckPosition = {
+  size?: string;
+  rotate: string;
+  /** Horizontal offset of card center from the hero midpoint. */
+  centerOffset: string;
+  bottom: string;
+  zIndex?: number;
+};
+
+type HeroPhotoItem = HeroDeckPosition & {
+  kind: "photo";
   src: string;
   alt: string;
-  size: string;
-  rotate: string;
-  top?: string;
-  bottom?: string;
-  left?: string;
-  right?: string;
 };
+
+type HeroHost = {
+  initials: string;
+  gradient: string;
+};
+
+type HeroHostsItem = HeroDeckPosition & {
+  kind: "hosts";
+  hosts: readonly HeroHost[];
+};
+
+type HeroMetaItem = HeroDeckPosition & {
+  kind: "meta";
+  sqFt: number;
+  rating: number;
+  reviewCount: number;
+};
+
+type HeroTagItem = HeroDeckPosition & {
+  kind: "tag";
+  label: string;
+};
+
+type HeroDeckItem =
+  | HeroPhotoItem
+  | HeroHostsItem
+  | HeroMetaItem
+  | HeroTagItem;
 
 // Decorative images scattered around the hero. `size` is in `em` so they
 // scale with the layout; larger ones read as "closer", smaller as "further".
@@ -109,13 +141,96 @@ const KITCHEN_EXPANDED_DETAILS = {
   ] as const,
 };
 
-const heroImages: HeroImage[] = [
-  { src: "/images/kitchen.png", alt: "Kitchen", size: "6em", bottom: "4em", left: "-0.75em", rotate: "5deg" },
-  { src: "/images/warehouse-1.png", alt: "Warehouse", size: "5.5em", bottom: "6.25em", left: "4.75em", rotate: "-4deg" },
-  { src: "/images/robotics-lab.png", alt: "Robotics lab", size: "6.5em", bottom: "3.25em", left: "9.25em", rotate: "3deg" },
-  { src: "/images/courtyard.png", alt: "Office courtyard", size: "5.75em", bottom: "6em", right: "4.75em", rotate: "6deg" },
-  { src: "/images/warehouse-2.png", alt: "Warehouse", size: "6.25em", bottom: "4em", right: "-0.75em", rotate: "-6deg" },
+const HERO_KITCHEN_HOSTS = LISTING_CARDS[KITCHEN_LISTING_INDEX].hosts;
+
+const heroDeckHalfSize = (size: string) => `${parseFloat(size) / 2}em`;
+
+const HERO_DECK_TAGS = KITCHEN_EXPANDED_DETAILS.amenities.slice(0, 3);
+
+const heroDeck: HeroDeckItem[] = [
+  {
+    kind: "photo",
+    src: "/images/kitchen.png",
+    alt: "Kitchen",
+    size: "7.5em",
+    centerOffset: "-10.5em",
+    bottom: "3.5em",
+    rotate: "3.5deg",
+  },
+  {
+    kind: "tag",
+    label: HERO_DECK_TAGS[0],
+    centerOffset: "-7.875em",
+    bottom: "5em",
+    rotate: "-1.5deg",
+    zIndex: 3,
+  },
+  {
+    kind: "hosts",
+    hosts: HERO_KITCHEN_HOSTS,
+    size: "6em",
+    centerOffset: "-5.25em",
+    bottom: "6.1em",
+    rotate: "-2deg",
+    zIndex: 2,
+  },
+  {
+    kind: "photo",
+    src: "/images/courtyard.png",
+    alt: "Garden terrace",
+    size: "8.25em",
+    centerOffset: "0em",
+    bottom: "2.5em",
+    rotate: "1.5deg",
+  },
+  {
+    kind: "tag",
+    label: HERO_DECK_TAGS[1],
+    centerOffset: "0em",
+    bottom: "7.35em",
+    rotate: "1deg",
+    zIndex: 3,
+  },
+  {
+    kind: "meta",
+    sqFt: LISTING_CARDS[KITCHEN_LISTING_INDEX].sqFt,
+    rating: LISTING_CARDS[KITCHEN_LISTING_INDEX].rating,
+    reviewCount: KITCHEN_EXPANDED_DETAILS.reviewCount,
+    size: "6em",
+    centerOffset: "5.25em",
+    bottom: "6.1em",
+    rotate: "2deg",
+    zIndex: 2,
+  },
+  {
+    kind: "tag",
+    label: HERO_DECK_TAGS[2],
+    centerOffset: "7.875em",
+    bottom: "5em",
+    rotate: "1.5deg",
+    zIndex: 3,
+  },
+  {
+    kind: "photo",
+    src: "/images/warehouse-2.png",
+    alt: "Warehouse",
+    size: "7.5em",
+    centerOffset: "10.5em",
+    bottom: "3.5em",
+    rotate: "-3.5deg",
+  },
 ] as const;
+
+const ratingStarIcon = (
+  <svg
+    className="listing-card-rating-star"
+    viewBox="0 0 24 24"
+    fill="currentColor"
+    aria-hidden
+  >
+    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+  </svg>
+);
 
 const upRightArrow = (
   <svg
@@ -209,12 +324,14 @@ export default function Home() {
   const [revealedListingCount, setRevealedListingCount] = useState(0);
   const [kitchenCardFocused, setKitchenCardFocused] = useState(false);
   const [kitchenCardExpanded, setKitchenCardExpanded] = useState(false);
+  const [kitchenContentReady, setKitchenContentReady] = useState(false);
   const [sectionTwoComplete, setSectionTwoComplete] = useState(false);
   const [kitchenAnchoredInThird, setKitchenAnchoredInThird] = useState(false);
   const [kitchenInThirdSection, setKitchenInThirdSection] = useState(false);
   const [promptFlowHeight, setPromptFlowHeight] = useState(0);
 
   const promptWrapRef = useRef<HTMLDivElement>(null);
+  const promptSlotRef = useRef<HTMLDivElement>(null);
   const secondSectionRef = useRef<HTMLDivElement>(null);
   const thirdSectionRef = useRef<HTMLDivElement>(null);
   const promptScrollRef = useRef({
@@ -232,6 +349,7 @@ export default function Home() {
     prePinTop: 0,
     prePinLeft: 0,
     prePinWidth: 0,
+    preSlotHeight: 0,
   });
   const listingRevealStartedRef = useRef(false);
   const listingsReplayStartedRef = useRef(false);
@@ -376,17 +494,22 @@ export default function Home() {
       setTimeout(() => {
         setSubmitPressed(false);
         const wrap = promptWrapRef.current;
+        const slot = promptSlotRef.current;
         if (wrap) {
           const rect = wrap.getBoundingClientRect();
           promptScrollRef.current.prePinTop = rect.top;
           promptScrollRef.current.prePinLeft = rect.left;
           promptScrollRef.current.prePinWidth = rect.width;
+          const slotHeight = slot?.offsetHeight ?? wrap.offsetHeight;
+          promptScrollRef.current.preSlotHeight = slotHeight;
+          if (slot) slot.style.height = `${slotHeight}px`;
+          setPromptFlowHeight(slotHeight);
         }
         setScrollUnlocked(true);
       }, 780),
     );
 
-    heroImages.forEach((_, i) => {
+    heroDeck.forEach((_, i) => {
       timers.push(
         setTimeout(() => setRevealedImageCount(i + 1), 950 + i * 220),
       );
@@ -498,6 +621,8 @@ export default function Home() {
         width: rect.width,
         height: rect.height,
       };
+      // Lock content visible before portal moves so re-mounts don't replay animation.
+      setKitchenContentReady(true);
       setSectionTwoComplete(true);
     };
 
@@ -520,6 +645,16 @@ export default function Home() {
       overlay.style.left = `${target.left}px`;
       overlay.style.width = `${target.width}px`;
       overlay.style.height = `${target.height}px`;
+
+      // Gently zoom the photo out as the card grows so it feels like a smooth
+      // reveal rather than just stretching with the container.
+      const img = overlay.querySelector<HTMLElement>(".listing-card-image");
+      if (img) {
+        img.style.transform = "scale(1.12)";
+        requestAnimationFrame(() => {
+          img.style.transform = "scale(1.0)";
+        });
+      }
 
       overlay.addEventListener("transitionend", onTransitionEnd);
       completeTimer = setTimeout(onExpandComplete, 1500);
@@ -842,6 +977,13 @@ export default function Home() {
       const pinLeft = metrics.prePinLeft || rect.left;
       const pinWidth = metrics.prePinWidth || rect.width;
 
+      const slotHeight =
+        metrics.preSlotHeight || promptFlowHeight || boxHeight;
+      if (promptSlotRef.current) {
+        promptSlotRef.current.style.height = `${slotHeight}px`;
+      }
+      setPromptFlowHeight(slotHeight);
+
       wrap.style.position = "fixed";
       wrap.style.left = `${pinLeft}px`;
       wrap.style.width = `${pinWidth}px`;
@@ -849,8 +991,6 @@ export default function Home() {
       wrap.style.transform = "none";
       wrap.style.zIndex = "10";
       wrap.style.marginTop = "0";
-
-      setPromptFlowHeight(boxHeight + rootFontSize() * 1.5);
 
       promptScrollRef.current = {
         ...metrics,
@@ -995,6 +1135,13 @@ export default function Home() {
       sectionTop + section.offsetHeight - window.innerHeight,
     );
 
+    const slotHeight =
+      metrics.preSlotHeight || promptFlowHeight || boxHeight;
+    if (promptSlotRef.current) {
+      promptSlotRef.current.style.height = `${slotHeight}px`;
+    }
+    setPromptFlowHeight(slotHeight);
+
     wrap.style.position = "fixed";
     wrap.style.left = `${pinLeft}px`;
     wrap.style.width = `${pinWidth}px`;
@@ -1002,8 +1149,6 @@ export default function Home() {
     wrap.style.transform = "none";
     wrap.style.zIndex = "10";
     wrap.style.marginTop = "0";
-
-    setPromptFlowHeight(boxHeight + rootFontSize() * 1.5);
 
     promptScrollRef.current = {
       ...metrics,
@@ -1015,6 +1160,7 @@ export default function Home() {
       pinned: true,
       lockedAtBottom: metrics.lockedAtBottom,
       lockedInSection: metrics.lockedInSection,
+      preSlotHeight: slotHeight,
     };
 
     document.documentElement.style.setProperty(
@@ -1026,6 +1172,27 @@ export default function Home() {
       `${bottomPadding}px`,
     );
   }, [scrollUnlocked]);
+
+  // Keep the prompt slot height measured so fixed positioning never shifts hero copy.
+  useLayoutEffect(() => {
+    if (!showHeroPrompt) return;
+
+    const slot = promptSlotRef.current;
+    if (!slot) return;
+
+    const measure = () => {
+      if (scrollUnlocked) return;
+      const nextHeight = slot.offsetHeight;
+      setPromptFlowHeight(nextHeight);
+    };
+
+    measure();
+
+    const ro = new ResizeObserver(measure);
+    ro.observe(slot);
+    if (promptWrapRef.current) ro.observe(promptWrapRef.current);
+    return () => ro.disconnect();
+  }, [showHeroPrompt, promptPhase, typed, scrollUnlocked]);
 
   // Listing cards — one by one, only after the AI box hits the phone bottom.
   useEffect(() => {
@@ -1203,22 +1370,24 @@ export default function Home() {
         </div>
 
         <div
+          className="hero-stage"
           style={{
             position: "relative",
             zIndex:
               scrollUnlocked && revealedListingCount < 1 ? 3 : 1,
             maxWidth: "var(--ipad-width)",
             margin: "0 auto",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
             minHeight: "100vh",
-            gap: "0.75em",
             padding: "1.5em",
             textAlign: "center",
           }}
         >
+          <div
+            aria-hidden
+            className="hero-stage-spacer"
+            style={{ flex: "1 1 0", minHeight: 0 }}
+          />
+
           {/* Scattered decorative images — square, rounded, behind the text. */}
           <div
             aria-hidden
@@ -1230,29 +1399,114 @@ export default function Home() {
               pointerEvents: "none",
             }}
           >
-            {heroImages.map((img, i) => {
-              const imgStyle: CSSProperties & { "--base-rotate": string } = {
+            {heroDeck.map((item, i) => {
+              const isTag = item.kind === "tag";
+              const deckStyle: CSSProperties & {
+                "--base-rotate": string;
+                "--hero-card-size"?: string;
+              } = {
                 position: "absolute",
-                top: "top" in img ? img.top : undefined,
-                bottom: "bottom" in img ? img.bottom : undefined,
-                left: "left" in img ? img.left : undefined,
-                right: "right" in img ? img.right : undefined,
-                width: img.size,
-                height: img.size,
-                objectFit: "cover",
-                borderRadius: "1em",
-                "--base-rotate": img.rotate,
-                boxShadow: "0 0.85em 2.25em rgba(0, 0, 0, 0.28)",
+                bottom: item.bottom,
+                left: isTag
+                  ? `calc(50% + ${item.centerOffset})`
+                  : `calc(50% + ${item.centerOffset} - ${heroDeckHalfSize(item.size!)})`,
+                width: isTag ? undefined : item.size,
+                height: isTag ? undefined : item.size,
+                zIndex: item.zIndex,
+                "--base-rotate": item.rotate,
+                ...(isTag ? {} : { "--hero-card-size": item.size }),
               };
 
+              if (item.kind === "photo") {
+                return (
+                  <img
+                    key={i}
+                    src={item.src}
+                    alt={item.alt}
+                    className={`hero-image-rise${i < revealedImageCount ? " is-visible" : ""}`}
+                    style={{
+                      ...deckStyle,
+                      objectFit: "cover",
+                      borderRadius: "1em",
+                      boxShadow: "0 0.85em 2.25em rgba(0, 0, 0, 0.28)",
+                    }}
+                  />
+                );
+              }
+
+              if (item.kind === "tag") {
+                return (
+                  <span
+                    key={i}
+                    className={`hero-deck-tag hero-image-rise hero-image-rise--centered${
+                      i < revealedImageCount ? " is-visible" : ""
+                    }`}
+                    style={deckStyle}
+                  >
+                    {item.label}
+                  </span>
+                );
+              }
+
+              if (item.kind === "hosts") {
+                return (
+                  <div
+                    key={i}
+                    className={`hero-info-card hero-info-card--hosts hero-image-rise${
+                      i < revealedImageCount ? " is-visible" : ""
+                    }`}
+                    style={deckStyle}
+                  >
+                    <div className="hero-info-card-inner">
+                      <span className="hero-info-card-label">Hosts</span>
+                      <div className="hero-info-card-hosts-stage">
+                        <div className="listing-card-hosts" aria-label="Hosts">
+                          {item.hosts.map((host, hostIndex) => (
+                            <span
+                              key={host.initials}
+                              className={`listing-card-avatar${
+                                hostIndex === 0
+                                  ? " listing-card-avatar--back"
+                                  : " listing-card-avatar--front"
+                              }`}
+                              style={{
+                                background: `linear-gradient(${host.gradient})`,
+                              }}
+                            >
+                              {host.initials}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              }
+
               return (
-                <img
+                <div
                   key={i}
-                  src={img.src}
-                  alt={img.alt}
-                  className={`hero-image-rise${i < revealedImageCount ? " is-visible" : ""}`}
-                  style={imgStyle}
-                />
+                  className={`hero-info-card hero-info-card--meta hero-image-rise${
+                    i < revealedImageCount ? " is-visible" : ""
+                  }`}
+                  style={deckStyle}
+                >
+                  <div className="hero-info-card-inner">
+                    <span className="hero-info-card-sqft">
+                      {formatSqFt(item.sqFt)}
+                    </span>
+                    <span
+                      className="hero-info-card-rating"
+                      aria-label={`Rating ${item.rating} from ${item.reviewCount} reviews`}
+                    >
+                      {item.rating}
+                      {ratingStarIcon}
+                      <span className="hero-info-card-reviews">
+                        ({item.reviewCount})
+                      </span>
+                    </span>
+                  </div>
+                </div>
               );
             })}
           </div>
@@ -1336,23 +1590,27 @@ export default function Home() {
           </div>
           </div>
 
-          {/* Spacer keeps hero layout height once the AI box is position:fixed. */}
-          {scrollUnlocked && promptFlowHeight > 0 ? (
-            <div
-              aria-hidden
-              style={{ alignSelf: "stretch", height: promptFlowHeight }}
-            />
-          ) : null}
-
-          {/* Fixed on scroll — stays in hero until unlock, then glides to
-              the bottom of the second-section viewport. */}
+          {/* Slot reserves prompt height so hero copy never jumps on submit. */}
           <div
-            ref={promptWrapRef}
+            ref={promptSlotRef}
+            className="hero-prompt-slot"
             style={{
               alignSelf: "stretch",
               width: "100%",
               marginTop: "1.5em",
-              position: "relative",
+              height:
+                showHeroPrompt && promptFlowHeight > 0
+                  ? promptFlowHeight
+                  : undefined,
+              flexShrink: 0,
+            }}
+          >
+          <div
+            ref={promptWrapRef}
+            className="hero-prompt-wrap"
+            style={{
+              width: "100%",
+              position: scrollUnlocked ? "fixed" : "relative",
               zIndex: 2,
               overflow: "visible",
               willChange: scrollUnlocked ? "top" : "auto",
@@ -1361,21 +1619,11 @@ export default function Home() {
           {/* Frosted-glass prompt card — backdrop blur + dark overlay, with a
               typing animation, blinking caret, and a circular send button. */}
           <div
-            className={`hero-prompt-card hero-intro-fade${showHeroPrompt ? " is-visible" : ""}`}
-            style={{
-              position: "relative",
-              zIndex: 1,
-              padding: "1em 1.15em 0.85em",
-              borderRadius: "1.25em",
-              background: "rgba(30, 27, 24, 0.45)",
-              backdropFilter: "blur(1em)",
-              WebkitBackdropFilter: "blur(1em)",
-              border: "0.0625em solid rgba(255, 255, 255, 0.12)",
-              boxShadow: "0 1em 2.5em rgba(0, 0, 0, 0.25)",
-              textAlign: "left",
-              fontFamily: "var(--font-suisse), system-ui, sans-serif",
-            }}
+            className={`hero-prompt-card-shell hero-intro-fade${
+              showHeroPrompt ? " is-visible" : ""
+            }`}
           >
+          <div className="hero-prompt-card">
             <p className="hero-prompt-text">
               {/* Full final layout always present — locks box size from first @. */}
               <span className="hero-prompt-layout" aria-hidden>
@@ -1478,6 +1726,14 @@ export default function Home() {
             </button>
           </div>
           </div>
+          </div>
+          </div>
+
+          <div
+            aria-hidden
+            className="hero-stage-spacer"
+            style={{ flex: "1 1 0", minHeight: 0 }}
+          />
         </div>
 
         {/* Second section — listings + AI box live here once settled. */}
@@ -1600,7 +1856,7 @@ export default function Home() {
                       kitchenInThirdSection && !kitchenAnchoredInThird
                         ? " is-floating"
                         : ""
-                    }`}
+                    }${kitchenContentReady ? " content-ready" : ""}`}
                     style={{ fontSize: MOBILE_ROOT_FONT_SIZE }}
                   >
                     <div className="listing-card-media kitchen-expand-overlay__media">
