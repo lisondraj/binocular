@@ -61,6 +61,7 @@ h6 {
   line-height: 1;
   width: 100%;
   text-align: left;
+  font-family: var(--font-suisse), system-ui, sans-serif;
 }
 
 .hero-title-word {
@@ -2221,7 +2222,7 @@ a.fourth-section__btn {
 }
 
 .mobile-nav-logo {
-  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-family: var(--font-suisse), system-ui, sans-serif;
   font-size: calc(2.25em * 14 / 24);
   line-height: 1;
   font-weight: 400;
@@ -2244,7 +2245,7 @@ a.fourth-section__btn {
   padding: 0;
   cursor: pointer;
   color: inherit;
-  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-family: var(--font-suisse), system-ui, sans-serif;
 }
 
 .mobile-nav-logo.is-visible {
