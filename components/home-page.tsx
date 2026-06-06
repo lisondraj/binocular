@@ -403,8 +403,7 @@ export function HomePage({
 
   const promptWrapRef = useRef<HTMLDivElement>(null);
   const promptSlotRef = useRef<HTMLDivElement>(null);
-  const main2GrainRef = useRef<HTMLCanvasElement>(null);
-  const main2HeroBoxRef = useRef<HTMLDivElement>(null);
+  const main2GrainRef = useRef<HTMLDivElement>(null);
   const secondSectionRef = useRef<HTMLDivElement>(null);
   const thirdSectionRef = useRef<HTMLDivElement>(null);
   const fourthSectionRef = useRef<HTMLElement>(null);
@@ -484,63 +483,44 @@ export function HomePage({
     return () => timers.forEach(clearTimeout);
   }, []);
 
-  // /main2 — fine film grain: low-res speckle, lightly knitted, smooth upscale.
+  // /main2 — tiny film grain tile repeated at 1:1 (no upscale zoom).
   useEffect(() => {
     if (!isMain2) return;
 
-    const canvas = main2GrainRef.current;
-    const box = main2HeroBoxRef.current;
-    if (!canvas || !box) return;
+    const layer = main2GrainRef.current;
+    if (!layer) return;
 
-    const paintGrain = () => {
-      const width = box.clientWidth;
-      const height = box.clientHeight;
-      if (width < 1 || height < 1) return;
+    const tile = 40;
+    const canvas = document.createElement("canvas");
+    canvas.width = tile;
+    canvas.height = tile;
 
-      const grainW = Math.max(1, Math.round(width * 0.42));
-      const grainH = Math.max(1, Math.round(height * 0.42));
+    const ctx = canvas.getContext("2d", { alpha: true });
+    if (!ctx) return;
 
-      canvas.width = grainW;
-      canvas.height = grainH;
+    const image = ctx.createImageData(tile, tile);
+    const pixels = image.data;
 
-      const ctx = canvas.getContext("2d", { alpha: true });
-      if (!ctx) return;
+    for (let i = 0; i < pixels.length; i += 4) {
+      if (Math.random() > 0.91) continue;
 
-      const image = ctx.createImageData(grainW, grainH);
-      const pixels = image.data;
+      const light = Math.random() > 0.5;
+      const lum = light
+        ? 235 + Math.floor(Math.random() * 20)
+        : 22 + Math.floor(Math.random() * 30);
 
-      for (let i = 0; i < pixels.length; i += 4) {
-        if (Math.random() > 0.7) continue;
+      pixels[i] = lum;
+      pixels[i + 1] = lum;
+      pixels[i + 2] = lum;
+      pixels[i + 3] = 5 + Math.floor(Math.random() * 9);
+    }
 
-        const light = Math.random() > 0.5;
-        const lum = light
-          ? 228 + Math.floor(Math.random() * 27)
-          : 18 + Math.floor(Math.random() * 42);
+    ctx.putImageData(image, 0, 0);
 
-        pixels[i] = lum;
-        pixels[i + 1] = lum;
-        pixels[i + 2] = lum;
-        pixels[i + 3] = 9 + Math.floor(Math.random() * 14);
-      }
-
-      ctx.putImageData(image, 0, 0);
-
-      const knit = document.createElement("canvas");
-      knit.width = grainW;
-      knit.height = grainH;
-      const knitCtx = knit.getContext("2d");
-      if (knitCtx) {
-        knitCtx.filter = "blur(0.55px)";
-        knitCtx.drawImage(canvas, 0, 0);
-        ctx.clearRect(0, 0, grainW, grainH);
-        ctx.drawImage(knit, 0, 0);
-      }
-    };
-
-    paintGrain();
-    const observer = new ResizeObserver(paintGrain);
-    observer.observe(box);
-    return () => observer.disconnect();
+    const tilePx = `${tile}px`;
+    layer.style.backgroundImage = `url(${canvas.toDataURL("image/png")})`;
+    layer.style.backgroundSize = `${tilePx} ${tilePx}`;
+    layer.style.backgroundRepeat = "repeat";
   }, [isMain2]);
 
   // @ types in → mention menu → chip → prompt typing (after AI box fade-in)
@@ -2076,8 +2056,8 @@ export function HomePage({
           ) : null}
 
           {isMain2 ? (
-            <div ref={main2HeroBoxRef} className="main2-hero-box">
-              <canvas
+            <div className="main2-hero-box">
+              <div
                 ref={main2GrainRef}
                 className="main2-hero-box__grain"
                 aria-hidden
