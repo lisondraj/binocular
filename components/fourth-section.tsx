@@ -95,6 +95,37 @@ function FourthSectionPrice({ price }: { price: string }) {
   );
 }
 
+function FourthSectionListingCard({
+  className,
+  image,
+  alt,
+  price,
+  title,
+  subtitle,
+}: {
+  className: string;
+  image: string;
+  alt: string;
+  price: string;
+  title: string;
+  subtitle: string;
+}) {
+  return (
+    <article className={`fourth-section-listing-card ${className}`}>
+      <div className="listing-card-media fourth-section-listing-card__media">
+        <img src={image} alt={alt} className="listing-card-image" />
+        <FourthSectionPrice price={price} />
+        <div className="fourth-section-listing-card__caption">
+          <div className="listing-card-body">
+            <h3 className="listing-card-title">{title}</h3>
+            <p className="listing-card-distance">{subtitle}</p>
+          </div>
+        </div>
+      </div>
+    </article>
+  );
+}
+
 type FourthSectionProps = {
   scrollReveal?: boolean;
   className?: string;
@@ -259,25 +290,14 @@ export const FourthSection = forwardRef(function FourthSection(
                   key={`fourth-distance-${listing.title}`}
                   className="fourth-section-listing-card-wrap fourth-section-listing-card-wrap--distance"
                 >
-                  <article className="fourth-section-listing-card fourth-section-listing-card--distance">
-                    <div className="listing-card-media fourth-section-listing-card__media">
-                      <img
-                        src={listing.image}
-                        alt={listing.alt}
-                        className="listing-card-image"
-                      />
-                      <FourthSectionPrice price={listing.pricePerHour} />
-                      <div className="listing-card-image-fade" aria-hidden />
-                    </div>
-                    <div className="listing-card-footer fourth-section-listing-card__footer">
-                      <div className="listing-card-body">
-                        <h3 className="listing-card-title">{listing.title}</h3>
-                        <p className="listing-card-distance">
-                          {listing.distanceMi} mi away
-                        </p>
-                      </div>
-                    </div>
-                  </article>
+                  <FourthSectionListingCard
+                    className="fourth-section-listing-card--distance"
+                    image={listing.image}
+                    alt={listing.alt}
+                    price={listing.pricePerHour}
+                    title={listing.title}
+                    subtitle={`${listing.distanceMi} mi away`}
+                  />
                 </div>
               ))}
             </div>
@@ -297,23 +317,14 @@ export const FourthSection = forwardRef(function FourthSection(
                 key={`fourth-space-${listing.title}`}
                 className="fourth-section-listing-card-wrap fourth-section-listing-card-wrap--space"
               >
-                <article className="fourth-section-listing-card fourth-section-listing-card--space">
-                  <div className="listing-card-media fourth-section-listing-card__media">
-                    <img
-                      src={listing.image}
-                      alt={listing.alt}
-                      className="listing-card-image"
-                    />
-                    <FourthSectionPrice price={listing.pricePerHour} />
-                    <div className="listing-card-image-fade" aria-hidden />
-                  </div>
-                  <div className="listing-card-footer fourth-section-listing-card__footer">
-                    <div className="listing-card-body">
-                      <h3 className="listing-card-title">{listing.title}</h3>
-                      <p className="listing-card-distance">{listing.subtitle}</p>
-                    </div>
-                  </div>
-                </article>
+                <FourthSectionListingCard
+                  className="fourth-section-listing-card--space"
+                  image={listing.image}
+                  alt={listing.alt}
+                  price={listing.pricePerHour}
+                  title={listing.title}
+                  subtitle={listing.subtitle}
+                />
               </div>
             ))}
           </div>
@@ -332,23 +343,14 @@ export const FourthSection = forwardRef(function FourthSection(
                 key={`fourth-price-${listing.title}`}
                 className="fourth-section-listing-card-wrap fourth-section-listing-card-wrap--distance"
               >
-                <article className="fourth-section-listing-card fourth-section-listing-card--distance">
-                  <div className="listing-card-media fourth-section-listing-card__media">
-                    <img
-                      src={listing.image}
-                      alt={listing.alt}
-                      className="listing-card-image"
-                    />
-                    <FourthSectionPrice price={listing.pricePerHour} />
-                    <div className="listing-card-image-fade" aria-hidden />
-                  </div>
-                  <div className="listing-card-footer fourth-section-listing-card__footer">
-                    <div className="listing-card-body">
-                      <h3 className="listing-card-title">{listing.title}</h3>
-                      <p className="listing-card-distance">{listing.subtitle}</p>
-                    </div>
-                  </div>
-                </article>
+                <FourthSectionListingCard
+                  className="fourth-section-listing-card--distance"
+                  image={listing.image}
+                  alt={listing.alt}
+                  price={listing.pricePerHour}
+                  title={listing.title}
+                  subtitle={listing.subtitle}
+                />
               </div>
             ))}
           </div>
@@ -368,23 +370,14 @@ export const FourthSection = forwardRef(function FourthSection(
                 className="fourth-section-listing-card-wrap fourth-section-listing-card-wrap--bundle"
               >
                 <div className="fourth-section-bundle">
-                  <article className="fourth-section-listing-card fourth-section-listing-card--distance fourth-section-bundle__main">
-                    <div className="listing-card-media fourth-section-listing-card__media">
-                      <img
-                        src={bundle.image}
-                        alt={bundle.alt}
-                        className="listing-card-image"
-                      />
-                      <FourthSectionPrice price={bundle.pricePerHour} />
-                      <div className="listing-card-image-fade" aria-hidden />
-                    </div>
-                    <div className="listing-card-footer fourth-section-listing-card__footer">
-                      <div className="listing-card-body">
-                        <h3 className="listing-card-title">{bundle.title}</h3>
-                        <p className="listing-card-distance">{bundle.subtitle}</p>
-                      </div>
-                    </div>
-                  </article>
+                  <FourthSectionListingCard
+                    className="fourth-section-listing-card--distance fourth-section-bundle__main"
+                    image={bundle.image}
+                    alt={bundle.alt}
+                    price={bundle.pricePerHour}
+                    title={bundle.title}
+                    subtitle={bundle.subtitle}
+                  />
                   <div className="fourth-section-bundle__stack" aria-hidden>
                     {[0, 1].map((stackIndex) => (
                       <article
