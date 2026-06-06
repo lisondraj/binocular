@@ -2284,6 +2284,155 @@ a.fourth-section__btn {
   transform: none;
 }
 
+/* /main2 — hero in rounded gradient + grain box, white copy on dark. */
+.hero-stage--main2 {
+  justify-content: stretch;
+  gap: 0;
+  box-sizing: border-box;
+}
+
+.main2-hero-box {
+  position: relative;
+  flex: 1 1 auto;
+  width: 100%;
+  min-height: calc(100vh - 3em);
+  border-radius: 0.75em;
+  overflow: visible;
+  isolation: isolate;
+  padding: 1.5em;
+  padding-top: 4.75em;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 1.25em;
+  background:
+    radial-gradient(ellipse 95% 70% at 12% 8%, rgba(118, 118, 118, 0.42), transparent 58%),
+    radial-gradient(ellipse 80% 55% at 88% 92%, rgba(72, 72, 72, 0.5), transparent 62%),
+    radial-gradient(ellipse 60% 45% at 50% 40%, rgba(48, 48, 48, 0.35), transparent 70%),
+    linear-gradient(155deg, #4a4a4a 0%, #2a2a2a 32%, #141414 68%, #050505 100%);
+  box-shadow:
+    0 0.35em 1.4em rgba(0, 0, 0, 0.14),
+    inset 0 0.0625em 0 rgba(255, 255, 255, 0.06);
+}
+
+.main2-hero-prompt-slot {
+  margin-top: auto;
+  position: relative;
+  z-index: 2;
+}
+
+.main2-hero-box__grain {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: inherit;
+  opacity: 0.42;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.15' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 88px 88px;
+  mix-blend-mode: soft-light;
+}
+
+.main2-hero-intro {
+  position: relative;
+  z-index: 1;
+}
+
+.mobile-view--main2 .main2-hero-box .hero-title-word,
+.mobile-view--main2 .main2-hero-box .hero-description {
+  color: #ffffff;
+}
+
+.main2-hero-actions {
+  align-self: flex-start;
+  display: flex;
+  gap: 0.75em;
+}
+
+.main2-hero-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  padding: 0.75em 1.25em;
+  border: 0.0625em solid #ffffff;
+  border-radius: 0.5em;
+  background: none;
+  color: #ffffff;
+  font-family: var(--font-suisse), system-ui, sans-serif;
+  font-size: 0.95em;
+  font-weight: 300;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.main2-hero-btn--primary {
+  background: #ffffff;
+  color: #000000;
+  border-color: #ffffff;
+}
+
+/* White nav menu on hero; revert after scroll like default nav. */
+.mobile-view--main2:not(.mobile-view--main2-past-hero) .mobile-nav-menu {
+  color: #ffffff;
+}
+
+.mobile-view--main2:not(.mobile-view--main2-past-hero) .mobile-nav-menu {
+  color: #ffffff;
+}
+
+/* /main2 — white AI prompt card with black type inside gradient hero. */
+.mobile-view--main2 .main2-hero-box .main2-hero-prompt-card {
+  box-shadow:
+    0 0.45em 1.35em rgba(0, 0, 0, 0.22),
+    0 0.08em 0.25em rgba(0, 0, 0, 0.08);
+}
+
+.mobile-view--main2 .main2-hero-box .main2-hero-prompt-card::before {
+  background: #ffffff;
+  border: 0.0625em solid rgba(0, 0, 0, 0.1);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+.mobile-view--main2 .main2-hero-box .hero-prompt-text,
+.mobile-view--main2 .main2-hero-box .hero-prompt-typed,
+.mobile-view--main2 .main2-hero-box .hero-prompt-at {
+  color: #000000;
+}
+
+.mobile-view--main2 .main2-hero-box .hero-prompt-chip {
+  background: rgba(0, 0, 0, 0.06);
+  border-color: rgba(0, 0, 0, 0.12);
+  color: #000000;
+}
+
+.mobile-view--main2 .main2-hero-box .hero-prompt-chip-icon {
+  color: #000000;
+  opacity: 0.72;
+}
+
+.mobile-view--main2 .main2-hero-box .hero-prompt-menu {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.1);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-shadow: 0 0.5em 1.5em rgba(0, 0, 0, 0.14);
+}
+
+.mobile-view--main2 .main2-hero-box .hero-prompt-menu-item {
+  color: rgba(0, 0, 0, 0.72);
+}
+
+.mobile-view--main2 .main2-hero-box .hero-prompt-menu-item.is-highlighted {
+  background: rgba(0, 0, 0, 0.06);
+  color: #000000;
+}
+
+.mobile-view--main2 .main2-hero-box .type-caret::after {
+  background: #000000;
+}
+
 /* Standalone /book page — full nav clearance, all content visible. */
 .book-page {
   background-color: #ffffff;
