@@ -1322,7 +1322,7 @@ a.fourth-section__btn {
   bottom: var(--fourth-caption-inset);
   z-index: 2;
   padding: var(--fourth-caption-padding);
-  border-radius: 0.9em;
+  border-radius: 0.65em;
   isolation: isolate;
   overflow: hidden;
 }
@@ -1359,6 +1359,8 @@ a.fourth-section__btn {
 .fourth-section-listing-card--distance .listing-card-distance {
   font-size: 0.78em;
   line-height: 1.15;
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.62);
 }
 
 .fourth-section-listing-card--space {
@@ -1378,6 +1380,8 @@ a.fourth-section__btn {
 .fourth-section-listing-card--space .listing-card-distance {
   font-size: 0.76em;
   line-height: 1.15;
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.62);
 }
 
 .fourth-section-listing-card__price {
@@ -1945,8 +1949,8 @@ a.fourth-section__btn {
   margin: 0;
   font-family: var(--font-suisse), system-ui, sans-serif;
   font-size: 0.75em;
-  font-weight: 300;
-  color: rgba(0, 0, 0, 0.5);
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.62);
 }
 
 .listing-card-rating {
