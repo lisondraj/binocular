@@ -6,6 +6,7 @@ import {
   useRef,
   useState,
   type CSSProperties,
+  type ReactNode,
 } from "react";
 import Link from "next/link";
 import { createPortal } from "react-dom";
@@ -60,49 +61,6 @@ type HeroDeckItem =
 const formatSqFt = (sqFt: number) =>
   `${sqFt.toLocaleString("en-US")} sq ft`;
 
-/** Pin element inside second section at its current viewport position. */
-const anchorToSecondSection = (
-  el: HTMLElement,
-  section: HTMLElement,
-  zIndex?: number,
-) => {
-  const sectionRect = section.getBoundingClientRect();
-  const rect = el.getBoundingClientRect();
-
-  el.style.position = "absolute";
-  el.style.top = `${rect.top - sectionRect.top}px`;
-  el.style.bottom = "auto";
-  el.style.left = `${rect.left - sectionRect.left}px`;
-  el.style.right = "auto";
-  el.style.width = `${rect.width}px`;
-  el.style.height = `${rect.height}px`;
-  el.style.transform = "none";
-  if (zIndex !== undefined) {
-    el.style.zIndex = String(zIndex);
-  }
-};
-
-/** /main2 — anchor the AI box to the bottom inside the section-two grain box. */
-const anchorMain2PromptInSectionTwo = (
-  wrap: HTMLElement,
-  content: HTMLElement,
-) => {
-  if (wrap.parentElement !== content) {
-    content.appendChild(wrap);
-  }
-
-  wrap.style.position = "absolute";
-  wrap.style.top = "auto";
-  wrap.style.left = "1.4em";
-  wrap.style.right = "1.4em";
-  wrap.style.width = "auto";
-  wrap.style.bottom = "0.85em";
-  wrap.style.height = "auto";
-  wrap.style.transform = "none";
-  wrap.style.zIndex = "10";
-  wrap.style.marginTop = "0";
-};
-
 const paintMain2GrainSurfaces = () => {
   const tile = 40;
 
@@ -147,6 +105,28 @@ const paintMain2GrainSurfaces = () => {
     layer.style.backgroundRepeat = "repeat";
   });
 };
+
+function Main2GrainContinuum({
+  active,
+  children,
+}: {
+  active: boolean;
+  children: ReactNode;
+}) {
+  if (!active) {
+    return <>{children}</>;
+  }
+
+  return (
+    <div className="main2-grain-continuum main2-grain-box">
+      <div
+        className="main2-grain-surface main2-grain-continuum__grain"
+        aria-hidden
+      />
+      <div className="main2-grain-continuum__inner">{children}</div>
+    </div>
+  );
+}
 
 /** Kitchen is the middle listing card — index 1 in LISTING_CARDS. */
 const KITCHEN_LISTING_INDEX = 1;
@@ -347,10 +327,7 @@ const upRightArrow = (
 );
 
 const HERO_PROMPT =
-  "Show me top 3 of the nearest listings with a dishwasher, stairs, and a dog. Budget $500";
-
-const FOLLOWUP_PROMPT =
-  "Which one is available Mon-Fri from 12-3 PM?";
+  "Show me the 3 closest spaces with a dishwasher, stairs, and a dog. Budget $500.";
 
 const MENTION_OPTIONS = [
   "Astra Robotics",
@@ -362,15 +339,7 @@ const MENTION_OPTIONS = [
 const SELECTED_MENTION = MENTION_OPTIONS.length - 1;
 const SELECTED_LABEL = MENTION_OPTIONS[SELECTED_MENTION];
 
-type PromptPhase =
-  | "at"
-  | "menu"
-  | "chip"
-  | "typing"
-  | "done"
-  | "followup-ready"
-  | "followup-typing"
-  | "followup-done";
+type PromptPhase = "at" | "menu" | "chip" | "typing" | "done";
 
 const INTRO_UI_DELAY = 200;
 const INTRO_FADE_MS = 1200;
@@ -439,7 +408,6 @@ export function HomePage({
   const [revealedImageCount, setRevealedImageCount] = useState(0);
   const [submitPressed, setSubmitPressed] = useState(false);
   const [scrollUnlocked, setScrollUnlocked] = useState(false);
-  const [promptAtBottom, setPromptAtBottom] = useState(false);
   const [revealedListingCount, setRevealedListingCount] = useState(0);
   const [kitchenCardFocused, setKitchenCardFocused] = useState(false);
   const [kitchenCardExpanded, setKitchenCardExpanded] = useState(false);
@@ -474,26 +442,9 @@ export function HomePage({
   const secondSectionRef = useRef<HTMLDivElement>(null);
   const thirdSectionRef = useRef<HTMLDivElement>(null);
   const fourthSectionRef = useRef<HTMLElement>(null);
-  const promptScrollRef = useRef({
-    initialTop: 0,
-    left: 0,
-    width: 0,
-    targetTop: 0,
-    scrollEnd: 1,
-    pinned: false,
-    // Once the box reaches the bottom it stays there — scroll-up can't move it.
-    lockedAtBottom: false,
-    // After first listing card: absolute in section two (scrolls with page).
-    lockedInSection: false,
-    // Captured before scroll unlock so pin uses pre-submit viewport position.
-    prePinTop: 0,
-    prePinLeft: 0,
-    prePinWidth: 0,
-    preSlotHeight: 0,
-  });
   const listingRevealStartedRef = useRef(false);
   const listingsReplayStartedRef = useRef(false);
-  const followupPromptTriggeredRef = useRef(false);
+  const kitchenFlowTriggeredRef = useRef(false);
   const listingStackRef = useRef<HTMLDivElement>(null);
   const listingInnerRef = useRef<HTMLDivElement>(null);
   const kitchenSlotRef = useRef<HTMLDivElement>(null);
@@ -550,11 +501,11 @@ export function HomePage({
     return () => timers.forEach(clearTimeout);
   }, []);
 
-  // /main2 — paint tiny grain tiles on every grain surface (hero + section two).
+  // /main2 — paint tiny grain tiles on every grain surface (hero + listings + section two).
   useEffect(() => {
     if (!isMain2) return;
     paintMain2GrainSurfaces();
-  }, [isMain2, promptAtBottom]);
+  }, [isMain2]);
 
   // @ types in → mention menu → chip → prompt typing (after AI box fade-in)
   useEffect(() => {
@@ -594,47 +545,19 @@ export function HomePage({
   }, [promptAnimReady]);
 
   useEffect(() => {
-    if (promptPhase !== "typing" && promptPhase !== "followup-typing") return;
+    if (promptPhase !== "typing") return;
 
-    const text =
-      promptPhase === "typing" ? HERO_PROMPT : FOLLOWUP_PROMPT;
     let i = 0;
     const id = setInterval(() => {
       i += 1;
-      setTyped(text.slice(0, i));
-      if (i >= text.length) {
+      setTyped(HERO_PROMPT.slice(0, i));
+      if (i >= HERO_PROMPT.length) {
         clearInterval(id);
-        setPromptPhase(
-          promptPhase === "typing" ? "done" : "followup-done",
-        );
+        setPromptPhase("done");
       }
     }, 45);
     return () => clearInterval(id);
   }, [promptPhase]);
-
-  // Brief caret after chip, then type the follow-up question.
-  useEffect(() => {
-    if (promptPhase !== "followup-ready") return;
-
-    const timer = setTimeout(() => setPromptPhase("followup-typing"), 400);
-    return () => clearTimeout(timer);
-  }, [promptPhase]);
-
-  // After all listing cards: hold 2s, clear prompt, show caret beside chip.
-  // Only once — listing replay in section two must not retype the follow-up.
-  useEffect(() => {
-    if (revealedListingCount < LISTING_CARDS.length) return;
-    if (followupPromptTriggeredRef.current) return;
-
-    followupPromptTriggeredRef.current = true;
-
-    const timer = setTimeout(() => {
-      setTyped("");
-      setPromptPhase("followup-ready");
-    }, 2000);
-
-    return () => clearTimeout(timer);
-  }, [revealedListingCount]);
 
   // After full text: simulate submit click, unlock scrolling, then reveal
   // the scattered images one by one.
@@ -643,24 +566,8 @@ export function HomePage({
 
     const timers: ReturnType<typeof setTimeout>[] = [];
     timers.push(setTimeout(() => setSubmitPressed(true), 600));
-    timers.push(
-      setTimeout(() => {
-        setSubmitPressed(false);
-        const wrap = promptWrapRef.current;
-        const slot = promptSlotRef.current;
-        if (wrap) {
-          const rect = wrap.getBoundingClientRect();
-          promptScrollRef.current.prePinTop = rect.top;
-          promptScrollRef.current.prePinLeft = rect.left;
-          promptScrollRef.current.prePinWidth = rect.width;
-          const slotHeight = slot?.offsetHeight ?? wrap.offsetHeight;
-          promptScrollRef.current.preSlotHeight = slotHeight;
-          if (slot) slot.style.height = `${slotHeight}px`;
-          setPromptFlowHeight(slotHeight);
-        }
-        setScrollUnlocked(true);
-      }, 780),
-    );
+    timers.push(setTimeout(() => setSubmitPressed(false), 780));
+    timers.push(setTimeout(() => setScrollUnlocked(true), 780));
 
     heroDeck.forEach((_, i) => {
       timers.push(
@@ -671,9 +578,13 @@ export function HomePage({
     return () => timers.forEach(clearTimeout);
   }, [promptPhase]);
 
-  // Follow-up submit → fade others, then overlay Kitchen card expands.
+  // After all listing cards: hold 2s, then fade others and expand Kitchen card.
   useEffect(() => {
-    if (promptPhase !== "followup-done") return;
+    if (isMain2) return;
+    if (revealedListingCount < LISTING_CARDS.length) return;
+    if (kitchenFlowTriggeredRef.current) return;
+
+    kitchenFlowTriggeredRef.current = true;
 
     const timers: ReturnType<typeof setTimeout>[] = [];
     timers.push(setTimeout(() => setSubmitPressed(true), 650));
@@ -691,7 +602,6 @@ export function HomePage({
           return;
         }
 
-        // Snapshot coords before any DOM change.
         const from = slot.getBoundingClientRect();
         const stackRect = stack.getBoundingClientRect();
         const promptCard = wrap.querySelector<Element>(".hero-prompt-card");
@@ -716,7 +626,6 @@ export function HomePage({
           left: 0,
         };
 
-        // Section-two coords — overlay scrolls with section two after expand.
         kitchenFromRef.current = {
           top: from.top - sectionRect.top,
           left: from.left - sectionRect.left,
@@ -730,14 +639,12 @@ export function HomePage({
           height: targetHeight,
         };
 
-        // Mount the portal overlay. React commits as a microtask, then
-        // useLayoutEffect fires synchronously — ref is guaranteed set there.
         setKitchenCardExpanded(true);
       }, 2000),
     );
 
     return () => timers.forEach(clearTimeout);
-  }, [promptPhase]);
+  }, [revealedListingCount, isMain2]);
 
   // After the portal commits to the DOM, useLayoutEffect fires synchronously
   // (before paint), so kitchenOverlayRef.current is guaranteed to be set.
@@ -1206,23 +1113,22 @@ export function HomePage({
     thirdSectionAnimationCompleteRef.current = thirdSectionAnimationComplete;
   }, [thirdSectionAnimationComplete]);
 
-  // Fade kitchen while fourth section overlaps; restore when scrolling back up.
+  // Fade kitchen while the footer scrolls in; restore when scrolling back up.
   useEffect(() => {
     if (!thirdSectionAnimationComplete || !kitchenCardExpanded) return;
 
     let raf = 0;
 
     const update = () => {
-      const fourth = fourthSectionRef.current;
+      const footer = document.querySelector<HTMLElement>(".mobile-site-footer");
       const overlay = kitchenOverlayRef.current;
-      if (!fourth || !overlay) return;
+      if (!footer || !overlay) return;
 
-      const fourthTop = fourth.getBoundingClientRect().top;
+      const footerTop = footer.getBoundingClientRect().top;
       const vh = window.innerHeight;
-      // Start fading only once fourth section has clearly entered the viewport.
-      const start = vh * 0.62;
-      const end = vh * 0.18;
-      const t = Math.min(Math.max((start - fourthTop) / (start - end), 0), 1);
+      const start = vh * 0.72;
+      const end = vh * 0.28;
+      const t = Math.min(Math.max((start - footerTop) / (start - end), 0), 1);
 
       if (t <= 0) {
         overlay.style.transition = "";
@@ -1363,23 +1269,6 @@ export function HomePage({
     };
   }, [kitchenAnchoredInThird]);
 
-  // Lock page scroll until the submit button has been pressed.
-  useEffect(() => {
-    if (scrollUnlocked) return;
-
-    const { documentElement, body } = document;
-    const prevHtml = documentElement.style.overflow;
-    const prevBody = body.style.overflow;
-    window.scrollTo(0, 0);
-    documentElement.style.overflow = "hidden";
-    body.style.overflow = "hidden";
-
-    return () => {
-      documentElement.style.overflow = prevHtml;
-      body.style.overflow = prevBody;
-    };
-  }, [scrollUnlocked]);
-
   useEffect(() => {
     const onScroll = () => {
       // Fade in once the user scrolls roughly past the hero.
@@ -1396,255 +1285,7 @@ export function HomePage({
     setMain2MenuOpen(false);
   }, [isMain2, showLogo]);
 
-  // After the prompt animation + submit: pin the AI box in the viewport and
-  // lerp it to the bottom of the phone as the user scrolls into section two.
-  useEffect(() => {
-    const wrap = promptWrapRef.current;
-    const section = secondSectionRef.current;
-    if (!wrap || !section) return;
-
-    const rootFontSize = () => window.innerWidth / 24.375;
-
-    const clearPin = () => {
-      // Never clear once anchored in section two or locked at the bottom.
-      if (
-        promptScrollRef.current.lockedAtBottom ||
-        promptScrollRef.current.lockedInSection
-      ) {
-        return;
-      }
-      wrap.style.position = "";
-      wrap.style.top = "";
-      wrap.style.left = "";
-      wrap.style.width = "";
-      wrap.style.transform = "";
-      wrap.style.zIndex = "";
-      promptScrollRef.current.pinned = false;
-    };
-
-    const measureScrollEnd = () => {
-      const sectionTop = section.getBoundingClientRect().top + window.scrollY;
-      return Math.max(
-        1,
-        sectionTop + section.offsetHeight - window.innerHeight,
-      );
-    };
-
-    const pinPrompt = () => {
-      const rect = wrap.getBoundingClientRect();
-      const bottomPadding = rootFontSize() * 2;
-      const boxHeight = wrap.offsetHeight;
-      const targetTop = window.innerHeight - bottomPadding - boxHeight;
-      const metrics = promptScrollRef.current;
-
-      // Use coords captured before unlock so removing marginTop doesn't jump.
-      const pinTop = metrics.prePinTop || rect.top;
-      const pinLeft = metrics.prePinLeft || rect.left;
-      const pinWidth = metrics.prePinWidth || rect.width;
-
-      const slotHeight =
-        metrics.preSlotHeight || promptFlowHeight || boxHeight;
-      if (promptSlotRef.current) {
-        promptSlotRef.current.style.height = `${slotHeight}px`;
-      }
-      setPromptFlowHeight(slotHeight);
-
-      wrap.style.position = "fixed";
-      wrap.style.left = `${pinLeft}px`;
-      wrap.style.width = `${pinWidth}px`;
-      wrap.style.top = `${pinTop}px`;
-      wrap.style.transform = "none";
-      wrap.style.zIndex = "10";
-      wrap.style.marginTop = "0";
-
-      promptScrollRef.current = {
-        ...metrics,
-        initialTop: pinTop,
-        left: pinLeft,
-        width: pinWidth,
-        targetTop,
-        scrollEnd: measureScrollEnd(),
-        pinned: true,
-        // Preserve lock flags across re-pins (e.g. resize).
-        lockedAtBottom: metrics.lockedAtBottom,
-        lockedInSection: metrics.lockedInSection,
-      };
-
-      document.documentElement.style.setProperty(
-        "--prompt-box-height",
-        `${boxHeight}px`,
-      );
-      document.documentElement.style.setProperty(
-        "--prompt-bottom-padding",
-        `${bottomPadding}px`,
-      );
-    };
-
-    let frame = 0;
-
-    const update = () => {
-      if (!scrollUnlocked) {
-        clearPin();
-        setPromptAtBottom(false);
-        return;
-      }
-
-      if (!promptScrollRef.current.pinned) {
-        pinPrompt();
-      }
-
-      cancelAnimationFrame(frame);
-      frame = requestAnimationFrame(() => {
-        const metrics = promptScrollRef.current;
-        if (!metrics.pinned) return;
-
-        // Anchored in section two — native scroll, no viewport lerp.
-        if (metrics.lockedInSection) return;
-
-        // Once locked at the bottom, clamp to targetTop and don't move.
-        if (metrics.lockedAtBottom) {
-          wrap.style.top = `${metrics.targetTop}px`;
-          return;
-        }
-
-        metrics.scrollEnd = measureScrollEnd();
-
-        const progress = Math.min(
-          Math.max(window.scrollY / metrics.scrollEnd, 0),
-          1,
-        );
-        const top =
-          metrics.initialTop +
-          (metrics.targetTop - metrics.initialTop) * progress;
-        wrap.style.top = `${top}px`;
-
-        if (progress >= 0.98) {
-          metrics.lockedAtBottom = true;
-          if (isMain2) metrics.lockedInSection = true;
-          wrap.style.top = `${metrics.targetTop}px`;
-          setPromptAtBottom(true);
-        }
-      });
-    };
-
-    const onResize = () => {
-      if (!scrollUnlocked || !promptScrollRef.current.pinned) return;
-
-      const metrics = promptScrollRef.current;
-
-      if (metrics.lockedInSection) {
-        if (isMain2) {
-          const content = main2SectionTwoContentRef.current;
-          if (content) anchorMain2PromptInSectionTwo(wrap, content);
-        } else {
-          const section = secondSectionRef.current;
-          if (section) {
-            anchorToSecondSection(wrap, section, 10);
-            const stack = listingStackRef.current;
-            if (stack) anchorToSecondSection(stack, section, 8);
-          }
-        }
-        return;
-      }
-
-      const bottomPadding = rootFontSize() * 2;
-      const boxHeight = wrap.offsetHeight;
-      const targetTop = window.innerHeight - bottomPadding - boxHeight;
-      const rect = wrap.getBoundingClientRect();
-
-      promptScrollRef.current.targetTop = targetTop;
-      promptScrollRef.current.scrollEnd = measureScrollEnd();
-      promptScrollRef.current.left = rect.left;
-      promptScrollRef.current.width = rect.width;
-      wrap.style.left = `${rect.left}px`;
-      wrap.style.width = `${rect.width}px`;
-
-      document.documentElement.style.setProperty(
-        "--prompt-box-height",
-        `${boxHeight}px`,
-      );
-      document.documentElement.style.setProperty(
-        "--prompt-bottom-padding",
-        `${bottomPadding}px`,
-      );
-
-      update();
-    };
-
-    update();
-
-    window.addEventListener("scroll", update, { passive: true });
-    window.addEventListener("resize", onResize);
-
-    return () => {
-      cancelAnimationFrame(frame);
-      window.removeEventListener("scroll", update);
-      window.removeEventListener("resize", onResize);
-      clearPin();
-    };
-  }, [scrollUnlocked, isMain2]);
-
-  // Pin synchronously on unlock — before paint — so margin/layout changes never flash.
-  useLayoutEffect(() => {
-    if (!scrollUnlocked) return;
-    const wrap = promptWrapRef.current;
-    const section = secondSectionRef.current;
-    if (!wrap || !section || promptScrollRef.current.pinned) return;
-
-    const rootFontSize = () => window.innerWidth / 24.375;
-    const rect = wrap.getBoundingClientRect();
-    const metrics = promptScrollRef.current;
-    const pinTop = metrics.prePinTop || rect.top;
-    const pinLeft = metrics.prePinLeft || rect.left;
-    const pinWidth = metrics.prePinWidth || rect.width;
-    const bottomPadding = rootFontSize() * 2;
-    const boxHeight = wrap.offsetHeight;
-    const targetTop = window.innerHeight - bottomPadding - boxHeight;
-    const sectionTop = section.getBoundingClientRect().top + window.scrollY;
-    const scrollEnd = Math.max(
-      1,
-      sectionTop + section.offsetHeight - window.innerHeight,
-    );
-
-    const slotHeight =
-      metrics.preSlotHeight || promptFlowHeight || boxHeight;
-    if (promptSlotRef.current) {
-      promptSlotRef.current.style.height = `${slotHeight}px`;
-    }
-    setPromptFlowHeight(slotHeight);
-
-    wrap.style.position = "fixed";
-    wrap.style.left = `${pinLeft}px`;
-    wrap.style.width = `${pinWidth}px`;
-    wrap.style.top = `${pinTop}px`;
-    wrap.style.transform = "none";
-    wrap.style.zIndex = "10";
-    wrap.style.marginTop = "0";
-
-    promptScrollRef.current = {
-      ...metrics,
-      initialTop: pinTop,
-      left: pinLeft,
-      width: pinWidth,
-      targetTop,
-      scrollEnd,
-      pinned: true,
-      lockedAtBottom: metrics.lockedAtBottom,
-      lockedInSection: metrics.lockedInSection,
-      preSlotHeight: slotHeight,
-    };
-
-    document.documentElement.style.setProperty(
-      "--prompt-box-height",
-      `${boxHeight}px`,
-    );
-    document.documentElement.style.setProperty(
-      "--prompt-bottom-padding",
-      `${bottomPadding}px`,
-    );
-  }, [scrollUnlocked]);
-
-  // Keep the prompt slot height measured so fixed positioning never shifts hero copy.
+  // Keep the prompt slot height measured so hero layout stays stable.
   useLayoutEffect(() => {
     if (!showHeroPrompt) return;
 
@@ -1652,7 +1293,6 @@ export function HomePage({
     if (!slot) return;
 
     const measure = () => {
-      if (scrollUnlocked) return;
       const nextHeight = slot.offsetHeight;
       setPromptFlowHeight(nextHeight);
     };
@@ -1665,9 +1305,9 @@ export function HomePage({
     return () => ro.disconnect();
   }, [showHeroPrompt, promptPhase, typed, scrollUnlocked]);
 
-  // Listing cards — one by one, only after the AI box hits the phone bottom.
+  // Listing cards — one by one, once scrolling unlocks after the first submit.
   useEffect(() => {
-    if (!promptAtBottom || listingRevealStartedRef.current) return;
+    if (!scrollUnlocked || listingRevealStartedRef.current || isMain2) return;
 
     listingRevealStartedRef.current = true;
 
@@ -1676,52 +1316,11 @@ export function HomePage({
     );
 
     return () => timers.forEach(clearTimeout);
-  }, [promptAtBottom]);
+  }, [scrollUnlocked, isMain2]);
 
-  // /main2 — keep the AI box anchored inside the section-two grain box.
-  useLayoutEffect(() => {
-    if (!isMain2 || !promptAtBottom) return;
-
-    const content = main2SectionTwoContentRef.current;
-    const wrap = promptWrapRef.current;
-    if (!content || !wrap) return;
-
-    anchorMain2PromptInSectionTwo(wrap, content);
-    promptScrollRef.current.lockedInSection = true;
-  }, [
-    isMain2,
-    promptAtBottom,
-    revealedListingCount,
-    showHeroPrompt,
-    promptPhase,
-    typed,
-    scrollUnlocked,
-  ]);
-
-  // Default page — reparent UI into second section when first listing appears.
-  useLayoutEffect(() => {
-    if (isMain2 || revealedListingCount < 1) return;
-
-    const metrics = promptScrollRef.current;
-    if (metrics.lockedInSection) return;
-
-    const section = secondSectionRef.current;
-    const wrap = promptWrapRef.current;
-    const stack = listingStackRef.current;
-    if (!section || !wrap) return;
-
-    if (wrap.parentElement !== section) {
-      section.appendChild(wrap);
-    }
-
-    anchorToSecondSection(wrap, section, 10);
-    if (stack) anchorToSecondSection(stack, section, 8);
-    metrics.lockedInSection = true;
-  }, [isMain2, revealedListingCount]);
-
-  // Fit listing stack in the band between nav and the settled AI box.
+  // Fit listing stack in the band between nav and the section bottom.
   useEffect(() => {
-    if (!promptAtBottom) return;
+    if (!scrollUnlocked) return;
 
     const fitListingStack = () => {
       const stack = listingStackRef.current;
@@ -1782,7 +1381,7 @@ export function HomePage({
       document.documentElement.style.removeProperty("--listing-stack-top");
     };
   }, [
-    promptAtBottom,
+    scrollUnlocked,
     revealedListingCount,
     showLogo,
     kitchenCardFocused,
@@ -2010,17 +1609,10 @@ export function HomePage({
         ref={promptWrapRef}
         className="hero-prompt-wrap"
         style={{
-          width: isMain2 && promptAtBottom ? "auto" : "100%",
-          position:
-            isMain2 && promptAtBottom
-              ? "absolute"
-              : scrollUnlocked
-                ? "fixed"
-                : "relative",
+          width: "100%",
+          position: "relative",
           zIndex: 2,
           overflow: "visible",
-          willChange:
-            scrollUnlocked && !(isMain2 && promptAtBottom) ? "top" : "auto",
         }}
       >
         <div
@@ -2067,10 +1659,7 @@ export function HomePage({
                   <>
                     {(promptPhase === "chip" ||
                       promptPhase === "typing" ||
-                      promptPhase === "done" ||
-                      promptPhase === "followup-ready" ||
-                      promptPhase === "followup-typing" ||
-                      promptPhase === "followup-done") && (
+                      promptPhase === "done") && (
                       <span className="hero-prompt-chip">
                         {labIcon}
                         {SELECTED_LABEL}
@@ -2093,23 +1682,6 @@ export function HomePage({
                     </span>
                   </>
                 )}
-
-                {promptPhase === "followup-ready" && (
-                  <span className="type-caret" aria-hidden />
-                )}
-
-                {(promptPhase === "followup-typing" ||
-                  promptPhase === "followup-done") && (
-                  <>
-                    <span className="hero-prompt-typed">{typed}</span>
-                    {promptPhase === "followup-typing" && (
-                      <span className="type-caret" aria-hidden />
-                    )}
-                    <span className="hero-prompt-reserve">
-                      {FOLLOWUP_PROMPT.slice(typed.length)}
-                    </span>
-                  </>
-                )}
               </span>
             </p>
 
@@ -2126,13 +1698,18 @@ export function HomePage({
                 fontSize: "inherit",
                 width: "1.8em",
                 height: "1.8em",
+                minWidth: "1.8em",
+                minHeight: "1.8em",
+                padding: 0,
                 display: "inline-flex",
                 alignItems: "center",
                 justifyContent: "center",
                 borderRadius: "50%",
+                aspectRatio: "1 / 1",
+                lineHeight: 0,
                 border: "none",
-                background: isMain2 ? "#000000" : "#ffffff",
-                color: isMain2 ? "#ffffff" : "#000000",
+                background: isMain2 ? undefined : "#ffffff",
+                color: isMain2 ? undefined : "#000000",
                 cursor: "pointer",
               }}
             >
@@ -2190,6 +1767,7 @@ export function HomePage({
           onMenuToggle={() => setMain2MenuOpen((open) => !open)}
         />
 
+        <Main2GrainContinuum active={isMain2}>
         <div
           className={`hero-stage${isMain2 ? " hero-stage--main2" : ""}`}
           style={{
@@ -2228,11 +1806,7 @@ export function HomePage({
           ) : null}
 
           {isMain2 ? (
-            <div className="main2-hero-box main2-grain-box">
-              <div
-                className="main2-grain-surface main2-hero-box__grain"
-                aria-hidden
-              />
+            <div className="main2-hero-box">
               <div aria-hidden className="hero-intro-images main2-hero-deck">
                 {renderHeroDeck()}
               </div>
@@ -2338,14 +1912,28 @@ export function HomePage({
           ) : null}
         </div>
 
-        {/* Second section — listings + AI box live here once settled. */}
+        {/* Second section — browse listings (former fourth section). */}
+        <FourthSection
+          ref={fourthSectionRef}
+          scrollReveal
+          className={`fourth-section--second${
+            isMain2 ? " fourth-section--main2-continuum" : ""
+          }`}
+          main2Grain={false}
+          main2Listings={isMain2}
+        />
+        </Main2GrainContinuum>
+
+        {!isMain2 ? (
+        <>
+        {/* Third section — AI results + listing stack once the prompt settles. */}
         <div
           ref={secondSectionRef}
           className={`second-section${
             sectionTwoComplete ? " second-section--elevated" : ""
-          }${isMain2 && promptAtBottom ? " second-section--main2-active" : ""}`}
+          }${isMain2 && scrollUnlocked ? " second-section--main2-active" : ""}`}
         >
-          {isMain2 && promptAtBottom ? (
+          {isMain2 && scrollUnlocked ? (
             <div className="main2-section-two-box main2-grain-box">
               <div
                 className="main2-grain-surface main2-hero-box__grain"
@@ -2358,7 +1946,7 @@ export function HomePage({
                 {renderListingStack()}
               </div>
             </div>
-          ) : promptAtBottom ? (
+          ) : scrollUnlocked ? (
             renderListingStack()
           ) : null}
         </div>
@@ -2515,6 +2103,7 @@ export function HomePage({
             )
           : null}
 
+        {/* Fourth section — kitchen glide + frosted prompt bars. */}
         {sectionTwoComplete ? (
           <div
             ref={thirdSectionRef}
@@ -2684,10 +2273,10 @@ export function HomePage({
             ) : null}
           </div>
         ) : null}
-        {thirdSectionAnimationComplete ? (
-          <FourthSection ref={fourthSectionRef} scrollReveal />
+        </>
         ) : null}
-        {thirdSectionAnimationComplete ? (
+
+        {isMain2 || thirdSectionAnimationComplete ? (
           <footer
             className="mobile-site-footer"
             style={{ fontSize: MOBILE_ROOT_FONT_SIZE }}

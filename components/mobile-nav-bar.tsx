@@ -23,8 +23,11 @@ export function MobileNavBar({
   menuOpen = false,
   onMenuToggle,
 }: MobileNavBarProps) {
-  const expanded = staticNav || showLogo || (isMain2 && menuOpen);
-  const logoVisible = staticNav || showLogo || (isMain2 && menuOpen);
+  const isMain2PastHero = isMain2 && showLogo;
+  const expanded =
+    staticNav || (isMain2 ? menuOpen && !isMain2PastHero : showLogo);
+  const logoVisible =
+    staticNav || (isMain2 ? menuOpen && !isMain2PastHero : showLogo);
   const navVisible = staticNav || showNav;
   const logoClassName = `mobile-nav-logo mobile-nav-logo-link${
     logoVisible ? " is-visible" : ""
@@ -39,24 +42,26 @@ export function MobileNavBar({
       className={`mobile-nav${
         staticNav ? " mobile-nav--static" : " hero-intro-fade"
       }${isMain2 ? " mobile-nav--main2" : ""}${
-        navVisible ? " is-visible" : ""
-      }${expanded ? " is-expanded" : ""}`}
+        isMain2PastHero ? " mobile-nav--main2-past-hero" : ""
+      }${navVisible ? " is-visible" : ""}${expanded ? " is-expanded" : ""}`}
     >
-      {staticNav ? (
-        <Link href="/" className={logoClassName} aria-hidden={!logoVisible}>
-          {isMain2 ? "BINOCULAR" : "Binocular"}
-        </Link>
-      ) : (
-        <button
-          type="button"
-          className={logoClassName}
-          aria-hidden={!logoVisible}
-          aria-label="Back to top"
-          onClick={scrollToTop}
-        >
-          {isMain2 ? "BINOCULAR" : "Binocular"}
-        </button>
-      )}
+      {!isMain2PastHero ? (
+        staticNav ? (
+          <Link href="/" className={logoClassName} aria-hidden={!logoVisible}>
+            {isMain2 ? "BINOCULAR" : "Binocular"}
+          </Link>
+        ) : (
+          <button
+            type="button"
+            className={logoClassName}
+            aria-hidden={!logoVisible}
+            aria-label="Back to top"
+            onClick={scrollToTop}
+          >
+            {isMain2 ? "BINOCULAR" : "Binocular"}
+          </button>
+        )
+      ) : null}
 
       <button
         type="button"

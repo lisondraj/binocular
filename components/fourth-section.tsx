@@ -16,7 +16,19 @@ import {
   FOURTH_SECTION_BY_PRICE,
   FOURTH_SECTION_BY_SPACE,
   LISTING_CARDS,
+  type ListingHost,
 } from "@/lib/listings";
+
+const ratingStarIcon = (
+  <svg
+    className="listing-card-rating-star"
+    viewBox="0 0 24 24"
+    fill="currentColor"
+    aria-hidden
+  >
+    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+  </svg>
+);
 
 const upRightArrow = (
   <svg
@@ -30,21 +42,6 @@ const upRightArrow = (
   >
     <line x1="7" y1="17" x2="17" y2="7" />
     <polyline points="7 7 17 7 17 17" />
-  </svg>
-);
-
-const upArrow = (
-  <svg
-    style={{ width: "0.9em", height: "0.9em" }}
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2.25"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <line x1="12" y1="19" x2="12" y2="5" />
-    <polyline points="5 12 12 5 19 12" />
   </svg>
 );
 
@@ -67,22 +64,9 @@ const filterIcon = (
   </svg>
 );
 
-const microphoneIcon = (
-  <svg
-    style={{ width: "0.95em", height: "0.95em" }}
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <path d="M12 1a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
-    <path d="M19 10v1a7 7 0 0 1-14 0v-1" />
-    <line x1="12" y1="19" x2="12" y2="23" />
-    <line x1="8" y1="23" x2="16" y2="23" />
-  </svg>
-);
+function formatListingPriceUsd(price: string) {
+  return `${price.replace(/\/hr$/, "").trim()} USD`;
+}
 
 function FourthSectionPrice({ price }: { price: string }) {
   const amount = price.replace(/\/hr$/, "");
@@ -95,6 +79,93 @@ function FourthSectionPrice({ price }: { price: string }) {
   );
 }
 
+function FourthSectionListingHosts({
+  hosts,
+}: {
+  hosts: readonly ListingHost[];
+}) {
+  return (
+    <div
+      className="fourth-section-listing-card__hosts listing-card-hosts"
+      aria-label="Hosts"
+    >
+      {hosts.map((host, hostIndex) => (
+        <span
+          key={host.initials}
+          className={`listing-card-avatar${
+            hosts.length > 1
+              ? hostIndex === 0
+                ? " listing-card-avatar--back"
+                : " listing-card-avatar--front"
+              : ""
+          }`}
+          style={{
+            background: `linear-gradient(${host.gradient})`,
+          }}
+        >
+          {host.initials}
+        </span>
+      ))}
+    </div>
+  );
+}
+
+function FourthSectionListingMeta({
+  title,
+  subtitle,
+  price,
+  rating,
+  reviewCount,
+  main2Listings = false,
+  className = "",
+}: {
+  title: string;
+  subtitle: string;
+  price: string;
+  rating?: number;
+  reviewCount?: number;
+  main2Listings?: boolean;
+  className?: string;
+}) {
+  return (
+    <div
+      className={`fourth-section-listing-card__caption${className ? ` ${className}` : ""}`}
+    >
+      <div
+        className={`fourth-section-listing-card__meta${
+          main2Listings && rating != null
+            ? " fourth-section-listing-card__meta--with-rating"
+            : ""
+        }`}
+      >
+        <div className="listing-card-body">
+          <h3 className="listing-card-title">{title}</h3>
+          <p className="listing-card-distance">{subtitle}</p>
+        </div>
+        {main2Listings && rating != null ? (
+          <div className="fourth-section-listing-card__aside">
+            <span
+              className="fourth-section-listing-card__rating listing-card-rating"
+              aria-label={`Rating ${rating} from ${reviewCount ?? 0} reviews`}
+            >
+              {rating}
+              {ratingStarIcon}
+              {reviewCount != null ? (
+                <span className="fourth-section-listing-card__review-count">
+                  ({reviewCount})
+                </span>
+              ) : null}
+            </span>
+            <span className="fourth-section-listing-card__price-usd">
+              {formatListingPriceUsd(price)}
+            </span>
+          </div>
+        ) : null}
+      </div>
+    </div>
+  );
+}
+
 function FourthSectionListingCard({
   className,
   image,
@@ -102,6 +173,11 @@ function FourthSectionListingCard({
   price,
   title,
   subtitle,
+  hosts,
+  rating,
+  reviewCount,
+  main2Listings = false,
+  bundleImageOnly = false,
 }: {
   className: string;
   image: string;
@@ -109,19 +185,62 @@ function FourthSectionListingCard({
   price: string;
   title: string;
   subtitle: string;
+  hosts?: readonly ListingHost[];
+  rating?: number;
+  reviewCount?: number;
+  main2Listings?: boolean;
+  /** /main2 bundle — image + hosts only; meta renders outside the stack deck. */
+  bundleImageOnly?: boolean;
 }) {
-  return (
-    <article className={`fourth-section-listing-card ${className}`}>
+  const imageStage = (
+    <div className="fourth-section-listing-card__stage">
       <div className="listing-card-media fourth-section-listing-card__media">
         <img src={image} alt={alt} className="listing-card-image" />
-        <FourthSectionPrice price={price} />
-        <div className="fourth-section-listing-card__caption">
-          <div className="listing-card-body">
-            <h3 className="listing-card-title">{title}</h3>
-            <p className="listing-card-distance">{subtitle}</p>
-          </div>
-        </div>
+        {main2Listings && hosts?.length ? (
+          <FourthSectionListingHosts hosts={hosts} />
+        ) : null}
+        {!main2Listings ? <FourthSectionPrice price={price} /> : null}
+        {!main2Listings ? (
+          <FourthSectionListingMeta
+            title={title}
+            subtitle={subtitle}
+            price={price}
+            rating={rating}
+            reviewCount={reviewCount}
+            main2Listings={main2Listings}
+          />
+        ) : null}
       </div>
+    </div>
+  );
+
+  if (main2Listings && bundleImageOnly) {
+    return (
+      <article className={`fourth-section-listing-card ${className}`}>
+        {imageStage}
+      </article>
+    );
+  }
+
+  if (main2Listings) {
+    return (
+      <article className={`fourth-section-listing-card ${className}`}>
+        {imageStage}
+        <FourthSectionListingMeta
+          title={title}
+          subtitle={subtitle}
+          price={price}
+          rating={rating}
+          reviewCount={reviewCount}
+          main2Listings={main2Listings}
+        />
+      </article>
+    );
+  }
+
+  return (
+    <article className={`fourth-section-listing-card ${className}`}>
+      {imageStage}
     </article>
   );
 }
@@ -129,10 +248,19 @@ function FourthSectionListingCard({
 type FourthSectionProps = {
   scrollReveal?: boolean;
   className?: string;
+  /** /main2 — continue hero grain + dark gradient into browse listings. */
+  main2Grain?: boolean;
+  /** /main2 — hosts on image, rating beside caption text. */
+  main2Listings?: boolean;
 };
 
 export const FourthSection = forwardRef(function FourthSection(
-  { scrollReveal = false, className = "" }: FourthSectionProps,
+  {
+    scrollReveal = false,
+    className = "",
+    main2Grain = false,
+    main2Listings = false,
+  }: FourthSectionProps,
   ref: Ref<HTMLElement>,
 ) {
   const [filterOpen, setFilterOpen] = useState(false);
@@ -185,41 +313,18 @@ export const FourthSection = forwardRef(function FourthSection(
   return (
     <section
       ref={setSectionRef}
-      className={`fourth-section${className ? ` ${className}` : ""}`}
+      className={`fourth-section${className ? ` ${className}` : ""}${
+        main2Grain ? " fourth-section--main2-grain main2-grain-box" : ""
+      }`}
       style={{ fontSize: MOBILE_ROOT_FONT_SIZE }}
     >
-      <div className="fourth-section__intro fourth-section-reveal">
-        <p className="fourth-section__description">
-          Book spaces for
-          <br />
-          physical intelligence.
-        </p>
-        <div className="fourth-section__ai-composer">
-          <input
-            type="text"
-            className="fourth-section__ai-input"
-            placeholder="Find a space..."
-            aria-label="Find a space"
-          />
-          <div className="fourth-section__ai-composer-actions">
-            <button
-              type="button"
-              className="fourth-section__ai-composer-btn"
-              aria-label="Voice input"
-            >
-              {microphoneIcon}
-            </button>
-            <button
-              type="button"
-              className="fourth-section__ai-composer-btn fourth-section__ai-composer-btn--submit"
-              aria-label="Submit"
-            >
-              {upArrow}
-            </button>
-          </div>
-        </div>
-      </div>
-
+      {main2Grain ? (
+        <div
+          className="main2-grain-surface fourth-section__grain"
+          aria-hidden
+        />
+      ) : null}
+      <div className="fourth-section__inner">
       <div className="fourth-section__listings-anchor fourth-section-reveal">
         <div className="fourth-section__listings-toolbar">
           <button
@@ -297,6 +402,10 @@ export const FourthSection = forwardRef(function FourthSection(
                     price={listing.pricePerHour}
                     title={listing.title}
                     subtitle={`${listing.distanceMi} mi away`}
+                    hosts={listing.hosts}
+                    rating={listing.rating}
+                    reviewCount={listing.reviewCount}
+                    main2Listings={main2Listings}
                   />
                 </div>
               ))}
@@ -324,6 +433,10 @@ export const FourthSection = forwardRef(function FourthSection(
                   price={listing.pricePerHour}
                   title={listing.title}
                   subtitle={listing.subtitle}
+                  hosts={listing.hosts}
+                  rating={listing.rating}
+                  reviewCount={listing.reviewCount}
+                  main2Listings={main2Listings}
                 />
               </div>
             ))}
@@ -350,6 +463,10 @@ export const FourthSection = forwardRef(function FourthSection(
                   price={listing.pricePerHour}
                   title={listing.title}
                   subtitle={listing.subtitle}
+                  hosts={listing.hosts}
+                  rating={listing.rating}
+                  reviewCount={listing.reviewCount}
+                  main2Listings={main2Listings}
                 />
               </div>
             ))}
@@ -370,22 +487,86 @@ export const FourthSection = forwardRef(function FourthSection(
                 className="fourth-section-listing-card-wrap fourth-section-listing-card-wrap--bundle"
               >
                 <div className="fourth-section-bundle">
-                  <FourthSectionListingCard
-                    className="fourth-section-listing-card--distance fourth-section-bundle__main"
-                    image={bundle.image}
-                    alt={bundle.alt}
-                    price={bundle.pricePerHour}
-                    title={bundle.title}
-                    subtitle={bundle.subtitle}
-                  />
-                  <div className="fourth-section-bundle__stack" aria-hidden>
-                    {[0, 1].map((stackIndex) => (
-                      <article
-                        key={`${bundle.title}-stack-${stackIndex}`}
-                        className={`fourth-section-bundle__mini fourth-section-bundle__mini--${stackIndex}`}
+                  {main2Listings ? (
+                    <>
+                      <div className="fourth-section-bundle__deck">
+                        <FourthSectionListingCard
+                          className="fourth-section-listing-card--distance fourth-section-bundle__main"
+                          image={bundle.image}
+                          alt={bundle.alt}
+                          price={bundle.pricePerHour}
+                          title={bundle.title}
+                          subtitle={bundle.subtitle}
+                          hosts={bundle.hosts}
+                          rating={bundle.rating}
+                          reviewCount={bundle.reviewCount}
+                          main2Listings={main2Listings}
+                          bundleImageOnly
+                        />
+                        <div
+                          className="fourth-section-bundle__stack"
+                          aria-hidden
+                        >
+                          {[0, 1].map((stackIndex) => {
+                            const space = bundle.spaces[2 - stackIndex];
+                            return (
+                              <article
+                                key={`${bundle.title}-stack-${stackIndex}`}
+                                className={`fourth-section-bundle__mini fourth-section-bundle__mini--${stackIndex}`}
+                              >
+                                <img
+                                  src={space.image}
+                                  alt=""
+                                  className="fourth-section-bundle__mini-image"
+                                />
+                              </article>
+                            );
+                          })}
+                        </div>
+                      </div>
+                      <FourthSectionListingMeta
+                        className="fourth-section-bundle__meta"
+                        title={bundle.title}
+                        subtitle={bundle.subtitle}
+                        price={bundle.pricePerHour}
+                        rating={bundle.rating}
+                        reviewCount={bundle.reviewCount}
+                        main2Listings={main2Listings}
                       />
-                    ))}
-                  </div>
+                    </>
+                  ) : (
+                    <>
+                      <FourthSectionListingCard
+                        className="fourth-section-listing-card--distance fourth-section-bundle__main"
+                        image={bundle.image}
+                        alt={bundle.alt}
+                        price={bundle.pricePerHour}
+                        title={bundle.title}
+                        subtitle={bundle.subtitle}
+                        hosts={bundle.hosts}
+                        rating={bundle.rating}
+                        reviewCount={bundle.reviewCount}
+                        main2Listings={main2Listings}
+                      />
+                      <div className="fourth-section-bundle__stack" aria-hidden>
+                        {[0, 1].map((stackIndex) => {
+                          const space = bundle.spaces[2 - stackIndex];
+                          return (
+                            <article
+                              key={`${bundle.title}-stack-${stackIndex}`}
+                              className={`fourth-section-bundle__mini fourth-section-bundle__mini--${stackIndex}`}
+                            >
+                              <img
+                                src={space.image}
+                                alt=""
+                                className="fourth-section-bundle__mini-image"
+                              />
+                            </article>
+                          );
+                        })}
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
             ))}
@@ -395,18 +576,12 @@ export const FourthSection = forwardRef(function FourthSection(
 
       <div className="fourth-section__outro fourth-section-reveal">
         <div className="fourth-section__actions">
-          <button
-            type="button"
-            className="fourth-section__btn fourth-section__btn--primary"
-          >
-            Host
-            {upRightArrow}
-          </button>
           <Link href="/book" className="fourth-section__btn">
             Book
             {upRightArrow}
           </Link>
         </div>
+      </div>
       </div>
     </section>
   );
