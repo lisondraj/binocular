@@ -439,6 +439,7 @@ export default function Home() {
   const kitchenInThirdSectionRef = useRef(false);
   const thirdSectionAnimationCompleteRef = useRef(false);
   const kitchenCompactHeightRef = useRef(0);
+  const kitchenCompactStartedRef = useRef(false);
   const kitchenGlideBoundsRef = useRef({ glideStart: 0, glideEnd: 0 });
   const kitchenGlideProgressRef = useRef(0);
 
@@ -996,7 +997,9 @@ export default function Home() {
       const secRect = sec3.getBoundingClientRect();
       const rootEm = window.innerWidth / 24.375;
       const compactHeight = Math.max(g.height * 0.38, rootEm * 11);
-      const centeredTop = (sec3.offsetHeight - g.height) / 2;
+      const isCompact = kitchenCompactStartedRef.current;
+      const activeHeight = isCompact ? compactHeight : g.height;
+      const centeredTop = (sec3.offsetHeight - activeHeight) / 2;
       const centeredLeft = g.left - secRect.left;
 
       kitchenCompactHeightRef.current = compactHeight;
@@ -1011,16 +1014,19 @@ export default function Home() {
         kitchenAnchoredLayoutRef.current = true;
       }
 
-      overlay.style.transition = "none";
       overlay.style.position = "absolute";
       overlay.style.top = `${top}px`;
       overlay.style.left = `${left}px`;
       overlay.style.width = `${g.width}px`;
-      overlay.style.height = `${g.height}px`;
       overlay.style.zIndex = "11";
       overlay.style.margin = "0";
       overlay.style.transform = "none";
       overlay.style.willChange = "auto";
+
+      if (!isCompact) {
+        overlay.style.transition = "none";
+        overlay.style.height = `${g.height}px`;
+      }
 
       sec3.style.setProperty("--kitchen-top", `${top}px`);
       sec3.style.setProperty("--kitchen-left", `${left}px`);
@@ -1031,7 +1037,10 @@ export default function Home() {
 
     apply(!kitchenAnchoredLayoutRef.current);
 
-    const onResize = () => apply(false);
+    const onResize = () => {
+      if (kitchenCompactStartedRef.current) return;
+      apply(false);
+    };
     window.addEventListener("resize", onResize);
     return () => window.removeEventListener("resize", onResize);
   }, [kitchenAnchoredInThird]);
@@ -1107,7 +1116,6 @@ export default function Home() {
     if (!overlay || !sec3) return;
 
     const timers: ReturnType<typeof setTimeout>[] = [];
-    const compactHeight = kitchenCompactHeightRef.current;
 
     const kitchenCompactDelayMs = 500;
     const kitchenCompactDurationMs = 1700;
@@ -1118,10 +1126,33 @@ export default function Home() {
 
     timers.push(
       setTimeout(() => {
-        overlay.style.transition = `height ${kitchenCompactDurationMs}ms cubic-bezier(0.33, 1, 0.68, 1)`;
-        overlay.style.height = `${compactHeight}px`;
+        const g = kitchenGlideRef.current;
+        const rootEm = window.innerWidth / 24.375;
+        const compactHeight =
+          kitchenCompactHeightRef.current ||
+          Math.max(g.height * 0.38, rootEm * 11);
+        if (!compactHeight || !g.height) return;
+        kitchenCompactHeightRef.current = compactHeight;
+
+        kitchenCompactStartedRef.current = true;
         setKitchenCompact(true);
-        sec3.style.setProperty("--kitchen-compact-height", `${compactHeight}px`);
+
+        // Swap to compact markup first, then animate height on the next frame.
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            const el = kitchenOverlayRef.current;
+            const section = thirdSectionRef.current;
+            if (!el || !section) return;
+
+            void el.offsetHeight;
+            el.style.transition = `height ${kitchenCompactDurationMs}ms cubic-bezier(0.33, 1, 0.68, 1)`;
+            el.style.height = `${compactHeight}px`;
+            section.style.setProperty(
+              "--kitchen-compact-height",
+              `${compactHeight}px`,
+            );
+          });
+        });
       }, kitchenCompactDelayMs),
     );
 
