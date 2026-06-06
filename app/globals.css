@@ -53,7 +53,7 @@ h6 {
   }
 }
 
-/* Hero title — trim text boxes to cap height / baseline for tight alignment. */
+/* Hero title — Inter, wide tracking, compact size (nav logo unchanged). */
 .hero-title {
   display: flex;
   align-items: center;
@@ -61,7 +61,11 @@ h6 {
   line-height: 1;
   width: 100%;
   text-align: left;
-  font-family: var(--font-suisse), system-ui, sans-serif;
+  font-family: var(--font-inter), system-ui, sans-serif;
+  font-size: 1.15em;
+  font-weight: 400;
+  letter-spacing: 0.22em;
+  text-transform: none;
 }
 
 .hero-title-word {
@@ -2314,6 +2318,11 @@ a.fourth-section__btn {
   --main2-hero-inset-y: 0.85em;
   --main2-hero-radius: 0.75em;
   --main2-nav-inset: 0.55em;
+  --main2-nav-height: calc(2.75em + (2 * 0.72em));
+  --main2-section-two-top: calc(
+    var(--main2-hero-inset-y) + var(--main2-nav-inset) + var(--main2-nav-height) +
+      0.35em
+  );
 }
 
 .main2-nav-anchor {
@@ -2349,6 +2358,17 @@ a.fourth-section__btn {
   );
   padding: 0.72em 0.62em;
   min-height: 2.75em;
+}
+
+/* /main2 nav logo — match hero BINOCULAR (Inter, caps, wide tracking). */
+.mobile-nav--main2 .mobile-nav-logo,
+.mobile-nav--main2 .mobile-nav-logo-link {
+  font-family: var(--font-inter), system-ui, sans-serif;
+  font-size: 0.76em;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.42em;
+  margin-left: 0.35em;
 }
 
 .main2-nav-menu-panel {
@@ -2410,6 +2430,17 @@ a.fourth-section__btn {
   padding: var(--main2-hero-inset-y) var(--main2-hero-inset-x);
 }
 
+.main2-grain-box {
+  background:
+    radial-gradient(ellipse 95% 70% at 12% 8%, rgba(118, 118, 118, 0.42), transparent 58%),
+    radial-gradient(ellipse 80% 55% at 88% 92%, rgba(72, 72, 72, 0.5), transparent 62%),
+    radial-gradient(ellipse 60% 45% at 50% 40%, rgba(48, 48, 48, 0.35), transparent 70%),
+    linear-gradient(155deg, #4a4a4a 0%, #2a2a2a 32%, #141414 68%, #050505 100%);
+  box-shadow:
+    0 0.35em 1.4em rgba(0, 0, 0, 0.14),
+    inset 0 0.0625em 0 rgba(255, 255, 255, 0.06);
+}
+
 .main2-hero-box {
   position: relative;
   flex: 1 1 auto;
@@ -2424,14 +2455,59 @@ a.fourth-section__btn {
   flex-direction: column;
   justify-content: center;
   align-items: stretch;
-  background:
-    radial-gradient(ellipse 95% 70% at 12% 8%, rgba(118, 118, 118, 0.42), transparent 58%),
-    radial-gradient(ellipse 80% 55% at 88% 92%, rgba(72, 72, 72, 0.5), transparent 62%),
-    radial-gradient(ellipse 60% 45% at 50% 40%, rgba(48, 48, 48, 0.35), transparent 70%),
-    linear-gradient(155deg, #4a4a4a 0%, #2a2a2a 32%, #141414 68%, #050505 100%);
-  box-shadow:
-    0 0.35em 1.4em rgba(0, 0, 0, 0.14),
-    inset 0 0.0625em 0 rgba(255, 255, 255, 0.06);
+}
+
+.second-section--main2-active {
+  padding: var(--main2-section-two-top) var(--main2-hero-inset-x)
+    var(--main2-hero-inset-y);
+  box-sizing: border-box;
+  background-color: #ffffff;
+}
+
+@keyframes main2-section-two-box-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 0.55em, 0);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.main2-section-two-box {
+  position: relative;
+  width: 100%;
+  min-height: calc(
+    100vh - var(--main2-section-two-top) - var(--main2-hero-inset-y)
+  );
+  border-radius: var(--main2-hero-radius);
+  overflow: hidden;
+  isolation: isolate;
+  opacity: 0;
+  animation: main2-section-two-box-in 0.9s ease forwards;
+}
+
+.main2-section-two-box__content {
+  position: relative;
+  z-index: 1;
+  min-height: inherit;
+  height: 100%;
+  overflow: hidden;
+}
+
+.listing-stack--main2-section {
+  position: absolute;
+  top: 0.85em;
+  left: 0;
+  right: 0;
+  bottom: calc(var(--prompt-box-height, 8rem) + 1.35em);
+  transform: none;
+  width: 100%;
+  max-width: none;
+  padding: 0.5em 1.15em;
+  pointer-events: auto;
 }
 
 .main2-hero-deck {
@@ -2485,28 +2561,68 @@ a.fourth-section__btn {
   gap: 0.55em;
 }
 
+.mobile-view--main2 .main2-hero-box .hero-title {
+  justify-content: center;
+  text-align: center;
+  font-size: 0.92em;
+  text-transform: uppercase;
+  letter-spacing: 0.42em;
+}
+
+.mobile-view--main2 .main2-hero-box .hero-description {
+  align-items: center;
+  text-align: center;
+}
+
+.mobile-view--main2 .main2-hero-box .main2-hero-actions {
+  align-self: center;
+}
+
 .mobile-view--main2 .main2-hero-box .hero-title-word,
 .mobile-view--main2 .main2-hero-box .hero-description {
   color: #ffffff;
 }
 
+/* No drop shadows inside the main2 hero grain box. */
+.mobile-view--main2 .main2-hero-box.main2-grain-box {
+  box-shadow: none;
+}
+
+.mobile-view--main2 .main2-hero-box .main2-hero-deck img,
+.mobile-view--main2 .main2-hero-box .hero-deck-tag,
+.mobile-view--main2 .main2-hero-box .hero-info-card {
+  box-shadow: none;
+}
+
+.mobile-view--main2 .main2-hero-box .main2-hero-prompt-card {
+  box-shadow: none;
+}
+
+.mobile-view--main2 .main2-hero-box .main2-hero-prompt-card .hero-prompt-menu {
+  box-shadow: none;
+}
+
+.mobile-view--main2 .main2-hero-box .main2-hero-prompt-slot {
+  padding-bottom: 0;
+  margin-bottom: 0;
+}
+
 .main2-hero-actions {
-  align-self: flex-start;
   display: flex;
-  gap: 0.75em;
+  gap: 0.6em;
 }
 
 .main2-hero-btn {
   display: inline-flex;
   align-items: center;
-  gap: 0.5em;
-  padding: 0.75em 1.25em;
+  gap: 0.4em;
+  padding: 0.58em 1em;
   border: 0.0625em solid #ffffff;
-  border-radius: 0.5em;
+  border-radius: 0.45em;
   background: none;
   color: #ffffff;
   font-family: var(--font-suisse), system-ui, sans-serif;
-  font-size: 0.95em;
+  font-size: 0.84em;
   font-weight: 300;
   cursor: pointer;
   text-decoration: none;

@@ -82,6 +82,72 @@ const anchorToSecondSection = (
   }
 };
 
+/** /main2 — anchor the AI box to the bottom inside the section-two grain box. */
+const anchorMain2PromptInSectionTwo = (
+  wrap: HTMLElement,
+  content: HTMLElement,
+) => {
+  if (wrap.parentElement !== content) {
+    content.appendChild(wrap);
+  }
+
+  wrap.style.position = "absolute";
+  wrap.style.top = "auto";
+  wrap.style.left = "1.15em";
+  wrap.style.right = "1.15em";
+  wrap.style.width = "auto";
+  wrap.style.bottom = "0.85em";
+  wrap.style.height = "auto";
+  wrap.style.transform = "none";
+  wrap.style.zIndex = "10";
+  wrap.style.marginTop = "0";
+};
+
+const paintMain2GrainSurfaces = () => {
+  const tile = 40;
+
+  const buildGrainTile = () => {
+    const canvas = document.createElement("canvas");
+    canvas.width = tile;
+    canvas.height = tile;
+
+    const ctx = canvas.getContext("2d", { alpha: true });
+    if (!ctx) return "";
+
+    const image = ctx.createImageData(tile, tile);
+    const pixels = image.data;
+
+    for (let i = 0; i < pixels.length; i += 4) {
+      if (Math.random() > 0.82) continue;
+
+      const light = Math.random() > 0.5;
+      const lum = light
+        ? 235 + Math.floor(Math.random() * 20)
+        : 22 + Math.floor(Math.random() * 30);
+
+      pixels[i] = lum;
+      pixels[i + 1] = lum;
+      pixels[i + 2] = lum;
+      pixels[i + 3] = 4 + Math.floor(Math.random() * 10);
+    }
+
+    ctx.putImageData(image, 0, 0);
+    return canvas.toDataURL("image/png");
+  };
+
+  const tilePx = `${tile}px`;
+  const offsetPx = `${tile / 2}px`;
+  const urlA = buildGrainTile();
+  const urlB = buildGrainTile();
+
+  document.querySelectorAll<HTMLElement>(".main2-grain-surface").forEach((layer) => {
+    layer.style.backgroundImage = `url(${urlA}), url(${urlB})`;
+    layer.style.backgroundSize = `${tilePx} ${tilePx}, ${tilePx} ${tilePx}`;
+    layer.style.backgroundPosition = `0 0, ${offsetPx} ${offsetPx}`;
+    layer.style.backgroundRepeat = "repeat";
+  });
+};
+
 /** Kitchen is the middle listing card — index 1 in LISTING_CARDS. */
 const KITCHEN_LISTING_INDEX = 1;
 
@@ -404,7 +470,7 @@ export function HomePage({
 
   const promptWrapRef = useRef<HTMLDivElement>(null);
   const promptSlotRef = useRef<HTMLDivElement>(null);
-  const main2GrainRef = useRef<HTMLDivElement>(null);
+  const main2SectionTwoContentRef = useRef<HTMLDivElement>(null);
   const secondSectionRef = useRef<HTMLDivElement>(null);
   const thirdSectionRef = useRef<HTMLDivElement>(null);
   const fourthSectionRef = useRef<HTMLElement>(null);
@@ -484,54 +550,11 @@ export function HomePage({
     return () => timers.forEach(clearTimeout);
   }, []);
 
-  // /main2 — tiny film grain tiles repeated at 1:1 (no upscale zoom).
+  // /main2 — paint tiny grain tiles on every grain surface (hero + section two).
   useEffect(() => {
     if (!isMain2) return;
-
-    const layer = main2GrainRef.current;
-    if (!layer) return;
-
-    const tile = 40;
-
-    const buildGrainTile = () => {
-      const canvas = document.createElement("canvas");
-      canvas.width = tile;
-      canvas.height = tile;
-
-      const ctx = canvas.getContext("2d", { alpha: true });
-      if (!ctx) return "";
-
-      const image = ctx.createImageData(tile, tile);
-      const pixels = image.data;
-
-      for (let i = 0; i < pixels.length; i += 4) {
-        if (Math.random() > 0.82) continue;
-
-        const light = Math.random() > 0.5;
-        const lum = light
-          ? 235 + Math.floor(Math.random() * 20)
-          : 22 + Math.floor(Math.random() * 30);
-
-        pixels[i] = lum;
-        pixels[i + 1] = lum;
-        pixels[i + 2] = lum;
-        pixels[i + 3] = 4 + Math.floor(Math.random() * 10);
-      }
-
-      ctx.putImageData(image, 0, 0);
-      return canvas.toDataURL("image/png");
-    };
-
-    const tilePx = `${tile}px`;
-    const offsetPx = `${tile / 2}px`;
-    const urlA = buildGrainTile();
-    const urlB = buildGrainTile();
-
-    layer.style.backgroundImage = `url(${urlA}), url(${urlB})`;
-    layer.style.backgroundSize = `${tilePx} ${tilePx}, ${tilePx} ${tilePx}`;
-    layer.style.backgroundPosition = `0 0, ${offsetPx} ${offsetPx}`;
-    layer.style.backgroundRepeat = "repeat";
-  }, [isMain2]);
+    paintMain2GrainSurfaces();
+  }, [isMain2, promptAtBottom]);
 
   // @ types in → mention menu → chip → prompt typing (after AI box fade-in)
   useEffect(() => {
@@ -1497,6 +1520,7 @@ export function HomePage({
 
         if (progress >= 0.98) {
           metrics.lockedAtBottom = true;
+          if (isMain2) metrics.lockedInSection = true;
           wrap.style.top = `${metrics.targetTop}px`;
           setPromptAtBottom(true);
         }
@@ -1509,11 +1533,16 @@ export function HomePage({
       const metrics = promptScrollRef.current;
 
       if (metrics.lockedInSection) {
-        const section = secondSectionRef.current;
-        if (section) {
-          anchorToSecondSection(wrap, section, 10);
-          const stack = listingStackRef.current;
-          if (stack) anchorToSecondSection(stack, section, 8);
+        if (isMain2) {
+          const content = main2SectionTwoContentRef.current;
+          if (content) anchorMain2PromptInSectionTwo(wrap, content);
+        } else {
+          const section = secondSectionRef.current;
+          if (section) {
+            anchorToSecondSection(wrap, section, 10);
+            const stack = listingStackRef.current;
+            if (stack) anchorToSecondSection(stack, section, 8);
+          }
         }
         return;
       }
@@ -1553,7 +1582,7 @@ export function HomePage({
       window.removeEventListener("resize", onResize);
       clearPin();
     };
-  }, [scrollUnlocked]);
+  }, [scrollUnlocked, isMain2]);
 
   // Pin synchronously on unlock — before paint — so margin/layout changes never flash.
   useLayoutEffect(() => {
@@ -1649,9 +1678,29 @@ export function HomePage({
     return () => timers.forEach(clearTimeout);
   }, [promptAtBottom]);
 
-  // First listing card: reparent UI into second section and anchor there.
+  // /main2 — keep the AI box anchored inside the section-two grain box.
   useLayoutEffect(() => {
-    if (revealedListingCount < 1) return;
+    if (!isMain2 || !promptAtBottom) return;
+
+    const content = main2SectionTwoContentRef.current;
+    const wrap = promptWrapRef.current;
+    if (!content || !wrap) return;
+
+    anchorMain2PromptInSectionTwo(wrap, content);
+    promptScrollRef.current.lockedInSection = true;
+  }, [
+    isMain2,
+    promptAtBottom,
+    revealedListingCount,
+    showHeroPrompt,
+    promptPhase,
+    typed,
+    scrollUnlocked,
+  ]);
+
+  // Default page — reparent UI into second section when first listing appears.
+  useLayoutEffect(() => {
+    if (isMain2 || revealedListingCount < 1) return;
 
     const metrics = promptScrollRef.current;
     if (metrics.lockedInSection) return;
@@ -1661,7 +1710,6 @@ export function HomePage({
     const stack = listingStackRef.current;
     if (!section || !wrap) return;
 
-    // Move prompt from hero into section two (stack already lives in section).
     if (wrap.parentElement !== section) {
       section.appendChild(wrap);
     }
@@ -1669,7 +1717,7 @@ export function HomePage({
     anchorToSecondSection(wrap, section, 10);
     if (stack) anchorToSecondSection(stack, section, 8);
     metrics.lockedInSection = true;
-  }, [revealedListingCount]);
+  }, [isMain2, revealedListingCount]);
 
   // Fit listing stack in the band between nav and the settled AI box.
   useEffect(() => {
@@ -1680,15 +1728,25 @@ export function HomePage({
       const inner = listingInnerRef.current;
       if (!stack || !inner) return;
 
-      const nav = document.querySelector(".mobile-nav");
-      const navBottom = nav?.getBoundingClientRect().bottom ?? 0;
-      const rootEm = window.innerWidth / 24.375;
-      const safeTop = Math.max(navBottom, rootEm * 5.5) + 10;
+      if (!isMain2) {
+        const nav = document.querySelector(".mobile-nav");
+        const navBottom = nav?.getBoundingClientRect().bottom ?? 0;
+        const rootEm = window.innerWidth / 24.375;
+        const safeTop = Math.max(navBottom, rootEm * 5.5) + 10;
 
-      document.documentElement.style.setProperty(
-        "--listing-stack-top",
-        `${safeTop}px`,
-      );
+        document.documentElement.style.setProperty(
+          "--listing-stack-top",
+          `${safeTop}px`,
+        );
+      }
+
+      const wrap = promptWrapRef.current;
+      if (wrap) {
+        document.documentElement.style.setProperty(
+          "--prompt-box-height",
+          `${wrap.offsetHeight}px`,
+        );
+      }
 
       inner.style.zoom = "1";
       inner.style.transformOrigin = "center center";
@@ -1730,6 +1788,7 @@ export function HomePage({
     kitchenCardFocused,
     kitchenCardExpanded,
     sectionTwoComplete,
+    isMain2,
   ]);
 
   const renderHeroDeck = () =>
@@ -1844,6 +1903,94 @@ export function HomePage({
       );
     });
 
+  const renderListingStack = () => (
+    <div
+      ref={listingStackRef}
+      className={`listing-stack${
+        kitchenCardFocused && !sectionTwoComplete
+          ? " listing-stack--kitchen-focused"
+          : ""
+      }${isMain2 ? " listing-stack--main2-section" : ""}`}
+      aria-label="Listing results"
+      style={{ fontSize: MOBILE_ROOT_FONT_SIZE }}
+    >
+      <div ref={listingInnerRef} className="listing-stack-inner">
+        {LISTING_CARDS.map((listing, i) => (
+          <div
+            key={listing.title}
+            ref={i === KITCHEN_LISTING_INDEX ? kitchenSlotRef : undefined}
+            className={`listing-card-slot listing-card-slot--${i}${
+              i < revealedListingCount ? " is-visible" : ""
+            }${
+              i === KITCHEN_LISTING_INDEX &&
+              kitchenCardExpanded &&
+              !sectionTwoComplete
+                ? " is-kitchen-hidden"
+                : ""
+            }`}
+          >
+            <article className="listing-card">
+              <div className="listing-card-media">
+                <img
+                  src={listing.image}
+                  alt={listing.alt}
+                  className="listing-card-image"
+                />
+                <div className="listing-card-image-fade" aria-hidden />
+              </div>
+              <div className="listing-card-footer">
+                <div className="listing-card-body">
+                  <h3 className="listing-card-title">{listing.title}</h3>
+                  <p className="listing-card-distance">
+                    {listing.distanceMi} mi away
+                  </p>
+                </div>
+                <div className="listing-card-meta">
+                  <span className="listing-card-sqft">
+                    {formatSqFt(listing.sqFt)}
+                  </span>
+                  <div className="listing-card-meta-row">
+                    <span
+                      className="listing-card-rating"
+                      aria-label={`Rating ${listing.rating}`}
+                    >
+                      {listing.rating}
+                      <svg
+                        className="listing-card-rating-star"
+                        viewBox="0 0 24 24"
+                        fill="currentColor"
+                        aria-hidden
+                      >
+                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                      </svg>
+                    </span>
+                    <div className="listing-card-hosts" aria-label="Hosts">
+                      {listing.hosts.map((host, hostIndex) => (
+                        <span
+                          key={host.initials}
+                          className={`listing-card-avatar${
+                            hostIndex === 0
+                              ? " listing-card-avatar--back"
+                              : " listing-card-avatar--front"
+                          }`}
+                          style={{
+                            background: `linear-gradient(${host.gradient})`,
+                          }}
+                        >
+                          {host.initials}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </article>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+
   const renderHeroPrompt = () => (
     <div
       ref={promptSlotRef}
@@ -1863,11 +2010,17 @@ export function HomePage({
         ref={promptWrapRef}
         className="hero-prompt-wrap"
         style={{
-          width: "100%",
-          position: scrollUnlocked ? "fixed" : "relative",
+          width: isMain2 && promptAtBottom ? "auto" : "100%",
+          position:
+            isMain2 && promptAtBottom
+              ? "absolute"
+              : scrollUnlocked
+                ? "fixed"
+                : "relative",
           zIndex: 2,
           overflow: "visible",
-          willChange: scrollUnlocked ? "top" : "auto",
+          willChange:
+            scrollUnlocked && !(isMain2 && promptAtBottom) ? "top" : "auto",
         }}
       >
         <div
@@ -2075,10 +2228,9 @@ export function HomePage({
           ) : null}
 
           {isMain2 ? (
-            <div className="main2-hero-box">
+            <div className="main2-hero-box main2-grain-box">
               <div
-                ref={main2GrainRef}
-                className="main2-hero-box__grain"
+                className="main2-grain-surface main2-hero-box__grain"
                 aria-hidden
               />
               <div aria-hidden className="hero-intro-images main2-hero-deck">
@@ -2090,14 +2242,7 @@ export function HomePage({
                     showHeroUi ? " is-visible" : ""
                   }`}
                 >
-                  <h1
-                    className="hero-title"
-                    style={{
-                      fontSize: "2.5em",
-                      fontWeight: 400,
-                      letterSpacing: "-0.02em",
-                    }}
-                  >
+                  <h1 className="hero-title">
                     <span className="hero-title-word">BINOCULAR</span>
                   </h1>
                   <p className="hero-description">
@@ -2122,15 +2267,8 @@ export function HomePage({
           <div
             className={`hero-intro-content hero-intro-fade${showHeroUi ? " is-visible" : ""}`}
           >
-          <h1
-            className="hero-title"
-            style={{
-              fontSize: "2.5em",
-              fontWeight: 400,
-              letterSpacing: "-0.02em",
-            }}
-          >
-            <span className="hero-title-word">BINOCULAR</span>
+          <h1 className="hero-title">
+            <span className="hero-title-word">Binocular</span>
           </h1>
           <p className="hero-description">
             <span className="hero-description__line">Book spaces for</span>
@@ -2205,99 +2343,23 @@ export function HomePage({
           ref={secondSectionRef}
           className={`second-section${
             sectionTwoComplete ? " second-section--elevated" : ""
-          }`}
+          }${isMain2 && promptAtBottom ? " second-section--main2-active" : ""}`}
         >
-          {promptAtBottom ? (
-            <div
-              ref={listingStackRef}
-              className={`listing-stack${
-                kitchenCardFocused && !sectionTwoComplete
-                  ? " listing-stack--kitchen-focused"
-                  : ""
-              }`}
-              aria-label="Listing results"
-              style={{ fontSize: MOBILE_ROOT_FONT_SIZE }}
-            >
-              <div ref={listingInnerRef} className="listing-stack-inner">
-              {LISTING_CARDS.map((listing, i) => (
+          {isMain2 && promptAtBottom ? (
+            <div className="main2-section-two-box main2-grain-box">
               <div
-                key={listing.title}
-                ref={
-                  i === KITCHEN_LISTING_INDEX ? kitchenSlotRef : undefined
-                }
-                className={`listing-card-slot listing-card-slot--${i}${
-                  i < revealedListingCount ? " is-visible" : ""
-                }${
-                  i === KITCHEN_LISTING_INDEX &&
-                  kitchenCardExpanded &&
-                  !sectionTwoComplete
-                    ? " is-kitchen-hidden"
-                    : ""
-                }`}
+                className="main2-grain-surface main2-hero-box__grain"
+                aria-hidden
+              />
+              <div
+                ref={main2SectionTwoContentRef}
+                className="main2-section-two-box__content"
               >
-                <article className="listing-card">
-                  <div className="listing-card-media">
-                    <img
-                      src={listing.image}
-                      alt={listing.alt}
-                      className="listing-card-image"
-                    />
-                    <div className="listing-card-image-fade" aria-hidden />
-                  </div>
-                  <div className="listing-card-footer">
-                    <div className="listing-card-body">
-                      <h3 className="listing-card-title">{listing.title}</h3>
-                      <p className="listing-card-distance">
-                        {listing.distanceMi} mi away
-                      </p>
-                    </div>
-                    <div className="listing-card-meta">
-                      <span className="listing-card-sqft">
-                        {formatSqFt(listing.sqFt)}
-                      </span>
-                      <div className="listing-card-meta-row">
-                        <span
-                          className="listing-card-rating"
-                          aria-label={`Rating ${listing.rating}`}
-                        >
-                          {listing.rating}
-                          <svg
-                            className="listing-card-rating-star"
-                            viewBox="0 0 24 24"
-                            fill="currentColor"
-                            aria-hidden
-                          >
-                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                          </svg>
-                        </span>
-                        <div
-                          className="listing-card-hosts"
-                          aria-label="Hosts"
-                        >
-                          {listing.hosts.map((host, hostIndex) => (
-                            <span
-                              key={host.initials}
-                              className={`listing-card-avatar${
-                                hostIndex === 0
-                                  ? " listing-card-avatar--back"
-                                  : " listing-card-avatar--front"
-                              }`}
-                              style={{
-                                background: `linear-gradient(${host.gradient})`,
-                              }}
-                            >
-                              {host.initials}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </article>
-              </div>
-            ))}
+                {renderListingStack()}
               </div>
             </div>
+          ) : promptAtBottom ? (
+            renderListingStack()
           ) : null}
         </div>
 
