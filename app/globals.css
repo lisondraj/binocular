@@ -2176,7 +2176,7 @@ a.fourth-section__btn {
   }
 }
 
-/* Mobile nav — slightly wider than hero content, nudged toward top. */
+/* Mobile nav — layout matches expanded pill so menu/logo never shift on scroll. */
 .mobile-nav {
   position: fixed;
   top: 0.75em;
@@ -2191,20 +2191,15 @@ a.fourth-section__btn {
   z-index: 10;
   pointer-events: none;
   box-sizing: border-box;
-}
-
-/* Expanded — frosted white pill, same width band as the AI prompt. */
-.mobile-nav.is-expanded {
-  position: fixed;
-  isolation: isolate;
-  border-radius: 0.75em;
   padding: 0.95em 0.78em;
   min-height: 3.35em;
+  isolation: isolate;
+  border-radius: 0.75em;
   overflow: hidden;
-  align-items: center;
 }
 
-.mobile-nav.is-expanded::before {
+/* Frosted fill fades in on scroll — padding/size stay constant from hero. */
+.mobile-nav::before {
   content: "";
   position: absolute;
   inset: 0;
@@ -2213,12 +2208,20 @@ a.fourth-section__btn {
   background: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(1.75em) saturate(1.15);
   -webkit-backdrop-filter: blur(1.75em) saturate(1.15);
+  opacity: 0;
+  transition: opacity 0.9s ease;
+  pointer-events: none;
 }
 
-.mobile-nav.is-expanded .mobile-nav-logo,
-.mobile-nav.is-expanded .mobile-nav-menu {
+.mobile-nav.is-expanded::before {
+  opacity: 1;
+}
+
+.mobile-nav .mobile-nav-logo,
+.mobile-nav .mobile-nav-menu {
   position: relative;
   z-index: 1;
+  flex-shrink: 0;
 }
 
 .mobile-nav-logo {
@@ -2229,7 +2232,10 @@ a.fourth-section__btn {
   letter-spacing: -0.02em;
   color: #000000;
   opacity: 0;
-  transition: opacity 0.9s ease;
+  visibility: hidden;
+  transition:
+    opacity 0.9s ease,
+    visibility 0.9s ease;
   text-box-trim: trim-both;
   text-box-edge: cap alphabetic;
   pointer-events: none;
@@ -2250,6 +2256,7 @@ a.fourth-section__btn {
 
 .mobile-nav-logo.is-visible {
   opacity: 1;
+  visibility: visible;
   pointer-events: auto;
 }
 
