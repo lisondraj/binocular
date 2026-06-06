@@ -403,6 +403,8 @@ export function HomePage({
 
   const promptWrapRef = useRef<HTMLDivElement>(null);
   const promptSlotRef = useRef<HTMLDivElement>(null);
+  const main2GrainRef = useRef<HTMLCanvasElement>(null);
+  const main2HeroBoxRef = useRef<HTMLDivElement>(null);
   const secondSectionRef = useRef<HTMLDivElement>(null);
   const thirdSectionRef = useRef<HTMLDivElement>(null);
   const fourthSectionRef = useRef<HTMLElement>(null);
@@ -481,6 +483,52 @@ export function HomePage({
 
     return () => timers.forEach(clearTimeout);
   }, []);
+
+  // /main2 — paint sharp 1:1 pixel film grain directly on a canvas overlay.
+  useEffect(() => {
+    if (!isMain2) return;
+
+    const canvas = main2GrainRef.current;
+    const box = main2HeroBoxRef.current;
+    if (!canvas || !box) return;
+
+    const paintGrain = () => {
+      const width = box.clientWidth;
+      const height = box.clientHeight;
+      if (width < 1 || height < 1) return;
+
+      canvas.width = width;
+      canvas.height = height;
+
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return;
+
+      const image = ctx.createImageData(width, height);
+      const pixels = image.data;
+
+      for (let i = 0; i < pixels.length; i += 4) {
+        const roll = Math.random();
+        if (roll < 0.14) {
+          pixels[i] = 255;
+          pixels[i + 1] = 255;
+          pixels[i + 2] = 255;
+          pixels[i + 3] = 42;
+        } else if (roll < 0.28) {
+          pixels[i] = 0;
+          pixels[i + 1] = 0;
+          pixels[i + 2] = 0;
+          pixels[i + 3] = 36;
+        }
+      }
+
+      ctx.putImageData(image, 0, 0);
+    };
+
+    paintGrain();
+    const observer = new ResizeObserver(paintGrain);
+    observer.observe(box);
+    return () => observer.disconnect();
+  }, [isMain2]);
 
   // @ types in → mention menu → chip → prompt typing (after AI box fade-in)
   useEffect(() => {
@@ -2015,8 +2063,12 @@ export function HomePage({
           ) : null}
 
           {isMain2 ? (
-            <div className="main2-hero-box">
-              <div className="main2-hero-box__grain" aria-hidden />
+            <div ref={main2HeroBoxRef} className="main2-hero-box">
+              <canvas
+                ref={main2GrainRef}
+                className="main2-hero-box__grain"
+                aria-hidden
+              />
               <div aria-hidden className="hero-intro-images main2-hero-deck">
                 {renderHeroDeck(true)}
               </div>
