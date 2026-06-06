@@ -93,8 +93,8 @@ const anchorMain2PromptInSectionTwo = (
 
   wrap.style.position = "absolute";
   wrap.style.top = "auto";
-  wrap.style.left = "1.15em";
-  wrap.style.right = "1.15em";
+  wrap.style.left = "1.4em";
+  wrap.style.right = "1.4em";
   wrap.style.width = "auto";
   wrap.style.bottom = "0.85em";
   wrap.style.height = "auto";

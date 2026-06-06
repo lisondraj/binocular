@@ -2319,9 +2319,11 @@ a.fourth-section__btn {
   --main2-hero-radius: 0.75em;
   --main2-nav-inset: 0.55em;
   --main2-nav-height: calc(2.75em + (2 * 0.72em));
+  --main2-section-two-gap: 0.12em;
+  --main2-section-two-bottom: 0.45em;
   --main2-section-two-top: calc(
     var(--main2-hero-inset-y) + var(--main2-nav-inset) + var(--main2-nav-height) +
-      0.35em
+      var(--main2-section-two-gap)
   );
 }
 
@@ -2459,7 +2461,7 @@ a.fourth-section__btn {
 
 .second-section--main2-active {
   padding: var(--main2-section-two-top) var(--main2-hero-inset-x)
-    var(--main2-hero-inset-y);
+    var(--main2-section-two-bottom);
   box-sizing: border-box;
   background-color: #ffffff;
 }
@@ -2480,7 +2482,7 @@ a.fourth-section__btn {
   position: relative;
   width: 100%;
   min-height: calc(
-    100vh - var(--main2-section-two-top) - var(--main2-hero-inset-y)
+    100vh - var(--main2-section-two-top) - var(--main2-section-two-bottom)
   );
   border-radius: var(--main2-hero-radius);
   overflow: hidden;
@@ -2642,6 +2644,10 @@ a.fourth-section__btn {
 }
 
 /* /main2 — white AI prompt card; same size in hero and section two. */
+.mobile-view--main2 .hero-prompt-wrap {
+  font-size: calc(100vw / 24.375);
+}
+
 .mobile-view--main2 .main2-hero-prompt-card-shell {
   font-size: 0.84em;
 }
