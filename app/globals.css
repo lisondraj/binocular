@@ -2223,8 +2223,19 @@ a.fourth-section__btn {
   align-self: center;
 }
 
+.mobile-nav-logo-link {
+  text-decoration: none;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+}
+
 .mobile-nav-logo.is-visible {
   opacity: 1;
+  pointer-events: auto;
 }
 
 .mobile-nav-menu {

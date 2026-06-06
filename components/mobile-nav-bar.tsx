@@ -1,3 +1,6 @@
+"use client";
+
+import Link from "next/link";
 import { MOBILE_ROOT_FONT_SIZE } from "@/lib/mobile-layout";
 
 type MobileNavBarProps = {
@@ -16,6 +19,13 @@ export function MobileNavBar({
   const logoVisible = staticNav || showLogo;
   const expanded = staticNav || showLogo;
   const navVisible = staticNav || showNav;
+  const logoClassName = `mobile-nav-logo mobile-nav-logo-link${
+    logoVisible ? " is-visible" : ""
+  }`;
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   return (
     <div
@@ -24,12 +34,25 @@ export function MobileNavBar({
       }${navVisible ? " is-visible" : ""}${expanded ? " is-expanded" : ""}`}
       style={{ fontSize: MOBILE_ROOT_FONT_SIZE }}
     >
-      <span
-        className={`mobile-nav-logo${logoVisible ? " is-visible" : ""}`}
-        aria-hidden={!logoVisible}
-      >
-        BINOCULAR
-      </span>
+      {staticNav ? (
+        <Link
+          href="/"
+          className={logoClassName}
+          aria-hidden={!logoVisible}
+        >
+          BINOCULAR
+        </Link>
+      ) : (
+        <button
+          type="button"
+          className={logoClassName}
+          aria-hidden={!logoVisible}
+          aria-label="Back to top"
+          onClick={scrollToTop}
+        >
+          BINOCULAR
+        </button>
+      )}
 
       <button
         type="button"
