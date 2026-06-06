@@ -353,28 +353,6 @@ h6 {
   overflow: visible;
 }
 
-/* Kitchen + bars pinned to viewport during section-three sequence. */
-.third-section--kitchen-fixed.third-section--kitchen-stack-visible {
-  z-index: 13;
-  pointer-events: none;
-}
-
-.third-section--kitchen-fixed .third-section-bars {
-  position: fixed;
-  z-index: 11;
-  top: calc(
-    var(--kitchen-fixed-top, 0px) +
-      var(--kitchen-compact-height, var(--kitchen-height, 0px)) + 0.5em
-  );
-  left: var(--kitchen-left, 0);
-  width: var(--kitchen-width, 100%);
-}
-
-.third-section-bars.is-stack-hidden {
-  visibility: hidden;
-  pointer-events: none;
-}
-
 .second-section .kitchen-expand-overlay,
 .third-section .kitchen-expand-overlay {
   position: absolute;
@@ -457,16 +435,6 @@ h6 {
   display: flex;
   flex-direction: column;
   gap: 0.45em;
-  pointer-events: none;
-}
-
-.third-section-prompt-bar:not(.is-visible):not(.is-closed) {
-  position: absolute;
-  width: 100%;
-  min-height: 0;
-  height: 0;
-  overflow: hidden;
-  visibility: hidden;
   pointer-events: none;
 }
 
