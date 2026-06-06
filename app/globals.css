@@ -2347,6 +2347,7 @@ a.fourth-section__btn {
   pointer-events: none;
   overflow: hidden;
   contain: paint;
+  font-size: 0.9em;
 }
 
 .main2-hero-deck-photo,
@@ -2372,7 +2373,7 @@ a.fourth-section__btn {
   margin-bottom: -0.85em;
 }
 
-/* Film grain — 1:1 canvas speckle overlay (painted in JS). */
+/* Film grain — canvas painted in JS, smooth upscale to box size. */
 .main2-hero-box__grain {
   position: absolute;
   inset: 0;
@@ -2381,7 +2382,8 @@ a.fourth-section__btn {
   height: 100%;
   border-radius: inherit;
   pointer-events: none;
-  mix-blend-mode: soft-light;
+  opacity: 0.82;
+  mix-blend-mode: overlay;
 }
 
 .main2-hero-intro {

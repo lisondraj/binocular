@@ -484,7 +484,7 @@ export function HomePage({
     return () => timers.forEach(clearTimeout);
   }, []);
 
-  // /main2 — paint sharp 1:1 pixel film grain directly on a canvas overlay.
+  // /main2 — fine film grain: low-res speckle, lightly knitted, smooth upscale.
   useEffect(() => {
     if (!isMain2) return;
 
@@ -497,31 +497,44 @@ export function HomePage({
       const height = box.clientHeight;
       if (width < 1 || height < 1) return;
 
-      canvas.width = width;
-      canvas.height = height;
+      const grainW = Math.max(1, Math.round(width * 0.42));
+      const grainH = Math.max(1, Math.round(height * 0.42));
 
-      const ctx = canvas.getContext("2d");
+      canvas.width = grainW;
+      canvas.height = grainH;
+
+      const ctx = canvas.getContext("2d", { alpha: true });
       if (!ctx) return;
 
-      const image = ctx.createImageData(width, height);
+      const image = ctx.createImageData(grainW, grainH);
       const pixels = image.data;
 
       for (let i = 0; i < pixels.length; i += 4) {
-        const roll = Math.random();
-        if (roll < 0.14) {
-          pixels[i] = 255;
-          pixels[i + 1] = 255;
-          pixels[i + 2] = 255;
-          pixels[i + 3] = 42;
-        } else if (roll < 0.28) {
-          pixels[i] = 0;
-          pixels[i + 1] = 0;
-          pixels[i + 2] = 0;
-          pixels[i + 3] = 36;
-        }
+        if (Math.random() > 0.7) continue;
+
+        const light = Math.random() > 0.5;
+        const lum = light
+          ? 228 + Math.floor(Math.random() * 27)
+          : 18 + Math.floor(Math.random() * 42);
+
+        pixels[i] = lum;
+        pixels[i + 1] = lum;
+        pixels[i + 2] = lum;
+        pixels[i + 3] = 9 + Math.floor(Math.random() * 14);
       }
 
       ctx.putImageData(image, 0, 0);
+
+      const knit = document.createElement("canvas");
+      knit.width = grainW;
+      knit.height = grainH;
+      const knitCtx = knit.getContext("2d");
+      if (knitCtx) {
+        knitCtx.filter = "blur(0.55px)";
+        knitCtx.drawImage(canvas, 0, 0);
+        ctx.clearRect(0, 0, grainW, grainH);
+        ctx.drawImage(knit, 0, 0);
+      }
     };
 
     paintGrain();
