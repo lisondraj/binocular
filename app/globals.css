@@ -101,6 +101,24 @@ h6 {
   flex-shrink: 0;
 }
 
+.hero-description {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  font-family: var(--font-suisse), system-ui, sans-serif;
+  font-size: clamp(1.72em, 5.35vw, 2.08em);
+  font-weight: 300;
+  line-height: 1.18;
+  text-align: left;
+  width: 100%;
+}
+
+.hero-description__line {
+  display: block;
+  white-space: nowrap;
+}
+
 .hero-intro-images {
   overflow: visible;
 }
@@ -2041,8 +2059,14 @@ a.fourth-section__btn {
 
 /* Reserve chip space in the ghost layer without showing the pill box. */
 .hero-prompt-layout .hero-prompt-chip {
-  background: transparent;
-  border-color: transparent;
+  background: transparent !important;
+  border-color: transparent !important;
+  color: transparent !important;
+}
+
+.hero-prompt-layout .hero-prompt-chip-icon {
+  opacity: 0 !important;
+  color: transparent !important;
 }
 
 .hero-prompt-live {
@@ -2082,7 +2106,7 @@ a.fourth-section__btn {
   gap: 0.35em;
   padding: 0.22em 0.55em;
   margin: 0 0.5em 0.12em 0;
-  border-radius: 0.5em;
+  border-radius: 0.28em;
   background: rgba(255, 255, 255, 0.16);
   border: 0.0625em solid rgba(255, 255, 255, 0.18);
   font-size: 0.82em;
@@ -2295,17 +2319,16 @@ a.fourth-section__btn {
   position: relative;
   flex: 1 1 auto;
   width: 100%;
-  min-height: calc(100vh - 3em);
+  min-height: calc(100vh - 1.7em);
   border-radius: 0.75em;
   overflow: visible;
   isolation: isolate;
-  padding: 1.5em;
-  padding-top: 4.75em;
+  padding: 3.35em 1.4em 0.85em;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
-  gap: 1.25em;
+  justify-content: center;
+  align-items: stretch;
   background:
     radial-gradient(ellipse 95% 70% at 12% 8%, rgba(118, 118, 118, 0.42), transparent 58%),
     radial-gradient(ellipse 80% 55% at 88% 92%, rgba(72, 72, 72, 0.5), transparent 62%),
@@ -2316,10 +2339,37 @@ a.fourth-section__btn {
     inset 0 0.0625em 0 rgba(255, 255, 255, 0.06);
 }
 
-.main2-hero-prompt-slot {
-  margin-top: auto;
+.main2-hero-deck {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: inherit;
+  pointer-events: none;
+  overflow: hidden;
+  contain: paint;
+}
+
+.main2-hero-deck-photo,
+.main2-hero-deck .listing-card-avatar {
+  filter: grayscale(100%);
+}
+
+.main2-hero-content {
   position: relative;
   z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2em;
+  width: 100%;
+  flex-shrink: 0;
+}
+
+.main2-hero-prompt-slot {
+  margin-top: 0;
+  position: relative;
+  z-index: 2;
+  padding-bottom: 0.85em;
+  margin-bottom: -0.85em;
 }
 
 .main2-hero-box__grain {
@@ -2327,16 +2377,30 @@ a.fourth-section__btn {
   inset: 0;
   z-index: 0;
   border-radius: inherit;
-  opacity: 0.42;
+  opacity: 0.78;
   pointer-events: none;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.15' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  background-size: 88px 88px;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.35' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 58px 58px;
+  mix-blend-mode: overlay;
+}
+
+.main2-hero-box::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: inherit;
+  opacity: 0.48;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.88' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 96px 96px;
   mix-blend-mode: soft-light;
 }
 
 .main2-hero-intro {
   position: relative;
   z-index: 1;
+  gap: 0.55em;
 }
 
 .mobile-view--main2 .main2-hero-box .hero-title-word,
@@ -2381,38 +2445,49 @@ a.fourth-section__btn {
   color: #ffffff;
 }
 
-/* /main2 — white AI prompt card with black type inside gradient hero. */
-.mobile-view--main2 .main2-hero-box .main2-hero-prompt-card {
-  box-shadow:
-    0 0.45em 1.35em rgba(0, 0, 0, 0.22),
-    0 0.08em 0.25em rgba(0, 0, 0, 0.08);
+/* /main2 — white AI prompt card; same size in hero and section two. */
+.mobile-view--main2 .main2-hero-prompt-card-shell {
+  font-size: 0.84em;
 }
 
-.mobile-view--main2 .main2-hero-box .main2-hero-prompt-card::before {
+.mobile-view--main2 .main2-hero-prompt-card {
+  padding: 0.7em 0.95em 0.58em;
+  border-radius: 0.55em;
+  box-shadow:
+    0 0.18em 0.55em rgba(0, 0, 0, 0.1),
+    0 0.04em 0.12em rgba(0, 0, 0, 0.04);
+}
+
+.mobile-view--main2 .main2-hero-prompt-card .hero-prompt-text {
+  font-size: 1.26em;
+  line-height: 1.32;
+}
+
+.mobile-view--main2 .main2-hero-prompt-card::before {
   background: #ffffff;
   border: 0.0625em solid rgba(0, 0, 0, 0.1);
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
 }
 
-.mobile-view--main2 .main2-hero-box .hero-prompt-text,
-.mobile-view--main2 .main2-hero-box .hero-prompt-typed,
-.mobile-view--main2 .main2-hero-box .hero-prompt-at {
-  color: #000000;
+.mobile-view--main2 .main2-hero-prompt-card .hero-prompt-text,
+.mobile-view--main2 .main2-hero-prompt-card .hero-prompt-typed,
+.mobile-view--main2 .main2-hero-prompt-card .hero-prompt-at {
+  color: #3d3d3d;
 }
 
-.mobile-view--main2 .main2-hero-box .hero-prompt-chip {
+.mobile-view--main2 .main2-hero-prompt-card .hero-prompt-live .hero-prompt-chip {
   background: rgba(0, 0, 0, 0.06);
   border-color: rgba(0, 0, 0, 0.12);
   color: #000000;
 }
 
-.mobile-view--main2 .main2-hero-box .hero-prompt-chip-icon {
+.mobile-view--main2 .main2-hero-prompt-card .hero-prompt-live .hero-prompt-chip-icon {
   color: #000000;
   opacity: 0.72;
 }
 
-.mobile-view--main2 .main2-hero-box .hero-prompt-menu {
+.mobile-view--main2 .main2-hero-prompt-card .hero-prompt-menu {
   background: #ffffff;
   border-color: rgba(0, 0, 0, 0.1);
   backdrop-filter: none;
@@ -2420,17 +2495,17 @@ a.fourth-section__btn {
   box-shadow: 0 0.5em 1.5em rgba(0, 0, 0, 0.14);
 }
 
-.mobile-view--main2 .main2-hero-box .hero-prompt-menu-item {
+.mobile-view--main2 .main2-hero-prompt-card .hero-prompt-menu-item {
   color: rgba(0, 0, 0, 0.72);
 }
 
-.mobile-view--main2 .main2-hero-box .hero-prompt-menu-item.is-highlighted {
+.mobile-view--main2 .main2-hero-prompt-card .hero-prompt-menu-item.is-highlighted {
   background: rgba(0, 0, 0, 0.06);
   color: #000000;
 }
 
-.mobile-view--main2 .main2-hero-box .type-caret::after {
-  background: #000000;
+.mobile-view--main2 .main2-hero-prompt-card .type-caret::after {
+  background: #3d3d3d;
 }
 
 /* Standalone /book page — full nav clearance, all content visible. */

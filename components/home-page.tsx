@@ -1676,6 +1676,120 @@ export function HomePage({
     sectionTwoComplete,
   ]);
 
+  const renderHeroDeck = (grayscalePhotos = false) =>
+    heroDeck.map((item, i) => {
+      const isTag = item.kind === "tag";
+      const deckStyle: CSSProperties & {
+        "--base-rotate": string;
+        "--hero-card-size"?: string;
+      } = {
+        position: "absolute",
+        bottom: item.bottom,
+        left: isTag
+          ? `calc(50% + ${item.centerOffset})`
+          : `calc(50% + ${item.centerOffset} - ${heroDeckHalfSize(item.size!)})`,
+        width: isTag ? undefined : item.size,
+        height: isTag ? undefined : item.size,
+        zIndex: item.zIndex,
+        "--base-rotate": item.rotate,
+        ...(isTag ? {} : { "--hero-card-size": item.size }),
+      };
+
+      if (item.kind === "photo") {
+        return (
+          <img
+            key={i}
+            src={item.src}
+            alt={item.alt}
+            className={`hero-image-rise${
+              grayscalePhotos ? " main2-hero-deck-photo" : ""
+            }${i < revealedImageCount ? " is-visible" : ""}`}
+            style={{
+              ...deckStyle,
+              objectFit: "cover",
+              borderRadius: "1em",
+              boxShadow: "0 0.85em 2.25em rgba(0, 0, 0, 0.28)",
+            }}
+          />
+        );
+      }
+
+      if (item.kind === "tag") {
+        return (
+          <span
+            key={i}
+            className={`hero-deck-tag hero-image-rise hero-image-rise--centered${
+              i < revealedImageCount ? " is-visible" : ""
+            }`}
+            style={deckStyle}
+          >
+            {item.label}
+          </span>
+        );
+      }
+
+      if (item.kind === "hosts") {
+        return (
+          <div
+            key={i}
+            className={`hero-info-card hero-info-card--hosts hero-image-rise${
+              i < revealedImageCount ? " is-visible" : ""
+            }`}
+            style={deckStyle}
+          >
+            <div className="hero-info-card-inner">
+              <span className="hero-info-card-label">Hosts</span>
+              <div className="hero-info-card-hosts-stage">
+                <div className="listing-card-hosts" aria-label="Hosts">
+                  {item.hosts.map((host, hostIndex) => (
+                    <span
+                      key={host.initials}
+                      className={`listing-card-avatar${
+                        hostIndex === 0
+                          ? " listing-card-avatar--back"
+                          : " listing-card-avatar--front"
+                      }`}
+                      style={{
+                        background: `linear-gradient(${host.gradient})`,
+                      }}
+                    >
+                      {host.initials}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      return (
+        <div
+          key={i}
+          className={`hero-info-card hero-info-card--meta hero-image-rise${
+            i < revealedImageCount ? " is-visible" : ""
+          }`}
+          style={deckStyle}
+        >
+          <div className="hero-info-card-inner">
+            <span className="hero-info-card-sqft">
+              {formatSqFt(item.sqFt)}
+            </span>
+            <span
+              className="hero-info-card-rating"
+              aria-label={`Rating ${item.rating} from ${item.reviewCount} reviews`}
+            >
+              {item.rating}
+              {ratingStarIcon}
+              <span className="hero-info-card-reviews">
+                ({item.reviewCount})
+              </span>
+            </span>
+          </div>
+        </div>
+      );
+    });
+
   const renderHeroPrompt = () => (
     <div
       ref={promptSlotRef}
@@ -1744,10 +1858,17 @@ export function HomePage({
                   </span>
                 ) : (
                   <>
-                    <span className="hero-prompt-chip">
-                      {labIcon}
-                      {SELECTED_LABEL}
-                    </span>
+                    {(promptPhase === "chip" ||
+                      promptPhase === "typing" ||
+                      promptPhase === "done" ||
+                      promptPhase === "followup-ready" ||
+                      promptPhase === "followup-typing" ||
+                      promptPhase === "followup-done") && (
+                      <span className="hero-prompt-chip">
+                        {labIcon}
+                        {SELECTED_LABEL}
+                      </span>
+                    )}
                     {promptPhase === "chip" && (
                       <span className="type-caret" aria-hidden />
                     )}
@@ -1793,8 +1914,8 @@ export function HomePage({
               }${isMain2 ? " main2-hero-prompt-send" : ""}`}
               style={{
                 position: "absolute",
-                bottom: "0.85em",
-                right: "1.15em",
+                bottom: isMain2 ? "0.58em" : "0.85em",
+                right: isMain2 ? "0.95em" : "1.15em",
                 fontSize: "inherit",
                 width: "1.8em",
                 height: "1.8em",
@@ -1865,7 +1986,7 @@ export function HomePage({
             maxWidth: "var(--ipad-width)",
             margin: "0 auto",
             minHeight: "100vh",
-            padding: "1.5em",
+            padding: isMain2 ? "0.85em 1.15em" : "1.5em",
             textAlign: "center",
           }}
         >
@@ -1879,174 +2000,59 @@ export function HomePage({
 
           {/* Scattered decorative images — square, rounded, behind the text. */}
           {!isMain2 ? (
-          <div
-            aria-hidden
-            className="hero-intro-images"
-            style={{
-              position: "absolute",
-              inset: 0,
-              zIndex: 0,
-              pointerEvents: "none",
-            }}
-          >
-            {heroDeck.map((item, i) => {
-              const isTag = item.kind === "tag";
-              const deckStyle: CSSProperties & {
-                "--base-rotate": string;
-                "--hero-card-size"?: string;
-              } = {
+            <div
+              aria-hidden
+              className="hero-intro-images"
+              style={{
                 position: "absolute",
-                bottom: item.bottom,
-                left: isTag
-                  ? `calc(50% + ${item.centerOffset})`
-                  : `calc(50% + ${item.centerOffset} - ${heroDeckHalfSize(item.size!)})`,
-                width: isTag ? undefined : item.size,
-                height: isTag ? undefined : item.size,
-                zIndex: item.zIndex,
-                "--base-rotate": item.rotate,
-                ...(isTag ? {} : { "--hero-card-size": item.size }),
-              };
-
-              if (item.kind === "photo") {
-                return (
-                  <img
-                    key={i}
-                    src={item.src}
-                    alt={item.alt}
-                    className={`hero-image-rise${i < revealedImageCount ? " is-visible" : ""}`}
-                    style={{
-                      ...deckStyle,
-                      objectFit: "cover",
-                      borderRadius: "1em",
-                      boxShadow: "0 0.85em 2.25em rgba(0, 0, 0, 0.28)",
-                    }}
-                  />
-                );
-              }
-
-              if (item.kind === "tag") {
-                return (
-                  <span
-                    key={i}
-                    className={`hero-deck-tag hero-image-rise hero-image-rise--centered${
-                      i < revealedImageCount ? " is-visible" : ""
-                    }`}
-                    style={deckStyle}
-                  >
-                    {item.label}
-                  </span>
-                );
-              }
-
-              if (item.kind === "hosts") {
-                return (
-                  <div
-                    key={i}
-                    className={`hero-info-card hero-info-card--hosts hero-image-rise${
-                      i < revealedImageCount ? " is-visible" : ""
-                    }`}
-                    style={deckStyle}
-                  >
-                    <div className="hero-info-card-inner">
-                      <span className="hero-info-card-label">Hosts</span>
-                      <div className="hero-info-card-hosts-stage">
-                        <div className="listing-card-hosts" aria-label="Hosts">
-                          {item.hosts.map((host, hostIndex) => (
-                            <span
-                              key={host.initials}
-                              className={`listing-card-avatar${
-                                hostIndex === 0
-                                  ? " listing-card-avatar--back"
-                                  : " listing-card-avatar--front"
-                              }`}
-                              style={{
-                                background: `linear-gradient(${host.gradient})`,
-                              }}
-                            >
-                              {host.initials}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                );
-              }
-
-              return (
-                <div
-                  key={i}
-                  className={`hero-info-card hero-info-card--meta hero-image-rise${
-                    i < revealedImageCount ? " is-visible" : ""
-                  }`}
-                  style={deckStyle}
-                >
-                  <div className="hero-info-card-inner">
-                    <span className="hero-info-card-sqft">
-                      {formatSqFt(item.sqFt)}
-                    </span>
-                    <span
-                      className="hero-info-card-rating"
-                      aria-label={`Rating ${item.rating} from ${item.reviewCount} reviews`}
-                    >
-                      {item.rating}
-                      {ratingStarIcon}
-                      <span className="hero-info-card-reviews">
-                        ({item.reviewCount})
-                      </span>
-                    </span>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+                inset: 0,
+                zIndex: 0,
+                pointerEvents: "none",
+              }}
+            >
+              {renderHeroDeck()}
+            </div>
           ) : null}
 
           {isMain2 ? (
             <div className="main2-hero-box">
               <div className="main2-hero-box__grain" aria-hidden />
-              <div
-                className={`hero-intro-content main2-hero-intro hero-intro-fade${
-                  showHeroUi ? " is-visible" : ""
-                }`}
-              >
-                <h1
-                  className="hero-title"
-                  style={{
-                    fontSize: "2.5em",
-                    fontWeight: 400,
-                    letterSpacing: "-0.02em",
-                  }}
-                >
-                  <span className="hero-title-word">BINOCULAR</span>
-                </h1>
-                <p
-                  className="hero-description"
-                  style={{
-                    fontFamily: "var(--font-suisse), system-ui, sans-serif",
-                    fontSize: "2.08em",
-                    fontWeight: 300,
-                    lineHeight: 1.18,
-                    textAlign: "left",
-                    width: "100%",
-                  }}
-                >
-                  Book spaces for
-                  <br />
-                  physical intelligence.
-                </p>
-                <div className="hero-actions main2-hero-actions">
-                  <button type="button" className="main2-hero-btn main2-hero-btn--primary">
-                    Host
-                    {upRightArrow}
-                  </button>
-                  <Link href="/book" className="main2-hero-btn">
-                    Book
-                    {upRightArrow}
-                  </Link>
-                </div>
+              <div aria-hidden className="hero-intro-images main2-hero-deck">
+                {renderHeroDeck(true)}
               </div>
-              {renderHeroPrompt()}
+              <div className="main2-hero-content">
+                <div
+                  className={`hero-intro-content main2-hero-intro hero-intro-fade${
+                    showHeroUi ? " is-visible" : ""
+                  }`}
+                >
+                  <h1
+                    className="hero-title"
+                    style={{
+                      fontSize: "2.5em",
+                      fontWeight: 400,
+                      letterSpacing: "-0.02em",
+                    }}
+                  >
+                    <span className="hero-title-word">BINOCULAR</span>
+                  </h1>
+                  <p className="hero-description">
+                    <span className="hero-description__line">Book spaces for</span>
+                    <span className="hero-description__line">physical intelligence.</span>
+                  </p>
+                  <div className="hero-actions main2-hero-actions">
+                    <button type="button" className="main2-hero-btn main2-hero-btn--primary">
+                      Host
+                      {upRightArrow}
+                    </button>
+                    <Link href="/book" className="main2-hero-btn">
+                      Book
+                      {upRightArrow}
+                    </Link>
+                  </div>
+                </div>
+                {renderHeroPrompt()}
+              </div>
             </div>
           ) : (
           <div
@@ -2062,20 +2068,9 @@ export function HomePage({
           >
             <span className="hero-title-word">BINOCULAR</span>
           </h1>
-          <p
-            className="hero-description"
-            style={{
-              fontFamily: "var(--font-suisse), system-ui, sans-serif",
-              fontSize: "2.08em",
-              fontWeight: 300,
-              lineHeight: 1.18,
-              textAlign: "left",
-              width: "100%",
-            }}
-          >
-            Book spaces for
-            <br />
-            physical intelligence.
+          <p className="hero-description">
+            <span className="hero-description__line">Book spaces for</span>
+            <span className="hero-description__line">physical intelligence.</span>
           </p>
           <div
             className="hero-actions"
