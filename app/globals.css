@@ -2372,28 +2372,21 @@ a.fourth-section__btn {
   margin-bottom: -0.85em;
 }
 
-/* Sharp film grain — discrete noise tile at 1:1 scale + fine speckle dots. */
+/* Film grain — hard pixel noise tile, no SVG filter blur. */
 .main2-hero-box__grain {
   position: absolute;
   inset: 0;
   z-index: 0;
   border-radius: inherit;
   pointer-events: none;
-  opacity: 0.22;
-  background-image:
-    radial-gradient(
-      circle,
-      rgba(255, 255, 255, 0.55) 0.45px,
-      transparent 0.45px
-    ),
-    url("/textures/grain-sharp.svg");
-  background-size:
-    3px 3px,
-    128px 128px;
+  opacity: 0.55;
+  background-image: url("/textures/grain-sharp.png");
+  background-size: 128px 128px;
   background-repeat: repeat;
-  image-rendering: -webkit-optimize-contrast;
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
   image-rendering: crisp-edges;
-  mix-blend-mode: screen;
+  mix-blend-mode: overlay;
 }
 
 .main2-hero-intro {
