@@ -436,6 +436,8 @@ export default function Home() {
   const kitchenInThirdSectionRef = useRef(false);
   const thirdSectionAnimationCompleteRef = useRef(false);
   const kitchenCompactHeightRef = useRef(0);
+  const kitchenGlideBoundsRef = useRef({ glideStart: 0, glideEnd: 0 });
+  const kitchenGlideProgressRef = useRef(0);
 
   const introFade = (step: number) =>
     INTRO_UI_DELAY + step * (INTRO_FADE_MS + INTRO_GAP_MS);
@@ -736,9 +738,15 @@ export default function Home() {
     return sec2.getBoundingClientRect().bottom <= 0;
   };
 
+  const getViewportHeight = () =>
+    window.visualViewport?.height ?? window.innerHeight;
+
+  const getViewportOffsetTop = () =>
+    window.visualViewport?.offsetTop ?? 0;
+
   const getThirdSectionGlideBounds = () => {
     const sec3 = thirdSectionRef.current;
-    const vh = window.innerHeight;
+    const vh = getViewportHeight();
     if (!sec3) {
       return { glideStart: 0, glideEnd: 0 };
     }
@@ -759,22 +767,30 @@ export default function Home() {
     const { glideStart } = getThirdSectionGlideBounds();
     // Wait until section three has actually begun entering the viewport.
     const sec3Top = sec3.getBoundingClientRect().top;
-    return window.scrollY >= glideStart && sec3Top < window.innerHeight;
+    return window.scrollY >= glideStart && sec3Top < getViewportHeight();
   };
 
-  /** Pin once on body; scroll only updates transform (avoids layout thrash / shake). */
+  const computeKitchenGlideProgress = () => {
+    const { glideStart, glideEnd } = kitchenGlideBoundsRef.current;
+    const glideSpan = Math.max(glideEnd - glideStart, 1);
+    return Math.min(
+      Math.max((window.scrollY - glideStart) / glideSpan, 0),
+      1,
+    );
+  };
+
+  /** Pin once on body; position updates use visual viewport coords (Safari-safe). */
   const pinKitchenGlideOnBody = (overlay: HTMLElement) => {
     const g = kitchenGlideRef.current;
     overlay.style.transition = "none";
     overlay.style.position = "fixed";
-    overlay.style.top = `${g.settledTop}px`;
     overlay.style.left = `${g.left}px`;
     overlay.style.width = `${g.width}px`;
     overlay.style.height = `${g.height}px`;
     overlay.style.zIndex = "11";
     overlay.style.margin = "0";
-    overlay.style.transform = "translate3d(0, 0, 0)";
-    overlay.style.willChange = "transform";
+    overlay.style.transform = "none";
+    overlay.style.willChange = "top";
   };
 
   /** Return the kitchen card to section two if the user scrolls back out of the glide zone. */
@@ -786,48 +802,7 @@ export default function Home() {
     setKitchenInThirdSection(false);
   };
 
-  /** Undo landing in section three when scrolling back up during the landing animation. */
-  const reverseKitchenAnchor = () => {
-    if (
-      !kitchenAnchoredInThirdRef.current ||
-      thirdSectionAnimationCompleteRef.current
-    ) {
-      return;
-    }
-
-    const overlay = kitchenOverlayRef.current;
-    const g = kitchenGlideRef.current;
-
-    if (overlay) {
-      const rect = overlay.getBoundingClientRect();
-      kitchenGlideRef.current = {
-        settledTop: rect.top,
-        left: rect.left,
-        width: rect.width,
-        height: g.height,
-      };
-      overlay.style.transition = "none";
-      overlay.style.height = `${g.height}px`;
-      overlay.style.opacity = "";
-      overlay.style.transform = "translate3d(0, 0, 0)";
-      overlay.style.pointerEvents = "";
-      overlay.style.visibility = "";
-      overlay.style.willChange = "transform";
-    }
-
-    setKitchenCompact(false);
-    setConfirmedDetailCount(0);
-    setClosedBarCount(0);
-    setRevealedThirdBarCount(0);
-
-    kitchenGlideLockedRef.current = false;
-    kitchenAnchoredInThirdRef.current = false;
-    setKitchenAnchoredInThird(false);
-    kitchenInThirdSectionRef.current = true;
-    setKitchenInThirdSection(true);
-  };
-
-  /** Scroll-linked glide — transform-only while fixed on body. */
+  /** Scroll-linked glide — fixed on body, top in visual viewport coords. */
   const applyKitchenGlideFromScroll = () => {
     const overlay = kitchenOverlayRef.current;
     if (!overlay || kitchenGlideLockedRef.current) return;
@@ -835,17 +810,16 @@ export default function Home() {
       return;
     }
 
-    const { glideStart, glideEnd } = getThirdSectionGlideBounds();
-    const glideSpan = Math.max(glideEnd - glideStart, 1);
     const g = kitchenGlideRef.current;
-    const vh = window.innerHeight;
-    const finalTop = (vh - g.height) / 2;
+    const p = computeKitchenGlideProgress();
+    kitchenGlideProgressRef.current = p;
 
-    const scrollY = window.scrollY;
-    const p = Math.min(Math.max((scrollY - glideStart) / glideSpan, 0), 1);
+    const vh = getViewportHeight();
+    const vvTop = getViewportOffsetTop();
+    const finalTop = vvTop + (vh - g.height) / 2;
+    const visualTop = g.settledTop + (finalTop - g.settledTop) * p;
 
-    const deltaY = Math.round((finalTop - g.settledTop) * p * 100) / 100;
-    overlay.style.transform = `translate3d(0, ${deltaY}px, 0)`;
+    overlay.style.top = `${Math.round(visualTop * 100) / 100}px`;
 
     if (p >= 1) {
       kitchenGlideLockedRef.current = true;
@@ -937,21 +911,11 @@ export default function Home() {
 
     let glideRaf = 0;
 
-    const runGlide = () => {
+    const runGlide = (allowReset: boolean) => {
       const sec3 = thirdSectionRef.current;
       if (!sec3) return;
 
-      if (kitchenAnchoredInThirdRef.current) {
-        if (!thirdSectionAnimationCompleteRef.current) {
-          const { glideEnd } = getThirdSectionGlideBounds();
-          if (window.scrollY < glideEnd - 2) {
-            reverseKitchenAnchor();
-          }
-        }
-        return;
-      }
-
-      if (kitchenGlideLockedRef.current) {
+      if (kitchenAnchoredInThirdRef.current || kitchenGlideLockedRef.current) {
         return;
       }
 
@@ -961,6 +925,7 @@ export default function Home() {
       if (!kitchenInThirdSectionRef.current) {
         if (!canStartKitchenGlide()) return;
 
+        kitchenGlideBoundsRef.current = getThirdSectionGlideBounds();
         const rect = overlay.getBoundingClientRect();
         kitchenGlideRef.current = {
           settledTop: rect.top,
@@ -968,12 +933,16 @@ export default function Home() {
           width: rect.width,
           height: rect.height,
         };
+        kitchenGlideProgressRef.current = 0;
         kitchenInThirdSectionRef.current = true;
         setKitchenInThirdSection(true);
         return;
       }
 
-      if (!canStartKitchenGlide()) {
+      if (
+        allowReset &&
+        window.scrollY < kitchenGlideBoundsRef.current.glideStart - 2
+      ) {
         resetKitchenGlideToSectionTwo();
         return;
       }
@@ -983,15 +952,25 @@ export default function Home() {
 
     const onScroll = () => {
       cancelAnimationFrame(glideRaf);
-      glideRaf = requestAnimationFrame(runGlide);
+      glideRaf = requestAnimationFrame(() => runGlide(true));
+    };
+
+    const onViewportChange = () => {
+      cancelAnimationFrame(glideRaf);
+      glideRaf = requestAnimationFrame(() => runGlide(false));
     };
 
     window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll);
+    window.addEventListener("resize", onViewportChange);
+    const visualViewport = window.visualViewport;
+    visualViewport?.addEventListener("resize", onViewportChange);
+    visualViewport?.addEventListener("scroll", onViewportChange);
     return () => {
       cancelAnimationFrame(glideRaf);
       window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onScroll);
+      window.removeEventListener("resize", onViewportChange);
+      visualViewport?.removeEventListener("resize", onViewportChange);
+      visualViewport?.removeEventListener("scroll", onViewportChange);
     };
   }, [sectionTwoComplete, kitchenInThirdSection, kitchenAnchoredInThird]);
 
@@ -1032,7 +1011,14 @@ export default function Home() {
 
     apply();
     window.addEventListener("resize", apply);
-    return () => window.removeEventListener("resize", apply);
+    const visualViewport = window.visualViewport;
+    visualViewport?.addEventListener("resize", apply);
+    visualViewport?.addEventListener("scroll", apply);
+    return () => {
+      window.removeEventListener("resize", apply);
+      visualViewport?.removeEventListener("resize", apply);
+      visualViewport?.removeEventListener("scroll", apply);
+    };
   }, [kitchenAnchoredInThird]);
 
   useEffect(() => {
@@ -1171,22 +1157,6 @@ export default function Home() {
       setRevealedThirdBarCount(0);
     };
   }, [kitchenAnchoredInThird]);
-
-  // Hold scroll at section-three center until the landing animation finishes.
-  useEffect(() => {
-    if (!kitchenAnchoredInThird || thirdSectionAnimationComplete) return;
-
-    const onScroll = () => {
-      const { glideEnd } = getThirdSectionGlideBounds();
-      if (window.scrollY > glideEnd) {
-        window.scrollTo(0, glideEnd);
-      }
-    };
-
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, [kitchenAnchoredInThird, thirdSectionAnimationComplete]);
 
   // Lock page scroll until the submit button has been pressed.
   useEffect(() => {
