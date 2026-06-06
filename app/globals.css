@@ -2183,8 +2183,10 @@ a.fourth-section__btn {
   position: fixed;
   isolation: isolate;
   border-radius: 0.9em;
-  padding: 0.62em;
+  padding: 0.95em 0.62em;
+  min-height: 3.35em;
   overflow: hidden;
+  align-items: center;
 }
 
 .mobile-nav.is-expanded::before {
@@ -2216,6 +2218,9 @@ a.fourth-section__btn {
   text-box-trim: trim-both;
   text-box-edge: cap alphabetic;
   pointer-events: none;
+  display: flex;
+  align-items: center;
+  align-self: center;
 }
 
 .mobile-nav-logo.is-visible {
@@ -2231,6 +2236,7 @@ a.fourth-section__btn {
   line-height: 0;
   display: flex;
   align-items: center;
+  align-self: center;
   pointer-events: auto;
 }
 
@@ -2253,7 +2259,7 @@ a.fourth-section__btn {
 .book-page .fourth-section--standalone {
   z-index: 0;
   min-height: auto;
-  padding-top: 6em;
+  padding-top: 6.5em;
 }
 
 .book-page .fourth-section--standalone .fourth-section__intro {
