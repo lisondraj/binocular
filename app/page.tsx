@@ -378,6 +378,15 @@ export default function Home() {
   const [kitchenOverlayHeightPx, setKitchenOverlayHeightPx] = useState<
     number | null
   >(null);
+  const [kitchenOverlayTopPx, setKitchenOverlayTopPx] = useState<number | null>(
+    null,
+  );
+  const [kitchenOverlayLeftPx, setKitchenOverlayLeftPx] = useState<
+    number | null
+  >(null);
+  const [kitchenOverlayWidthPx, setKitchenOverlayWidthPx] = useState<
+    number | null
+  >(null);
   const [kitchenCompactAnimating, setKitchenCompactAnimating] = useState(false);
   const [revealedThirdBarCount, setRevealedThirdBarCount] = useState(0);
   const [confirmedDetailCount, setConfirmedDetailCount] = useState(0);
@@ -989,6 +998,23 @@ export default function Home() {
     };
   }, [sectionTwoComplete, kitchenInThirdSection, kitchenAnchoredInThird]);
 
+  const syncKitchenSectionVars = (
+    sec3: HTMLElement,
+    layout: {
+      top: number;
+      left: number;
+      width: number;
+      height: number;
+      compactHeight: number;
+    },
+  ) => {
+    sec3.style.setProperty("--kitchen-top", `${layout.top}px`);
+    sec3.style.setProperty("--kitchen-left", `${layout.left}px`);
+    sec3.style.setProperty("--kitchen-width", `${layout.width}px`);
+    sec3.style.setProperty("--kitchen-height", `${layout.height}px`);
+    sec3.style.setProperty("--kitchen-compact-height", `${layout.compactHeight}px`);
+  };
+
   // Anchor the kitchen card inside section three so it scrolls with the page.
   useLayoutEffect(() => {
     if (!kitchenAnchoredInThird) return;
@@ -1004,24 +1030,19 @@ export default function Home() {
       const isCompact = kitchenCompactStartedRef.current;
       const activeHeight = isCompact ? compactHeight : g.height;
       const centeredTop = (sec3.offsetHeight - activeHeight) / 2;
-      const centeredLeft = g.left - secRect.left;
+      const centeredLeft = Math.max(0, (sec3.clientWidth - g.width) / 2);
 
       kitchenCompactHeightRef.current = compactHeight;
 
       let top = centeredTop;
-      let left = centeredLeft;
+      const left = centeredLeft;
 
       if (useLiveRect) {
         const overlayRect = overlay.getBoundingClientRect();
         top = overlayRect.top - secRect.top;
-        left = overlayRect.left - secRect.left;
         kitchenAnchoredLayoutRef.current = true;
       }
 
-      overlay.style.position = "absolute";
-      overlay.style.top = `${top}px`;
-      overlay.style.left = `${left}px`;
-      overlay.style.width = `${g.width}px`;
       overlay.style.zIndex = "11";
       overlay.style.margin = "0";
       overlay.style.transform = "none";
@@ -1029,27 +1050,81 @@ export default function Home() {
 
       if (!isCompact) {
         overlay.style.transition = "none";
-        setKitchenOverlayHeightPx(g.height);
-      } else {
-        setKitchenOverlayHeightPx(compactHeight);
       }
 
-      sec3.style.setProperty("--kitchen-top", `${top}px`);
-      sec3.style.setProperty("--kitchen-left", `${left}px`);
-      sec3.style.setProperty("--kitchen-width", `${g.width}px`);
-      sec3.style.setProperty("--kitchen-height", `${g.height}px`);
-      sec3.style.setProperty("--kitchen-compact-height", `${compactHeight}px`);
+      setKitchenOverlayLeftPx(left);
+      setKitchenOverlayWidthPx(g.width);
+      setKitchenOverlayTopPx(top);
+      setKitchenOverlayHeightPx(isCompact ? compactHeight : g.height);
+
+      syncKitchenSectionVars(sec3, {
+        top,
+        left,
+        width: g.width,
+        height: g.height,
+        compactHeight,
+      });
     };
 
     apply(!kitchenAnchoredLayoutRef.current);
 
     const onResize = () => {
-      if (kitchenCompactStartedRef.current) return;
+      const g = kitchenGlideRef.current;
+      const rootEm = window.innerWidth / 24.375;
+      const compactHeight = Math.max(g.height * 0.38, rootEm * 11);
+      const left = Math.max(0, (sec3.clientWidth - g.width) / 2);
+
+      if (kitchenCompactStartedRef.current) {
+        const secRect = sec3.getBoundingClientRect();
+        const overlayRect = overlay.getBoundingClientRect();
+        const top = overlayRect.top - secRect.top;
+
+        setKitchenOverlayLeftPx(left);
+        setKitchenOverlayTopPx(top);
+        syncKitchenSectionVars(sec3, {
+          top,
+          left,
+          width: g.width,
+          height: g.height,
+          compactHeight,
+        });
+        return;
+      }
+
       apply(false);
     };
     window.addEventListener("resize", onResize);
     return () => window.removeEventListener("resize", onResize);
   }, [kitchenAnchoredInThird]);
+
+  // Keep prompt bars aligned when kitchen layout state changes.
+  useEffect(() => {
+    if (!kitchenAnchoredInThird) return;
+    const sec3 = thirdSectionRef.current;
+    if (
+      !sec3 ||
+      kitchenOverlayLeftPx == null ||
+      kitchenOverlayTopPx == null ||
+      kitchenOverlayWidthPx == null ||
+      kitchenOverlayHeightPx == null
+    ) {
+      return;
+    }
+
+    syncKitchenSectionVars(sec3, {
+      top: kitchenOverlayTopPx,
+      left: kitchenOverlayLeftPx,
+      width: kitchenOverlayWidthPx,
+      height: kitchenGlideRef.current.height,
+      compactHeight: kitchenOverlayHeightPx,
+    });
+  }, [
+    kitchenAnchoredInThird,
+    kitchenOverlayLeftPx,
+    kitchenOverlayTopPx,
+    kitchenOverlayWidthPx,
+    kitchenOverlayHeightPx,
+  ]);
 
   useEffect(() => {
     thirdSectionAnimationCompleteRef.current = thirdSectionAnimationComplete;
@@ -2171,9 +2246,20 @@ export default function Home() {
                     }`}
                     style={{
                       fontSize: MOBILE_ROOT_FONT_SIZE,
-                      ...(kitchenOverlayHeightPx != null
+                      ...(kitchenAnchoredInThird &&
+                      kitchenOverlayLeftPx != null &&
+                      kitchenOverlayTopPx != null &&
+                      kitchenOverlayWidthPx != null &&
+                      kitchenOverlayHeightPx != null
                         ? {
+                            position: "absolute",
+                            left: `${kitchenOverlayLeftPx}px`,
+                            top: `${kitchenOverlayTopPx}px`,
+                            width: `${kitchenOverlayWidthPx}px`,
                             height: `${kitchenOverlayHeightPx}px`,
+                            zIndex: 11,
+                            margin: 0,
+                            transform: "none",
                             transition: kitchenCompactAnimating
                               ? `height ${1700}ms cubic-bezier(0.33, 1, 0.68, 1)`
                               : undefined,
