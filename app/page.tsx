@@ -434,7 +434,6 @@ export default function Home() {
   const kitchenGlideLockedRef = useRef(false);
   const kitchenAnchoredInThirdRef = useRef(false);
   const kitchenInThirdSectionRef = useRef(false);
-  const kitchenGlideMaxProgressRef = useRef(0);
   const thirdSectionAnimationCompleteRef = useRef(false);
   const kitchenCompactHeightRef = useRef(0);
 
@@ -778,6 +777,56 @@ export default function Home() {
     overlay.style.willChange = "transform";
   };
 
+  /** Return the kitchen card to section two if the user scrolls back out of the glide zone. */
+  const resetKitchenGlideToSectionTwo = () => {
+    if (!kitchenInThirdSectionRef.current || kitchenAnchoredInThirdRef.current) {
+      return;
+    }
+    kitchenInThirdSectionRef.current = false;
+    setKitchenInThirdSection(false);
+  };
+
+  /** Undo landing in section three when scrolling back up during the landing animation. */
+  const reverseKitchenAnchor = () => {
+    if (
+      !kitchenAnchoredInThirdRef.current ||
+      thirdSectionAnimationCompleteRef.current
+    ) {
+      return;
+    }
+
+    const overlay = kitchenOverlayRef.current;
+    const g = kitchenGlideRef.current;
+
+    if (overlay) {
+      const rect = overlay.getBoundingClientRect();
+      kitchenGlideRef.current = {
+        settledTop: rect.top,
+        left: rect.left,
+        width: rect.width,
+        height: g.height,
+      };
+      overlay.style.transition = "none";
+      overlay.style.height = `${g.height}px`;
+      overlay.style.opacity = "";
+      overlay.style.transform = "translate3d(0, 0, 0)";
+      overlay.style.pointerEvents = "";
+      overlay.style.visibility = "";
+      overlay.style.willChange = "transform";
+    }
+
+    setKitchenCompact(false);
+    setConfirmedDetailCount(0);
+    setClosedBarCount(0);
+    setRevealedThirdBarCount(0);
+
+    kitchenGlideLockedRef.current = false;
+    kitchenAnchoredInThirdRef.current = false;
+    setKitchenAnchoredInThird(false);
+    kitchenInThirdSectionRef.current = true;
+    setKitchenInThirdSection(true);
+  };
+
   /** Scroll-linked glide — transform-only while fixed on body. */
   const applyKitchenGlideFromScroll = () => {
     const overlay = kitchenOverlayRef.current;
@@ -794,13 +843,11 @@ export default function Home() {
 
     const scrollY = window.scrollY;
     const p = Math.min(Math.max((scrollY - glideStart) / glideSpan, 0), 1);
-    const useP = Math.max(p, kitchenGlideMaxProgressRef.current);
-    kitchenGlideMaxProgressRef.current = useP;
 
-    const deltaY = Math.round((finalTop - g.settledTop) * useP * 100) / 100;
+    const deltaY = Math.round((finalTop - g.settledTop) * p * 100) / 100;
     overlay.style.transform = `translate3d(0, ${deltaY}px, 0)`;
 
-    if (useP >= 1) {
+    if (p >= 1) {
       kitchenGlideLockedRef.current = true;
       kitchenAnchoredInThirdRef.current = true;
       setKitchenAnchoredInThird(true);
@@ -867,6 +914,7 @@ export default function Home() {
       overlay.style.zIndex = "11";
       overlay.style.margin = "0";
       overlay.style.transform = "none";
+      overlay.style.willChange = "auto";
     };
 
     apply();
@@ -893,11 +941,17 @@ export default function Home() {
       const sec3 = thirdSectionRef.current;
       if (!sec3) return;
 
-      if (kitchenGlideLockedRef.current) {
+      if (kitchenAnchoredInThirdRef.current) {
+        if (!thirdSectionAnimationCompleteRef.current) {
+          const { glideEnd } = getThirdSectionGlideBounds();
+          if (window.scrollY < glideEnd - 2) {
+            reverseKitchenAnchor();
+          }
+        }
         return;
       }
 
-      if (!canStartKitchenGlide()) {
+      if (kitchenGlideLockedRef.current) {
         return;
       }
 
@@ -905,6 +959,8 @@ export default function Home() {
       if (!overlay) return;
 
       if (!kitchenInThirdSectionRef.current) {
+        if (!canStartKitchenGlide()) return;
+
         const rect = overlay.getBoundingClientRect();
         kitchenGlideRef.current = {
           settledTop: rect.top,
@@ -912,9 +968,13 @@ export default function Home() {
           width: rect.width,
           height: rect.height,
         };
-        kitchenGlideMaxProgressRef.current = 0;
         kitchenInThirdSectionRef.current = true;
         setKitchenInThirdSection(true);
+        return;
+      }
+
+      if (!canStartKitchenGlide()) {
+        resetKitchenGlideToSectionTwo();
         return;
       }
 
