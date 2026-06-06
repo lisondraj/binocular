@@ -483,7 +483,7 @@ export function HomePage({
     return () => timers.forEach(clearTimeout);
   }, []);
 
-  // /main2 — tiny film grain tile repeated at 1:1 (no upscale zoom).
+  // /main2 — tiny film grain tiles repeated at 1:1 (no upscale zoom).
   useEffect(() => {
     if (!isMain2) return;
 
@@ -491,35 +491,44 @@ export function HomePage({
     if (!layer) return;
 
     const tile = 40;
-    const canvas = document.createElement("canvas");
-    canvas.width = tile;
-    canvas.height = tile;
 
-    const ctx = canvas.getContext("2d", { alpha: true });
-    if (!ctx) return;
+    const buildGrainTile = () => {
+      const canvas = document.createElement("canvas");
+      canvas.width = tile;
+      canvas.height = tile;
 
-    const image = ctx.createImageData(tile, tile);
-    const pixels = image.data;
+      const ctx = canvas.getContext("2d", { alpha: true });
+      if (!ctx) return "";
 
-    for (let i = 0; i < pixels.length; i += 4) {
-      if (Math.random() > 0.91) continue;
+      const image = ctx.createImageData(tile, tile);
+      const pixels = image.data;
 
-      const light = Math.random() > 0.5;
-      const lum = light
-        ? 235 + Math.floor(Math.random() * 20)
-        : 22 + Math.floor(Math.random() * 30);
+      for (let i = 0; i < pixels.length; i += 4) {
+        if (Math.random() > 0.82) continue;
 
-      pixels[i] = lum;
-      pixels[i + 1] = lum;
-      pixels[i + 2] = lum;
-      pixels[i + 3] = 5 + Math.floor(Math.random() * 9);
-    }
+        const light = Math.random() > 0.5;
+        const lum = light
+          ? 235 + Math.floor(Math.random() * 20)
+          : 22 + Math.floor(Math.random() * 30);
 
-    ctx.putImageData(image, 0, 0);
+        pixels[i] = lum;
+        pixels[i + 1] = lum;
+        pixels[i + 2] = lum;
+        pixels[i + 3] = 4 + Math.floor(Math.random() * 10);
+      }
+
+      ctx.putImageData(image, 0, 0);
+      return canvas.toDataURL("image/png");
+    };
 
     const tilePx = `${tile}px`;
-    layer.style.backgroundImage = `url(${canvas.toDataURL("image/png")})`;
-    layer.style.backgroundSize = `${tilePx} ${tilePx}`;
+    const offsetPx = `${tile / 2}px`;
+    const urlA = buildGrainTile();
+    const urlB = buildGrainTile();
+
+    layer.style.backgroundImage = `url(${urlA}), url(${urlB})`;
+    layer.style.backgroundSize = `${tilePx} ${tilePx}, ${tilePx} ${tilePx}`;
+    layer.style.backgroundPosition = `0 0, ${offsetPx} ${offsetPx}`;
     layer.style.backgroundRepeat = "repeat";
   }, [isMain2]);
 
@@ -2027,7 +2036,7 @@ export function HomePage({
             maxWidth: "var(--ipad-width)",
             margin: "0 auto",
             minHeight: "100vh",
-            padding: isMain2 ? "0.85em 1.15em" : "1.5em",
+            padding: isMain2 ? undefined : "1.5em",
             textAlign: "center",
           }}
         >

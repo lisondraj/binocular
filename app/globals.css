@@ -2308,11 +2308,36 @@ a.fourth-section__btn {
   transform: none;
 }
 
+/* /main2 — shared inset + corner radius for nav and hero grain box. */
+.mobile-view--main2 {
+  --main2-hero-inset-x: 1.15em;
+  --main2-hero-inset-y: 0.85em;
+  --main2-hero-radius: 0.75em;
+  --main2-nav-inset: 0.55em;
+}
+
+.mobile-view--main2 .mobile-nav {
+  top: calc(var(--main2-hero-inset-y) + var(--main2-nav-inset));
+  left: calc(var(--main2-hero-inset-x) + var(--main2-nav-inset));
+  right: calc(var(--main2-hero-inset-x) + var(--main2-nav-inset));
+  max-width: calc(
+    var(--ipad-width) - (2 * var(--main2-hero-inset-x)) -
+      (2 * var(--main2-nav-inset))
+  );
+  border-radius: max(
+    0.3em,
+    calc(var(--main2-hero-radius) - (var(--main2-nav-inset) * 0.5))
+  );
+  padding: 0.72em 0.62em;
+  min-height: 2.75em;
+}
+
 /* /main2 — hero in rounded gradient + grain box, white copy on dark. */
 .hero-stage--main2 {
   justify-content: stretch;
   gap: 0;
   box-sizing: border-box;
+  padding: var(--main2-hero-inset-y) var(--main2-hero-inset-x);
 }
 
 .main2-hero-box {
@@ -2320,7 +2345,7 @@ a.fourth-section__btn {
   flex: 1 1 auto;
   width: 100%;
   min-height: calc(100vh - 1.7em);
-  border-radius: 0.75em;
+  border-radius: var(--main2-hero-radius);
   overflow: visible;
   isolation: isolate;
   padding: 3.35em 1.4em 0.85em;
@@ -2381,7 +2406,7 @@ a.fourth-section__btn {
   border-radius: inherit;
   pointer-events: none;
   background-repeat: repeat;
-  opacity: 0.7;
+  opacity: 0.78;
   mix-blend-mode: overlay;
 }
 
