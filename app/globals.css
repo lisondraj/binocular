@@ -2171,13 +2171,13 @@ a.fourth-section__btn {
   }
 }
 
-/* Mobile nav — matches hero content width (1.5em inset each side). */
+/* Mobile nav — slightly wider than hero content, nudged toward top. */
 .mobile-nav {
   position: fixed;
-  top: 1em;
-  left: 1.5em;
-  right: 1.5em;
-  max-width: calc(var(--ipad-width) - 3em);
+  top: 0.75em;
+  left: 1.35em;
+  right: 1.35em;
+  max-width: calc(var(--ipad-width) - 2.7em);
   margin-left: auto;
   margin-right: auto;
   display: flex;
@@ -2193,7 +2193,7 @@ a.fourth-section__btn {
   position: fixed;
   isolation: isolate;
   border-radius: 0.9em;
-  padding: 0.95em 0.62em;
+  padding: 0.95em 0.78em;
   min-height: 3.35em;
   overflow: hidden;
   align-items: center;
