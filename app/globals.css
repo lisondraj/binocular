@@ -2029,12 +2029,10 @@ a.fourth-section__btn {
     transition: none;
   }
 
-  .mobile-nav-bg,
   .mobile-nav-logo {
     transition: none;
   }
 
-  .mobile-nav-bg.is-visible,
   .mobile-nav-logo.is-visible {
     transform: none;
   }
@@ -2195,42 +2193,28 @@ a.fourth-section__btn {
   }
 }
 
-/* Header fill — full-width white backing with a thin bottom hairline that
-   fades in together with the BINOCULAR logo beyond the hero. */
-.mobile-nav-bg {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 5.25em;
-  background: #ffffff;
-  border-bottom: 0.0625em solid rgba(0, 0, 0, 0.1);
-  z-index: 9;
-  opacity: 0;
-  transform: translate3d(0, -0.35em, 0);
-  transition:
-    opacity 0.9s ease,
-    transform 0.9s ease;
-  pointer-events: none;
-}
-
-.mobile-nav-bg.is-visible {
-  opacity: 1;
-  transform: translate3d(0, 0, 0);
-}
-
-/* Mobile nav — logo + menu share one row so they align vertically. */
+/* Mobile nav — matches hero content width (1.5em inset each side). */
 .mobile-nav {
   position: fixed;
   top: 1.5em;
   left: 1.5em;
   right: 1.5em;
-  height: 2.25em;
+  max-width: calc(var(--ipad-width) - 3em);
+  margin-left: auto;
+  margin-right: auto;
   display: flex;
   align-items: center;
   justify-content: space-between;
   z-index: 10;
   pointer-events: none;
+  box-sizing: border-box;
+}
+
+/* Expanded — plain white rounded box, same width band as the AI prompt. */
+.mobile-nav.is-expanded {
+  background: #ffffff;
+  border-radius: 1.25em;
+  padding: 0.85em;
 }
 
 .mobile-nav-logo {
@@ -2241,10 +2225,7 @@ a.fourth-section__btn {
   letter-spacing: -0.02em;
   color: #000000;
   opacity: 0;
-  transform: translate3d(0, -0.35em, 0);
-  transition:
-    opacity 0.9s ease,
-    transform 0.9s ease;
+  transition: opacity 0.9s ease;
   text-box-trim: trim-both;
   text-box-edge: cap alphabetic;
   pointer-events: none;
@@ -2252,7 +2233,6 @@ a.fourth-section__btn {
 
 .mobile-nav-logo.is-visible {
   opacity: 1;
-  transform: translate3d(0, 0, 0);
 }
 
 .mobile-nav-menu {
@@ -2286,7 +2266,7 @@ a.fourth-section__btn {
 .book-page .fourth-section--standalone {
   z-index: 0;
   min-height: auto;
-  padding-top: 8.25em;
+  padding-top: 6.5em;
 }
 
 .book-page .fourth-section--standalone .fourth-section__intro {

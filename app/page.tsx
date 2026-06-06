@@ -10,6 +10,7 @@ import {
 import Link from "next/link";
 import { createPortal } from "react-dom";
 import { FourthSection } from "@/components/fourth-section";
+import { MobileNavBar } from "@/components/mobile-nav-bar";
 import { MOBILE_ROOT_FONT_SIZE } from "@/lib/mobile-layout";
 import { LISTING_CARDS } from "@/lib/listings";
 
@@ -624,11 +625,7 @@ export default function Home() {
         const padV = rootEm * 0.55;
 
         const nav = document.querySelector(".mobile-nav");
-        const navBg = document.querySelector(".mobile-nav-bg");
-        const navBottom = Math.max(
-          nav?.getBoundingClientRect().bottom ?? 0,
-          navBg?.getBoundingClientRect().bottom ?? 0,
-        );
+        const navBottom = nav?.getBoundingClientRect().bottom ?? 0;
 
         const targetTop = Math.max(navBottom + padV, stackRect.top + padV);
         const targetBottom = stackRect.bottom - padV;
@@ -1771,11 +1768,7 @@ export default function Home() {
       if (!stack || !inner) return;
 
       const nav = document.querySelector(".mobile-nav");
-      const navBg = document.querySelector(".mobile-nav-bg");
-      const navBottom = Math.max(
-        nav?.getBoundingClientRect().bottom ?? 0,
-        navBg?.getBoundingClientRect().bottom ?? 0,
-      );
+      const navBottom = nav?.getBoundingClientRect().bottom ?? 0;
       const rootEm = window.innerWidth / 24.375;
       const safeTop = Math.max(navBottom, rootEm * 5.5) + 10;
 
@@ -1862,44 +1855,7 @@ export default function Home() {
           maxWidth: "100%",
         }}
       >
-        {/* Header fill — white background + thin bottom line, appears with the
-            BINOCULAR logo once scrolled beyond the hero. */}
-        <div
-          aria-hidden
-          className={`mobile-nav-bg${showLogo ? " is-visible" : ""}`}
-          style={{ fontSize: MOBILE_ROOT_FONT_SIZE }}
-        />
-
-        {/* Mobile nav — logo fades in past hero; menu always visible. */}
-        <div
-          className={`mobile-nav hero-intro-fade${showHeroUi ? " is-visible" : ""}`}
-          style={{ fontSize: MOBILE_ROOT_FONT_SIZE }}
-        >
-          <span
-            className={`mobile-nav-logo${showLogo ? " is-visible" : ""}`}
-            aria-hidden={!showLogo}
-          >
-            BINOCULAR
-          </span>
-
-          <button
-            type="button"
-            className="mobile-nav-menu"
-            aria-label="Open navigation menu"
-          >
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-            >
-              <line x1="3" y1="6" x2="21" y2="6" />
-              <line x1="3" y1="12" x2="21" y2="12" />
-              <line x1="3" y1="18" x2="21" y2="18" />
-            </svg>
-          </button>
-        </div>
+        <MobileNavBar showLogo={showLogo} showNav={showHeroUi} />
 
         <div
           className="hero-stage"
