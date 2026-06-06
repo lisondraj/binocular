@@ -1323,7 +1323,7 @@ a.fourth-section__btn {
   bottom: var(--fourth-caption-inset);
   z-index: 2;
   padding: var(--fourth-caption-padding);
-  border-radius: 0.65em;
+  border-radius: 0.55em;
   isolation: isolate;
   overflow: hidden;
 }
@@ -2197,7 +2197,7 @@ a.fourth-section__btn {
 .mobile-nav.is-expanded {
   position: fixed;
   isolation: isolate;
-  border-radius: 0.9em;
+  border-radius: 0.75em;
   padding: 0.95em 0.78em;
   min-height: 3.35em;
   overflow: hidden;
@@ -2223,7 +2223,7 @@ a.fourth-section__btn {
 
 .mobile-nav-logo {
   font-family: var(--font-suisse), system-ui, sans-serif;
-  font-size: calc(2.25em * 14 / 24);
+  font-size: calc(2.25em * 12.5 / 24);
   line-height: 1;
   font-weight: 400;
   letter-spacing: -0.02em;

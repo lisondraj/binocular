@@ -1857,7 +1857,7 @@ export default function Home() {
           <h1
             className="hero-title"
             style={{
-              fontSize: "3em",
+              fontSize: "2.8em",
               fontWeight: 400,
               letterSpacing: "-0.02em",
             }}
