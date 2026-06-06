@@ -2164,7 +2164,7 @@ a.fourth-section__btn {
 /* Mobile nav — matches hero content width (1.5em inset each side). */
 .mobile-nav {
   position: fixed;
-  top: 1.5em;
+  top: 1em;
   left: 1.5em;
   right: 1.5em;
   max-width: calc(var(--ipad-width) - 3em);
@@ -2178,16 +2178,35 @@ a.fourth-section__btn {
   box-sizing: border-box;
 }
 
-/* Expanded — plain white rounded box, same width band as the AI prompt. */
+/* Expanded — frosted white pill, same width band as the AI prompt. */
 .mobile-nav.is-expanded {
-  background: #ffffff;
-  border-radius: 1.25em;
-  padding: 0.85em;
+  position: fixed;
+  isolation: isolate;
+  border-radius: 0.9em;
+  padding: 0.62em;
+  overflow: hidden;
+}
+
+.mobile-nav.is-expanded::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: inherit;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(1.75em) saturate(1.15);
+  -webkit-backdrop-filter: blur(1.75em) saturate(1.15);
+}
+
+.mobile-nav.is-expanded .mobile-nav-logo,
+.mobile-nav.is-expanded .mobile-nav-menu {
+  position: relative;
+  z-index: 1;
 }
 
 .mobile-nav-logo {
   font-family: var(--font-geist-mono), ui-monospace, monospace;
-  font-size: calc(2.25em * 18 / 24);
+  font-size: calc(2.25em * 14 / 24);
   line-height: 1;
   font-weight: 400;
   letter-spacing: -0.02em;
@@ -2216,8 +2235,8 @@ a.fourth-section__btn {
 }
 
 .mobile-nav-menu svg {
-  width: 2.25em;
-  height: 2.25em;
+  width: 2em;
+  height: 2em;
   display: block;
 }
 
@@ -2234,7 +2253,7 @@ a.fourth-section__btn {
 .book-page .fourth-section--standalone {
   z-index: 0;
   min-height: auto;
-  padding-top: 6.5em;
+  padding-top: 6em;
 }
 
 .book-page .fourth-section--standalone .fourth-section__intro {

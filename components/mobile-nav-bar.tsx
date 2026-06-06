@@ -28,7 +28,7 @@ export function MobileNavBar({
         className={`mobile-nav-logo${logoVisible ? " is-visible" : ""}`}
         aria-hidden={!logoVisible}
       >
-        bino
+        BINOCULAR
       </span>
 
       <button
