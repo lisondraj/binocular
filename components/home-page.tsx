@@ -362,6 +362,7 @@ export function HomePage({
 }) {
   const isMain2 = variant === "main2";
   const [showLogo, setShowLogo] = useState(false);
+  const [main2MenuOpen, setMain2MenuOpen] = useState(false);
   const [showHeroUi, setShowHeroUi] = useState(false);
   const [showHeroPrompt, setShowHeroPrompt] = useState(false);
   const [promptAnimReady, setPromptAnimReady] = useState(false);
@@ -1367,6 +1368,11 @@ export function HomePage({
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  useEffect(() => {
+    if (!isMain2 || !showLogo) return;
+    setMain2MenuOpen(false);
+  }, [isMain2, showLogo]);
+
   // After the prompt animation + submit: pin the AI box in the viewport and
   // lerp it to the bottom of the phone as the user scrolls into section two.
   useEffect(() => {
@@ -1726,7 +1732,7 @@ export function HomePage({
     sectionTwoComplete,
   ]);
 
-  const renderHeroDeck = (grayscalePhotos = false) =>
+  const renderHeroDeck = () =>
     heroDeck.map((item, i) => {
       const isTag = item.kind === "tag";
       const deckStyle: CSSProperties & {
@@ -1751,9 +1757,7 @@ export function HomePage({
             key={i}
             src={item.src}
             alt={item.alt}
-            className={`hero-image-rise${
-              grayscalePhotos ? " main2-hero-deck-photo" : ""
-            }${i < revealedImageCount ? " is-visible" : ""}`}
+            className={`hero-image-rise${i < revealedImageCount ? " is-visible" : ""}`}
             style={{
               ...deckStyle,
               objectFit: "cover",
@@ -2025,7 +2029,13 @@ export function HomePage({
           maxWidth: "100%",
         }}
       >
-        <MobileNavBar showLogo={showLogo} showNav={showHeroUi} />
+        <MobileNavBar
+          showLogo={showLogo}
+          showNav={showHeroUi}
+          isMain2={isMain2}
+          menuOpen={main2MenuOpen}
+          onMenuToggle={() => setMain2MenuOpen((open) => !open)}
+        />
 
         <div
           className={`hero-stage${isMain2 ? " hero-stage--main2" : ""}`}
@@ -2072,7 +2082,7 @@ export function HomePage({
                 aria-hidden
               />
               <div aria-hidden className="hero-intro-images main2-hero-deck">
-                {renderHeroDeck(true)}
+                {renderHeroDeck()}
               </div>
               <div className="main2-hero-content">
                 <div

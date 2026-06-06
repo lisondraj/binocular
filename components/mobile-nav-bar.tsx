@@ -9,15 +9,22 @@ type MobileNavBarProps = {
   showLogo?: boolean;
   /** Hero intro fade — nav row appears with the rest of the hero UI. */
   showNav?: boolean;
+  /** /main2 — chevron menu + detached dropdown panel. */
+  isMain2?: boolean;
+  menuOpen?: boolean;
+  onMenuToggle?: () => void;
 };
 
 export function MobileNavBar({
   staticNav = false,
   showLogo = false,
   showNav = true,
+  isMain2 = false,
+  menuOpen = false,
+  onMenuToggle,
 }: MobileNavBarProps) {
-  const logoVisible = staticNav || showLogo;
-  const expanded = staticNav || showLogo;
+  const expanded = staticNav || showLogo || (isMain2 && menuOpen);
+  const logoVisible = staticNav || showLogo || (isMain2 && menuOpen);
   const navVisible = staticNav || showNav;
   const logoClassName = `mobile-nav-logo mobile-nav-logo-link${
     logoVisible ? " is-visible" : ""
@@ -27,19 +34,16 @@ export function MobileNavBar({
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  return (
+  const navRow = (
     <div
       className={`mobile-nav${
         staticNav ? " mobile-nav--static" : " hero-intro-fade"
-      }${navVisible ? " is-visible" : ""}${expanded ? " is-expanded" : ""}`}
-      style={{ fontSize: MOBILE_ROOT_FONT_SIZE }}
+      }${isMain2 ? " mobile-nav--main2" : ""}${
+        navVisible ? " is-visible" : ""
+      }${expanded ? " is-expanded" : ""}`}
     >
       {staticNav ? (
-        <Link
-          href="/"
-          className={logoClassName}
-          aria-hidden={!logoVisible}
-        >
+        <Link href="/" className={logoClassName} aria-hidden={!logoVisible}>
           BINOCULAR
         </Link>
       ) : (
@@ -56,21 +60,67 @@ export function MobileNavBar({
 
       <button
         type="button"
-        className="mobile-nav-menu"
-        aria-label="Open navigation menu"
+        className={`mobile-nav-menu${menuOpen ? " is-open" : ""}`}
+        aria-label={menuOpen ? "Close navigation menu" : "Open navigation menu"}
+        aria-expanded={isMain2 ? menuOpen : undefined}
+        onClick={isMain2 ? onMenuToggle : undefined}
       >
-        <svg
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-        >
-          <line x1="3" y1="6" x2="21" y2="6" />
-          <line x1="3" y1="12" x2="21" y2="12" />
-          <line x1="3" y1="18" x2="21" y2="18" />
-        </svg>
+        {isMain2 ? (
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <polyline points="6 9 12 15 18 9" />
+          </svg>
+        ) : (
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+          >
+            <line x1="3" y1="6" x2="21" y2="6" />
+            <line x1="3" y1="12" x2="21" y2="12" />
+            <line x1="3" y1="18" x2="21" y2="18" />
+          </svg>
+        )}
       </button>
     </div>
+  );
+
+  if (isMain2) {
+    return (
+      <div
+        className={`main2-nav-anchor hero-intro-fade${
+          navVisible ? " is-visible" : ""
+        }${menuOpen ? " is-menu-open" : ""}`}
+        style={{ fontSize: MOBILE_ROOT_FONT_SIZE }}
+      >
+        {navRow}
+        {menuOpen ? (
+          <nav className="main2-nav-menu-panel" aria-label="Navigation">
+            <button type="button" className="main2-nav-menu-panel__link">
+              Host
+            </button>
+            <Link
+              href="/book"
+              className="main2-nav-menu-panel__link"
+              onClick={() => onMenuToggle?.()}
+            >
+              Book
+            </Link>
+          </nav>
+        ) : null}
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ fontSize: MOBILE_ROOT_FONT_SIZE }}>{navRow}</div>
   );
 }
