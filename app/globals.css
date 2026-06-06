@@ -366,6 +366,11 @@ h6 {
 }
 
 /* Compact kitchen — top pinned, bottom edge rises; simpler footer copy. */
+.kitchen-expand-overlay.is-compact {
+  min-height: 0;
+  flex-shrink: 0;
+}
+
 .kitchen-expand-overlay.is-compact .listing-card-media {
   flex: 1.45 1 0;
   background: var(--listing-footer-bg);

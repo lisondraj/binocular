@@ -375,6 +375,10 @@ export default function Home() {
   const [kitchenAnchoredInThird, setKitchenAnchoredInThird] = useState(false);
   const [kitchenInThirdSection, setKitchenInThirdSection] = useState(false);
   const [kitchenCompact, setKitchenCompact] = useState(false);
+  const [kitchenOverlayHeightPx, setKitchenOverlayHeightPx] = useState<
+    number | null
+  >(null);
+  const [kitchenCompactAnimating, setKitchenCompactAnimating] = useState(false);
   const [revealedThirdBarCount, setRevealedThirdBarCount] = useState(0);
   const [confirmedDetailCount, setConfirmedDetailCount] = useState(0);
   const [closedBarCount, setClosedBarCount] = useState(0);
@@ -1025,7 +1029,9 @@ export default function Home() {
 
       if (!isCompact) {
         overlay.style.transition = "none";
-        overlay.style.height = `${g.height}px`;
+        setKitchenOverlayHeightPx(g.height);
+      } else {
+        setKitchenOverlayHeightPx(compactHeight);
       }
 
       sec3.style.setProperty("--kitchen-top", `${top}px`);
@@ -1136,23 +1142,25 @@ export default function Home() {
 
         kitchenCompactStartedRef.current = true;
         setKitchenCompact(true);
+        setKitchenCompactAnimating(true);
 
-        // Swap to compact markup first, then animate height on the next frame.
+        // Swap to compact markup first, then shrink via React-owned height.
         requestAnimationFrame(() => {
           requestAnimationFrame(() => {
-            const el = kitchenOverlayRef.current;
-            const section = thirdSectionRef.current;
-            if (!el || !section) return;
-
-            void el.offsetHeight;
-            el.style.transition = `height ${kitchenCompactDurationMs}ms cubic-bezier(0.33, 1, 0.68, 1)`;
-            el.style.height = `${compactHeight}px`;
-            section.style.setProperty(
+            setKitchenOverlayHeightPx(compactHeight);
+            thirdSectionRef.current?.style.setProperty(
               "--kitchen-compact-height",
               `${compactHeight}px`,
             );
           });
         });
+
+        timers.push(
+          setTimeout(
+            () => setKitchenCompactAnimating(false),
+            kitchenCompactDurationMs,
+          ),
+        );
       }, kitchenCompactDelayMs),
     );
 
@@ -2161,7 +2169,17 @@ export default function Home() {
                     }${kitchenContentReady ? " content-ready" : ""}${
                       kitchenCompact ? " is-compact" : ""
                     }`}
-                    style={{ fontSize: MOBILE_ROOT_FONT_SIZE }}
+                    style={{
+                      fontSize: MOBILE_ROOT_FONT_SIZE,
+                      ...(kitchenOverlayHeightPx != null
+                        ? {
+                            height: `${kitchenOverlayHeightPx}px`,
+                            transition: kitchenCompactAnimating
+                              ? `height ${1700}ms cubic-bezier(0.33, 1, 0.68, 1)`
+                              : undefined,
+                          }
+                        : {}),
+                    }}
                   >
                     <div className="listing-card-media kitchen-expand-overlay__media">
                       <img
