@@ -426,12 +426,17 @@ export default function Home() {
   } | null>(null);
   const kitchenGlideRef = useRef({
     settledTop: 0,
+    finalTop: 0,
+    vvOffsetAtStart: 0,
     left: 0,
     width: 0,
     height: 0,
   });
+  const kitchenAnchoredLayoutRef = useRef(false);
+  const kitchenAnchorHandoffRef = useRef<{ top: number; left: number } | null>(
+    null,
+  );
   const sectionTwoCompleteRef = useRef(false);
-  const kitchenGlideLockedRef = useRef(false);
   const kitchenAnchoredInThirdRef = useRef(false);
   const kitchenInThirdSectionRef = useRef(false);
   const thirdSectionAnimationCompleteRef = useRef(false);
@@ -671,8 +676,12 @@ export default function Home() {
     let completeTimer: ReturnType<typeof setTimeout> | undefined;
     const onExpandComplete = () => {
       const rect = overlay.getBoundingClientRect();
+      const vh = getViewportHeight();
+      const vvTop = getViewportOffsetTop();
       kitchenGlideRef.current = {
         settledTop: rect.top,
+        finalTop: vvTop + (vh - rect.height) / 2,
+        vvOffsetAtStart: vvTop,
         left: rect.left,
         width: rect.width,
         height: rect.height,
@@ -779,7 +788,7 @@ export default function Home() {
     );
   };
 
-  /** Pin once on body; position updates use visual viewport coords (Safari-safe). */
+  /** Pin once on body; glide uses frozen targets + transform (Safari chrome-safe). */
   const pinKitchenGlideOnBody = (overlay: HTMLElement) => {
     const g = kitchenGlideRef.current;
     overlay.style.transition = "none";
@@ -789,41 +798,58 @@ export default function Home() {
     overlay.style.height = `${g.height}px`;
     overlay.style.zIndex = "11";
     overlay.style.margin = "0";
-    overlay.style.transform = "none";
-    overlay.style.willChange = "top";
+    overlay.style.willChange = "transform";
   };
 
-  /** Return the kitchen card to section two if the user scrolls back out of the glide zone. */
-  const resetKitchenGlideToSectionTwo = () => {
-    if (!kitchenInThirdSectionRef.current || kitchenAnchoredInThirdRef.current) {
+  /** Keep glide frozen when Safari chrome moves without changing scroll progress. */
+  const stabilizeKitchenGlideForViewport = () => {
+    const overlay = kitchenOverlayRef.current;
+    if (!overlay || !kitchenInThirdSectionRef.current || kitchenAnchoredInThirdRef.current) {
       return;
     }
-    kitchenInThirdSectionRef.current = false;
-    setKitchenInThirdSection(false);
+
+    const g = kitchenGlideRef.current;
+    const p = kitchenGlideProgressRef.current;
+    const currentTop = overlay.getBoundingClientRect().top;
+    const vvTop = getViewportOffsetTop();
+
+    if (p > 0 && p < 1) {
+      g.settledTop = (currentTop - g.finalTop * p) / (1 - p);
+    } else {
+      g.settledTop = currentTop;
+    }
+    g.vvOffsetAtStart = vvTop;
   };
 
-  /** Scroll-linked glide — fixed on body, top in visual viewport coords. */
+  /** Scroll-linked glide — fixed on body, transform from frozen start/end tops. */
   const applyKitchenGlideFromScroll = () => {
     const overlay = kitchenOverlayRef.current;
-    if (!overlay || kitchenGlideLockedRef.current) return;
-    if (!kitchenInThirdSectionRef.current || kitchenAnchoredInThirdRef.current) {
-      return;
-    }
+    if (!overlay || kitchenAnchoredInThirdRef.current) return;
+    if (!kitchenInThirdSectionRef.current) return;
 
     const g = kitchenGlideRef.current;
     const p = computeKitchenGlideProgress();
     kitchenGlideProgressRef.current = p;
 
-    const vh = getViewportHeight();
-    const vvTop = getViewportOffsetTop();
-    const finalTop = vvTop + (vh - g.height) / 2;
-    const visualTop = g.settledTop + (finalTop - g.settledTop) * p;
+    const vvDelta = getViewportOffsetTop() - g.vvOffsetAtStart;
+    const baseTop = g.settledTop + vvDelta;
+    const travel = (g.finalTop - g.settledTop) * p;
 
-    overlay.style.top = `${Math.round(visualTop * 100) / 100}px`;
+    overlay.style.top = `${baseTop}px`;
+    overlay.style.transform = `translate3d(0, ${travel}px, 0)`;
 
-    if (p >= 1) {
-      kitchenGlideLockedRef.current = true;
+    if (p >= 1 && !kitchenAnchoredInThirdRef.current) {
+      const sec3 = thirdSectionRef.current;
+      if (sec3) {
+        const overlayRect = overlay.getBoundingClientRect();
+        const secRect = sec3.getBoundingClientRect();
+        kitchenAnchorHandoffRef.current = {
+          top: overlayRect.top - secRect.top,
+          left: overlayRect.left - secRect.left,
+        };
+      }
       kitchenAnchoredInThirdRef.current = true;
+      kitchenAnchoredLayoutRef.current = false;
       setKitchenAnchoredInThird(true);
     }
   };
@@ -911,13 +937,10 @@ export default function Home() {
 
     let glideRaf = 0;
 
-    const runGlide = (allowReset: boolean) => {
+    const runGlide = () => {
       const sec3 = thirdSectionRef.current;
       if (!sec3) return;
-
-      if (kitchenAnchoredInThirdRef.current || kitchenGlideLockedRef.current) {
-        return;
-      }
+      if (kitchenAnchoredInThirdRef.current) return;
 
       const overlay = kitchenOverlayRef.current;
       if (!overlay) return;
@@ -927,50 +950,53 @@ export default function Home() {
 
         kitchenGlideBoundsRef.current = getThirdSectionGlideBounds();
         const rect = overlay.getBoundingClientRect();
+        const vh = getViewportHeight();
+        const vvTop = getViewportOffsetTop();
         kitchenGlideRef.current = {
           settledTop: rect.top,
+          finalTop: vvTop + (vh - rect.height) / 2,
+          vvOffsetAtStart: vvTop,
           left: rect.left,
           width: rect.width,
           height: rect.height,
         };
         kitchenGlideProgressRef.current = 0;
         kitchenInThirdSectionRef.current = true;
-        setKitchenInThirdSection(true);
-        return;
-      }
 
-      if (
-        allowReset &&
-        window.scrollY < kitchenGlideBoundsRef.current.glideStart - 2
-      ) {
-        resetKitchenGlideToSectionTwo();
+        // Pin before portal reparent so the card never paints with section-two coords on body.
+        pinKitchenGlideOnBody(overlay);
+        applyKitchenGlideFromScroll();
+        setKitchenInThirdSection(true);
         return;
       }
 
       applyKitchenGlideFromScroll();
     };
 
-    const onScroll = () => {
+    const scheduleGlide = () => {
       cancelAnimationFrame(glideRaf);
-      glideRaf = requestAnimationFrame(() => runGlide(true));
+      glideRaf = requestAnimationFrame(runGlide);
     };
 
-    const onViewportChange = () => {
+    const onViewportChromeChange = () => {
       cancelAnimationFrame(glideRaf);
-      glideRaf = requestAnimationFrame(() => runGlide(false));
+      glideRaf = requestAnimationFrame(() => {
+        stabilizeKitchenGlideForViewport();
+        runGlide();
+      });
     };
 
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onViewportChange);
+    window.addEventListener("scroll", scheduleGlide, { passive: true });
+    window.addEventListener("resize", scheduleGlide);
     const visualViewport = window.visualViewport;
-    visualViewport?.addEventListener("resize", onViewportChange);
-    visualViewport?.addEventListener("scroll", onViewportChange);
+    visualViewport?.addEventListener("resize", onViewportChromeChange);
+    visualViewport?.addEventListener("scroll", onViewportChromeChange);
     return () => {
       cancelAnimationFrame(glideRaf);
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onViewportChange);
-      visualViewport?.removeEventListener("resize", onViewportChange);
-      visualViewport?.removeEventListener("scroll", onViewportChange);
+      window.removeEventListener("scroll", scheduleGlide);
+      window.removeEventListener("resize", scheduleGlide);
+      visualViewport?.removeEventListener("resize", onViewportChromeChange);
+      visualViewport?.removeEventListener("scroll", onViewportChromeChange);
     };
   }, [sectionTwoComplete, kitchenInThirdSection, kitchenAnchoredInThird]);
 
@@ -981,15 +1007,31 @@ export default function Home() {
     const sec3 = thirdSectionRef.current;
     if (!overlay || !sec3) return;
 
-    const apply = () => {
+    const apply = (useLiveRect: boolean) => {
       const g = kitchenGlideRef.current;
       const secRect = sec3.getBoundingClientRect();
-      const top = (sec3.offsetHeight - g.height) / 2;
-      const left = g.left - secRect.left;
       const rootEm = window.innerWidth / 24.375;
       const compactHeight = Math.max(g.height * 0.38, rootEm * 11);
+      const centeredTop = (sec3.offsetHeight - g.height) / 2;
+      const centeredLeft = g.left - secRect.left;
 
       kitchenCompactHeightRef.current = compactHeight;
+
+      let top = centeredTop;
+      let left = centeredLeft;
+
+      const handoff = kitchenAnchorHandoffRef.current;
+      if (useLiveRect && handoff) {
+        top = handoff.top;
+        left = handoff.left;
+        kitchenAnchorHandoffRef.current = null;
+        kitchenAnchoredLayoutRef.current = true;
+      } else if (useLiveRect) {
+        const overlayRect = overlay.getBoundingClientRect();
+        top = overlayRect.top - secRect.top;
+        left = overlayRect.left - secRect.left;
+        kitchenAnchoredLayoutRef.current = true;
+      }
 
       overlay.style.transition = "none";
       overlay.style.position = "absolute";
@@ -1009,16 +1051,13 @@ export default function Home() {
       sec3.style.setProperty("--kitchen-compact-height", `${compactHeight}px`);
     };
 
-    apply();
-    window.addEventListener("resize", apply);
-    const visualViewport = window.visualViewport;
-    visualViewport?.addEventListener("resize", apply);
-    visualViewport?.addEventListener("scroll", apply);
-    return () => {
-      window.removeEventListener("resize", apply);
-      visualViewport?.removeEventListener("resize", apply);
-      visualViewport?.removeEventListener("scroll", apply);
-    };
+    apply(!kitchenAnchoredLayoutRef.current);
+
+    // Only re-center on real window resize (orientation). Safari URL-bar chrome
+    // fires visualViewport resize and would snap the card if we recentered there.
+    const onWindowResize = () => apply(false);
+    window.addEventListener("resize", onWindowResize);
+    return () => window.removeEventListener("resize", onWindowResize);
   }, [kitchenAnchoredInThird]);
 
   useEffect(() => {
