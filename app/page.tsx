@@ -388,6 +388,7 @@ export default function Home() {
     number | null
   >(null);
   const [kitchenCompactAnimating, setKitchenCompactAnimating] = useState(false);
+  const [kitchenStackInView, setKitchenStackInView] = useState(false);
   const [revealedThirdBarCount, setRevealedThirdBarCount] = useState(0);
   const [confirmedDetailCount, setConfirmedDetailCount] = useState(0);
   const [closedBarCount, setClosedBarCount] = useState(0);
@@ -455,6 +456,7 @@ export default function Home() {
   const kitchenCompactStartedRef = useRef(false);
   const kitchenGlideBoundsRef = useRef({ glideStart: 0, glideEnd: 0 });
   const kitchenGlideProgressRef = useRef(0);
+  const kitchenStackInViewRef = useRef(false);
 
   const introFade = (step: number) =>
     INTRO_UI_DELAY + step * (INTRO_FADE_MS + INTRO_GAP_MS);
@@ -765,6 +767,46 @@ export default function Home() {
   const getViewportOffsetTop = () =>
     window.visualViewport?.offsetTop ?? 0;
 
+  const isThirdSectionKitchenInView = () => {
+    const sec3 = thirdSectionRef.current;
+    if (!sec3) return false;
+    const rect = sec3.getBoundingClientRect();
+    const vh = getViewportHeight();
+    const visible = Math.min(rect.bottom, vh) - Math.max(rect.top, 0);
+    return visible >= vh * 0.45;
+  };
+
+  /** Measure kitchen + visible prompt bars as one stack. */
+  const getKitchenStackMetrics = (
+    sec3: HTMLElement,
+    kitchenHeight: number,
+  ) => {
+    const bars = sec3.querySelector<HTMLElement>(".third-section-bars");
+    const rootEm = window.innerWidth / 24.375;
+    const gap = rootEm * 0.5;
+    const barsHeight = bars?.offsetHeight ?? 0;
+    const stackHeight =
+      kitchenHeight + (barsHeight > 0 ? barsHeight + gap : 0);
+    return { stackHeight, gap, barsHeight };
+  };
+
+  /** Fixed viewport top — vertically centers kitchen + bars on screen. */
+  const getKitchenStackTopFixed = (
+    sec3: HTMLElement,
+    kitchenHeight: number,
+  ) => {
+    const { stackHeight } = getKitchenStackMetrics(sec3, kitchenHeight);
+    const vh = getViewportHeight();
+    const vvTop = getViewportOffsetTop();
+    return vvTop + Math.max(0, (vh - stackHeight) / 2);
+  };
+
+  const getKitchenStackLeftFixed = (width: number) => {
+    const vvLeft = window.visualViewport?.offsetLeft ?? 0;
+    const vvWidth = window.visualViewport?.width ?? window.innerWidth;
+    return vvLeft + Math.max(0, (vvWidth - width) / 2);
+  };
+
   const getThirdSectionGlideBounds = () => {
     const sec3 = thirdSectionRef.current;
     const vh = getViewportHeight();
@@ -1009,6 +1051,7 @@ export default function Home() {
     },
   ) => {
     sec3.style.setProperty("--kitchen-top", `${layout.top}px`);
+    sec3.style.setProperty("--kitchen-fixed-top", `${layout.top}px`);
     sec3.style.setProperty("--kitchen-left", `${layout.left}px`);
     sec3.style.setProperty("--kitchen-width", `${layout.width}px`);
     sec3.style.setProperty("--kitchen-height", `${layout.height}px`);
@@ -1024,22 +1067,17 @@ export default function Home() {
 
     const apply = (useLiveRect: boolean) => {
       const g = kitchenGlideRef.current;
-      const secRect = sec3.getBoundingClientRect();
       const rootEm = window.innerWidth / 24.375;
       const compactHeight = Math.max(g.height * 0.38, rootEm * 11);
       const isCompact = kitchenCompactStartedRef.current;
       const activeHeight = isCompact ? compactHeight : g.height;
-      const centeredTop = (sec3.offsetHeight - activeHeight) / 2;
-      const centeredLeft = Math.max(0, (sec3.clientWidth - g.width) / 2);
 
       kitchenCompactHeightRef.current = compactHeight;
 
-      let top = centeredTop;
-      const left = centeredLeft;
+      const top = getKitchenStackTopFixed(sec3, activeHeight);
+      const left = getKitchenStackLeftFixed(g.width);
 
       if (useLiveRect) {
-        const overlayRect = overlay.getBoundingClientRect();
-        top = overlayRect.top - secRect.top;
         kitchenAnchoredLayoutRef.current = true;
       }
 
@@ -1072,12 +1110,10 @@ export default function Home() {
       const g = kitchenGlideRef.current;
       const rootEm = window.innerWidth / 24.375;
       const compactHeight = Math.max(g.height * 0.38, rootEm * 11);
-      const left = Math.max(0, (sec3.clientWidth - g.width) / 2);
 
       if (kitchenCompactStartedRef.current) {
-        const secRect = sec3.getBoundingClientRect();
-        const overlayRect = overlay.getBoundingClientRect();
-        const top = overlayRect.top - secRect.top;
+        const top = getKitchenStackTopFixed(sec3, compactHeight);
+        const left = getKitchenStackLeftFixed(g.width);
 
         setKitchenOverlayLeftPx(left);
         setKitchenOverlayTopPx(top);
@@ -1126,6 +1162,75 @@ export default function Home() {
     kitchenOverlayHeightPx,
   ]);
 
+  // Only show the fixed kitchen stack while section three is in the viewport.
+  useEffect(() => {
+    if (!kitchenAnchoredInThird) return;
+
+    let raf = 0;
+    const update = () => {
+      const inView = isThirdSectionKitchenInView();
+      kitchenStackInViewRef.current = inView;
+      setKitchenStackInView(inView);
+    };
+
+    const onScroll = () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(update);
+    };
+
+    update();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+    };
+  }, [kitchenAnchoredInThird]);
+
+  // Re-center the kitchen + bars stack as prompt bars grow during section three.
+  useEffect(() => {
+    if (!kitchenAnchoredInThird || !kitchenCompact) return;
+    const sec3 = thirdSectionRef.current;
+    if (!sec3 || kitchenOverlayHeightPx == null) return;
+
+    const recenter = () => {
+      const top = getKitchenStackTopFixed(sec3, kitchenOverlayHeightPx);
+      const left = getKitchenStackLeftFixed(kitchenGlideRef.current.width);
+      setKitchenOverlayTopPx(top);
+      setKitchenOverlayLeftPx(left);
+      syncKitchenSectionVars(sec3, {
+        top,
+        left,
+        width: kitchenGlideRef.current.width,
+        height: kitchenGlideRef.current.height,
+        compactHeight: kitchenOverlayHeightPx,
+      });
+    };
+
+    const raf = requestAnimationFrame(recenter);
+
+    const onViewportChange = () => requestAnimationFrame(recenter);
+    window.addEventListener("resize", onViewportChange);
+    const visualViewport = window.visualViewport;
+    visualViewport?.addEventListener("resize", onViewportChange);
+    visualViewport?.addEventListener("scroll", onViewportChange);
+
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("resize", onViewportChange);
+      visualViewport?.removeEventListener("resize", onViewportChange);
+      visualViewport?.removeEventListener("scroll", onViewportChange);
+    };
+  }, [
+    kitchenAnchoredInThird,
+    kitchenCompact,
+    kitchenOverlayHeightPx,
+    revealedThirdBarCount,
+    closedBarCount,
+    confirmedDetailCount,
+  ]);
+
   useEffect(() => {
     thirdSectionAnimationCompleteRef.current = thirdSectionAnimationComplete;
   }, [thirdSectionAnimationComplete]);
@@ -1139,6 +1244,8 @@ export default function Home() {
     const update = () => {
       const fourth = fourthSectionRef.current;
       const overlay = kitchenOverlayRef.current;
+      const sec3 = thirdSectionRef.current;
+      const bars = sec3?.querySelector<HTMLElement>(".third-section-bars");
       if (!fourth || !overlay) return;
 
       const fourthTop = fourth.getBoundingClientRect().top;
@@ -1148,21 +1255,43 @@ export default function Home() {
       const end = vh * 0.18;
       const t = Math.min(Math.max((start - fourthTop) / (start - end), 0), 1);
 
+      const clearStackStyles = (el: HTMLElement) => {
+        el.style.transition = "";
+        el.style.opacity = "";
+        el.style.transform = "";
+        el.style.pointerEvents = "";
+        el.style.visibility = "";
+      };
+
       if (t <= 0) {
-        overlay.style.transition = "";
-        overlay.style.opacity = "";
-        overlay.style.transform = "";
-        overlay.style.pointerEvents = "";
-        overlay.style.visibility = "";
+        if (!kitchenStackInViewRef.current) {
+          overlay.style.visibility = "hidden";
+          overlay.style.pointerEvents = "none";
+          if (bars) {
+            bars.style.visibility = "hidden";
+            bars.style.pointerEvents = "none";
+          }
+          return;
+        }
+        clearStackStyles(overlay);
+        if (bars) clearStackStyles(bars);
         return;
       }
 
-      overlay.style.transition =
+      const fadeTransition =
         "opacity 0.35s ease, transform 0.35s ease, visibility 0.35s ease";
+      overlay.style.transition = fadeTransition;
       overlay.style.opacity = String(1 - t);
       overlay.style.transform = `translate3d(0, ${-t * 32}px, 0)`;
       overlay.style.pointerEvents = t > 0.35 ? "none" : "";
       overlay.style.visibility = t >= 0.98 ? "hidden" : "visible";
+
+      if (bars) {
+        bars.style.transition = fadeTransition;
+        bars.style.opacity = String(1 - t);
+        bars.style.transform = `translate3d(0, ${-t * 32}px, 0)`;
+        bars.style.visibility = t >= 0.98 ? "hidden" : "visible";
+      }
     };
 
     const onScroll = () => {
@@ -1178,12 +1307,21 @@ export default function Home() {
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onScroll);
       const overlay = kitchenOverlayRef.current;
+      const bars = thirdSectionRef.current?.querySelector<HTMLElement>(
+        ".third-section-bars",
+      );
       if (overlay) {
         overlay.style.transition = "";
         overlay.style.opacity = "";
         overlay.style.transform = "";
         overlay.style.pointerEvents = "";
         overlay.style.visibility = "";
+      }
+      if (bars) {
+        bars.style.transition = "";
+        bars.style.opacity = "";
+        bars.style.transform = "";
+        bars.style.visibility = "";
       }
     };
   }, [thirdSectionAnimationComplete, kitchenCardExpanded]);
@@ -1222,11 +1360,21 @@ export default function Home() {
         // Swap to compact markup first, then shrink via React-owned height.
         requestAnimationFrame(() => {
           requestAnimationFrame(() => {
+            const section = thirdSectionRef.current;
+            if (!section) return;
+
+            const top = getKitchenStackTopFixed(section, compactHeight);
+            const left = getKitchenStackLeftFixed(g.width);
+            setKitchenOverlayTopPx(top);
+            setKitchenOverlayLeftPx(left);
             setKitchenOverlayHeightPx(compactHeight);
-            thirdSectionRef.current?.style.setProperty(
-              "--kitchen-compact-height",
-              `${compactHeight}px`,
-            );
+            syncKitchenSectionVars(section, {
+              top,
+              left,
+              width: g.width,
+              height: g.height,
+              compactHeight,
+            });
           });
         });
 
@@ -1999,6 +2147,12 @@ export default function Home() {
               zIndex: 2,
               overflow: "visible",
               willChange: scrollUnlocked ? "top" : "auto",
+              ...(kitchenAnchoredInThird && kitchenStackInView
+                ? {
+                    visibility: "hidden",
+                    pointerEvents: "none",
+                  }
+                : {}),
             }}
           >
           {/* Frosted-glass prompt card — backdrop blur + dark overlay, with a
@@ -2225,7 +2379,9 @@ export default function Home() {
         {/* Kitchen overlay — section two, body during glide, section three when landed. */}
         {kitchenCardExpanded &&
         (kitchenAnchoredInThird
-          ? thirdSectionRef.current
+          ? typeof document !== "undefined"
+            ? document.body
+            : null
           : kitchenInThirdSection
             ? typeof document !== "undefined"
               ? document.body
@@ -2252,7 +2408,7 @@ export default function Home() {
                       kitchenOverlayWidthPx != null &&
                       kitchenOverlayHeightPx != null
                         ? {
-                            position: "absolute",
+                            position: "fixed",
                             left: `${kitchenOverlayLeftPx}px`,
                             top: `${kitchenOverlayTopPx}px`,
                             width: `${kitchenOverlayWidthPx}px`,
@@ -2263,6 +2419,12 @@ export default function Home() {
                             transition: kitchenCompactAnimating
                               ? `height ${1700}ms cubic-bezier(0.33, 1, 0.68, 1)`
                               : undefined,
+                            ...(!kitchenStackInView
+                              ? {
+                                  visibility: "hidden",
+                                  pointerEvents: "none",
+                                }
+                              : {}),
                           }
                         : {}),
                     }}
@@ -2367,7 +2529,7 @@ export default function Home() {
                 );
               })(),
               kitchenAnchoredInThird
-                ? thirdSectionRef.current!
+                ? document.body
                 : kitchenInThirdSection
                   ? document.body
                   : secondSectionRef.current!,
@@ -2380,6 +2542,12 @@ export default function Home() {
             className={`third-section${
               kitchenAnchoredInThird ? " third-section--kitchen-active" : ""
             }${
+              kitchenAnchoredInThird ? " third-section--kitchen-fixed" : ""
+            }${
+              kitchenAnchoredInThird && kitchenStackInView
+                ? " third-section--kitchen-stack-visible"
+                : ""
+            }${
               thirdSectionAnimationComplete
                 ? " third-section--animation-complete"
                 : ""
@@ -2387,7 +2555,9 @@ export default function Home() {
           >
             {kitchenAnchoredInThird ? (
               <div
-                className="third-section-bars"
+                className={`third-section-bars${
+                  kitchenStackInView ? "" : " is-stack-hidden"
+                }`}
                 aria-hidden={revealedThirdBarCount === 0}
                 style={{ fontSize: MOBILE_ROOT_FONT_SIZE }}
               >
