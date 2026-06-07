@@ -12,6 +12,8 @@ const MAIN2_NAV_TABS = [
   { id: "actions", label: "Actions" },
 ] as const;
 
+type Main2NavTabId = (typeof MAIN2_NAV_TABS)[number]["id"];
+
 type MobileNavBarProps = {
   /** When true, logo and header fill are always visible (e.g. /book). */
   staticNav?: boolean;
@@ -32,6 +34,7 @@ export function MobileNavBar({
   menuOpen = false,
   onMenuToggle,
 }: MobileNavBarProps) {
+  const [activeTab, setActiveTab] = useState<Main2NavTabId>("spaces");
   const [searchOpen, setSearchOpen] = useState(false);
 
   const isMain2PastHero = isMain2;
@@ -113,9 +116,18 @@ export function MobileNavBar({
               key={tab.id}
               type="button"
               role="tab"
-              aria-selected={false}
-              className="main2-nav-tabs__tab"
-              onClick={() => setSearchOpen((open) => !open)}
+              aria-selected={activeTab === tab.id}
+              className={`main2-nav-tabs__tab${
+                activeTab === tab.id ? " is-active" : ""
+              }`}
+              onClick={() => {
+                if (activeTab === tab.id) {
+                  setSearchOpen((open) => !open);
+                } else {
+                  setActiveTab(tab.id);
+                  setSearchOpen(true);
+                }
+              }}
             >
               {tab.label}
             </button>

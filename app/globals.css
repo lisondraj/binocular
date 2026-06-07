@@ -3259,6 +3259,11 @@ a.fourth-section__btn {
     border-color 0.2s ease;
 }
 
+.main2-nav-tabs__tab.is-active {
+  color: #000000;
+  border-bottom-color: #000000;
+}
+
 .main2-nav-tabs__tab:hover,
 .main2-nav-tabs__tab:focus-visible {
   color: #000000;
