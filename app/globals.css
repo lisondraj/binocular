@@ -1392,7 +1392,7 @@ h6 {
 /* /main2 — listings on white page below hero grain box. */
 .mobile-view--main2 .fourth-section--main2-continuum {
   --listing-card-radius: var(--main2-surface-radius);
-  padding: 0 0 2em;
+  padding: 0;
   background-color: #ffffff;
 }
 
@@ -2329,22 +2329,7 @@ a.fourth-section__btn {
 }
 
 .mobile-view--main2 .mobile-site-footer--main2 .mobile-site-footer__box {
-  position: relative;
-  flex: 1 1 auto;
-  min-height: calc(10.5em - var(--main2-nav-bar-height));
-  width: 100%;
-  max-width: calc(var(--ipad-width) - 2.7em);
-  margin: 0 auto;
-  padding: 0;
-  border-radius: 0;
-  background: #ffffff;
-  border: none;
-  overflow: visible;
-  isolation: isolate;
-  box-sizing: border-box;
-  box-shadow: none;
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
+  display: none;
 }
 
 .mobile-view--main2 .mobile-site-footer--main2 .mobile-site-footer__chrome {
@@ -2376,6 +2361,7 @@ a.fourth-section__btn {
 }
 
 .fourth-section--main2-continuum .fourth-section__listings-block--audience {
+  margin-bottom: 0;
   padding-bottom: 0;
 }
 
