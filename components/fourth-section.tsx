@@ -718,31 +718,33 @@ export const FourthSection = forwardRef(function FourthSection(
           <ListingWhiteBox fullHeight>
             <ListingWhiteBoxTagline />
             <div className="fourth-section__listing-white-box__listings">
-              <p className="fourth-section__category">By action</p>
-              <div
-                className="fourth-section__listings-scroll fourth-section__listings-scroll--row"
-                aria-label="Listings by action"
-              >
-                <div className="fourth-section__listings fourth-section__listings--row">
-                  {FOURTH_SECTION_BY_ACTION.map((listing) => (
-                    <div
-                      key={`fourth-action-${listing.title}`}
-                      className="fourth-section-listing-card-wrap fourth-section-listing-card-wrap--space"
-                    >
-                      <FourthSectionListingCard
-                        className="fourth-section-listing-card--space"
-                        image={listing.image}
-                        alt={listing.alt}
-                        price={listing.pricePerHour}
-                        title={listing.title}
-                        subtitle={listing.subtitle}
-                        hosts={listing.hosts}
-                        rating={listing.rating}
-                        reviewCount={listing.reviewCount}
-                        main2Listings={main2Listings}
-                      />
-                    </div>
-                  ))}
+              <div className="fourth-section__listing-white-box__listings-inner">
+                <p className="fourth-section__category">By action</p>
+                <div
+                  className="fourth-section__listings-scroll fourth-section__listings-scroll--row"
+                  aria-label="Listings by action"
+                >
+                  <div className="fourth-section__listings fourth-section__listings--row">
+                    {FOURTH_SECTION_BY_ACTION.map((listing) => (
+                      <div
+                        key={`fourth-action-${listing.title}`}
+                        className="fourth-section-listing-card-wrap fourth-section-listing-card-wrap--space"
+                      >
+                        <FourthSectionListingCard
+                          className="fourth-section-listing-card--space"
+                          image={listing.image}
+                          alt={listing.alt}
+                          price={listing.pricePerHour}
+                          title={listing.title}
+                          subtitle={listing.subtitle}
+                          hosts={listing.hosts}
+                          rating={listing.rating}
+                          reviewCount={listing.reviewCount}
+                          main2Listings={main2Listings}
+                        />
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
