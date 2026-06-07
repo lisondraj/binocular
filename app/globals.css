@@ -2096,20 +2096,9 @@ a.fourth-section__btn {
   box-sizing: border-box;
 }
 
-.mobile-view--main2 .fourth-section__white-box-intro-title.hero-title {
-  justify-content: flex-start;
-  margin: 0;
-  font-family: var(--font-geist-mono), ui-monospace, monospace;
-  font-size: 1.08em;
-  font-weight: 400;
-  text-transform: uppercase;
-  letter-spacing: 0;
-  color: #000000;
-}
-
 .mobile-view--main2 .fourth-section__distance-intro.hero-description {
   align-items: flex-start;
-  margin: -0.15em 0 0;
+  margin: 0;
   padding: 0;
   box-sizing: border-box;
   font-size: clamp(1.65em, 5vw, 2em);

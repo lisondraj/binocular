@@ -395,19 +395,13 @@ function ListingWhiteBox({ children }: { children?: ReactNode }) {
   );
 }
 
-function ListingWhiteBoxIntro({
-  title,
-  children,
-}: {
-  title: string;
-  children?: ReactNode;
-}) {
+function ListingWhiteBoxTagline() {
   return (
     <div className="fourth-section__white-box-intro-content hero-intro-content">
-      <h2 className="hero-title fourth-section__white-box-intro-title">
-        <span className="hero-title-word">{title}</span>
-      </h2>
-      {children}
+      <p className="hero-description fourth-section__distance-intro">
+        <span className="hero-description__line">We make the physical</span>
+        <span className="hero-description__line">world searchable.</span>
+      </p>
     </div>
   );
 }
@@ -560,12 +554,7 @@ export const FourthSection = forwardRef(function FourthSection(
         <div className="fourth-section__listings-block">
           {main2Listings ? (
             <ListingWhiteBox>
-              <ListingWhiteBoxIntro title="SPACES">
-                <p className="hero-description fourth-section__distance-intro">
-                  <span className="hero-description__line">We make the physical</span>
-                  <span className="hero-description__line">world searchable.</span>
-                </p>
-              </ListingWhiteBoxIntro>
+              <ListingWhiteBoxTagline />
             </ListingWhiteBox>
           ) : null}
           <p className="fourth-section__category">By distance</p>
