@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { BinocularWordmark } from "@/components/binocular-wordmark";
 import { Main2HeroPromptCard } from "@/components/main2-hero-prompt-card";
 import { MOBILE_ROOT_FONT_SIZE } from "@/lib/mobile-layout";
@@ -36,6 +36,26 @@ export function MobileNavBar({
 }: MobileNavBarProps) {
   const [activeTab, setActiveTab] = useState<Main2NavTabId>("spaces");
   const [searchOpen, setSearchOpen] = useState(false);
+  const navAnchorRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!isMain2 || !searchOpen) return;
+
+    const closeSearch = (event: MouseEvent | TouchEvent) => {
+      const target = event.target;
+      if (!(target instanceof Node)) return;
+      if (navAnchorRef.current?.contains(target)) return;
+      setSearchOpen(false);
+    };
+
+    document.addEventListener("mousedown", closeSearch);
+    document.addEventListener("touchstart", closeSearch);
+
+    return () => {
+      document.removeEventListener("mousedown", closeSearch);
+      document.removeEventListener("touchstart", closeSearch);
+    };
+  }, [isMain2, searchOpen]);
 
   const isMain2PastHero = isMain2;
   const expanded =
@@ -100,6 +120,7 @@ export function MobileNavBar({
   if (isMain2) {
     return (
       <div
+        ref={navAnchorRef}
         className={`main2-nav-anchor${menuOpen ? " is-menu-open" : ""}${
           searchOpen ? " is-search-open" : ""
         }`}
