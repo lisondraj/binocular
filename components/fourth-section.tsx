@@ -409,13 +409,25 @@ function ListingWhiteBox({
   );
 }
 
-function ListingWhiteBoxTagline() {
+function ListingWhiteBoxTagline({
+  variant = "distance",
+}: {
+  variant?: "distance" | "action";
+}) {
   return (
     <div className="fourth-section__white-box-intro-content hero-intro-content">
-      <p className="hero-description fourth-section__distance-intro">
-        <span className="hero-description__line">We make the physical</span>
-        <span className="hero-description__line">world searchable.</span>
-      </p>
+      {variant === "action" ? (
+        <p className="hero-description fourth-section__distance-intro">
+          <span className="hero-description__line">Find.</span>
+          <span className="hero-description__line">Test.</span>
+          <span className="hero-description__line">Deploy.</span>
+        </p>
+      ) : (
+        <p className="hero-description fourth-section__distance-intro">
+          <span className="hero-description__line">We make the physical</span>
+          <span className="hero-description__line">world searchable.</span>
+        </p>
+      )}
     </div>
   );
 }
@@ -716,7 +728,7 @@ export const FourthSection = forwardRef(function FourthSection(
       <div className="fourth-section__listings-block fourth-section-reveal">
         {main2Listings ? (
           <ListingWhiteBox fullHeight>
-            <ListingWhiteBoxTagline />
+            <ListingWhiteBoxTagline variant="action" />
             <div className="fourth-section__listing-white-box__listings">
               <div className="fourth-section__listing-white-box__listings-inner">
                 <p className="fourth-section__category">By action</p>
