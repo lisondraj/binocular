@@ -310,9 +310,7 @@ function ListingProfessionCarousel() {
       aria-atomic="true"
       aria-label={`Book a ${activeProfession}`}
     >
-      <span className="fourth-section__listing-grain-box__carousel-prefix">
-        Book a{" "}
-      </span>
+      <span className="fourth-section__listing-grain-box__carousel-prefix">Book a</span>
       <span className="fourth-section__listing-grain-box__carousel-window">
         <span
           ref={trackRef}
