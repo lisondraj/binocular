@@ -395,6 +395,23 @@ function ListingWhiteBox({ children }: { children?: ReactNode }) {
   );
 }
 
+function ListingWhiteBoxIntro({
+  title,
+  children,
+}: {
+  title: string;
+  children?: ReactNode;
+}) {
+  return (
+    <div className="fourth-section__white-box-intro-content hero-intro-content">
+      <h2 className="hero-title fourth-section__white-box-intro-title">
+        <span className="hero-title-word">{title}</span>
+      </h2>
+      {children}
+    </div>
+  );
+}
+
 type FourthSectionProps = {
   scrollReveal?: boolean;
   className?: string;
@@ -543,10 +560,12 @@ export const FourthSection = forwardRef(function FourthSection(
         <div className="fourth-section__listings-block">
           {main2Listings ? (
             <ListingWhiteBox>
-              <p className="hero-description fourth-section__distance-intro">
-                <span className="hero-description__line">We make the physical</span>
-                <span className="hero-description__line">world searchable.</span>
-              </p>
+              <ListingWhiteBoxIntro title="SPACES">
+                <p className="hero-description fourth-section__distance-intro">
+                  <span className="hero-description__line">We make the physical</span>
+                  <span className="hero-description__line">world searchable.</span>
+                </p>
+              </ListingWhiteBoxIntro>
             </ListingWhiteBox>
           ) : null}
           <p className="fourth-section__category">By distance</p>
@@ -692,7 +711,11 @@ export const FourthSection = forwardRef(function FourthSection(
       </div>
 
       <div className="fourth-section__listings-block fourth-section-reveal">
-        {main2Listings ? <ListingWhiteBox /> : null}
+        {main2Listings ? (
+          <ListingWhiteBox>
+            <ListingWhiteBoxIntro title="SPACES" />
+          </ListingWhiteBox>
+        ) : null}
         <p className="fourth-section__category">By action</p>
         <div
           className="fourth-section__listings-scroll fourth-section__listings-scroll--row"
