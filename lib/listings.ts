@@ -228,6 +228,68 @@ export const FOURTH_SECTION_BY_ACTION = [
   },
 ] as const;
 
+export const FOURTH_SECTION_BY_AUDIENCE = [
+  {
+    title: "Robotics teams",
+    subtitle: "Locomotion & manipulation",
+    pricePerHour: "$68",
+    rating: 4.9,
+    reviewCount: 142,
+    hosts: [
+      { initials: "MR", gradient: "135deg, #5c7cfa 0%, #364fc7 100%" },
+      { initials: "KL", gradient: "135deg, #e64980 0%, #c2255c 100%" },
+    ],
+    image: "/images/warehouse-1.png",
+    alt: "Robotics team movement capture",
+  },
+  {
+    title: "ML researchers",
+    subtitle: "Real-world task data",
+    pricePerHour: "$54",
+    rating: 4.8,
+    reviewCount: 97,
+    hosts: [{ initials: "DF", gradient: "135deg, #748ffc 0%, #5c7cfa 100%" }],
+    image: "/images/kitchen.png",
+    alt: "ML researcher movement capture",
+  },
+  {
+    title: "Hardware startups",
+    subtitle: "Prototype validation",
+    pricePerHour: "$62",
+    rating: 4.7,
+    reviewCount: 58,
+    hosts: [
+      { initials: "JS", gradient: "135deg, #38d9a9 0%, #12b886 100%" },
+      { initials: "AN", gradient: "135deg, #fcc419 0%, #f59f00 100%" },
+    ],
+    image: "/images/warehouse-1.png",
+    alt: "Hardware startup movement capture",
+  },
+  {
+    title: "University labs",
+    subtitle: "Embodied AI studies",
+    pricePerHour: "$46",
+    rating: 4.8,
+    reviewCount: 73,
+    hosts: [{ initials: "RP", gradient: "135deg, #da77f2 0%, #9c36b5 100%" }],
+    image: "/images/courtyard.png",
+    alt: "University lab movement capture",
+  },
+  {
+    title: "Foundation models",
+    subtitle: "Physical intelligence data",
+    pricePerHour: "$76",
+    rating: 4.9,
+    reviewCount: 118,
+    hosts: [
+      { initials: "AL", gradient: "135deg, #ffa94d 0%, #fd7e14 100%" },
+      { initials: "MR", gradient: "135deg, #5c7cfa 0%, #364fc7 100%" },
+    ],
+    image: "/images/kitchen.png",
+    alt: "Foundation model team movement capture",
+  },
+] as const;
+
 export const FOURTH_SECTION_BY_PRICE = [
   {
     title: "Garden terrace",

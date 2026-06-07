@@ -13,8 +13,8 @@ import { MOBILE_ROOT_FONT_SIZE } from "@/lib/mobile-layout";
 import {
   FOURTH_SECTION_BUDGET_MAX,
   FOURTH_SECTION_BUDGET_MIN,
+  FOURTH_SECTION_BY_AUDIENCE,
   FOURTH_SECTION_BY_BUNDLE,
-  FOURTH_SECTION_BY_PRICE,
   FOURTH_SECTION_BY_PROFESSION,
   FOURTH_SECTION_BY_ACTION,
   FOURTH_SECTION_BY_SPACE,
@@ -476,36 +476,6 @@ export const FourthSection = forwardRef(function FourthSection(
       </div>
 
       <div className="fourth-section__listings-block fourth-section-reveal">
-        <p className="fourth-section__category">By price</p>
-        <div
-          className="fourth-section__listings-scroll fourth-section__listings-scroll--row"
-          aria-label="Listings by price"
-        >
-          <div className="fourth-section__listings fourth-section__listings--row">
-            {FOURTH_SECTION_BY_PRICE.map((listing) => (
-              <div
-                key={`fourth-price-${listing.title}`}
-                className="fourth-section-listing-card-wrap fourth-section-listing-card-wrap--distance"
-              >
-                <FourthSectionListingCard
-                  className="fourth-section-listing-card--distance"
-                  image={listing.image}
-                  alt={listing.alt}
-                  price={listing.pricePerHour}
-                  title={listing.title}
-                  subtitle={listing.subtitle}
-                  hosts={listing.hosts}
-                  rating={listing.rating}
-                  reviewCount={listing.reviewCount}
-                  main2Listings={main2Listings}
-                />
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      <div className="fourth-section__listings-block fourth-section-reveal">
         {main2Listings ? <ListingGrainBox /> : null}
         <p className="fourth-section__category">By profession</p>
         <div
@@ -567,11 +537,7 @@ export const FourthSection = forwardRef(function FourthSection(
         </div>
       </div>
 
-      {main2Listings ? (
-        <div className="fourth-section__listings-block fourth-section-reveal">
-          <ListingWhiteBox />
-        </div>
-      ) : (
+      {!main2Listings ? (
       <div className="fourth-section__listings-block fourth-section-reveal">
         <p className="fourth-section__category">By bundle</p>
         <div
@@ -671,7 +637,38 @@ export const FourthSection = forwardRef(function FourthSection(
           </div>
         </div>
       </div>
-      )}
+      ) : null}
+
+      <div className="fourth-section__listings-block fourth-section-reveal">
+        {main2Listings ? <ListingGrainBox /> : null}
+        <p className="fourth-section__category">By audience</p>
+        <div
+          className="fourth-section__listings-scroll fourth-section__listings-scroll--row"
+          aria-label="Listings by audience"
+        >
+          <div className="fourth-section__listings fourth-section__listings--row">
+            {FOURTH_SECTION_BY_AUDIENCE.map((listing) => (
+              <div
+                key={`fourth-audience-${listing.title}`}
+                className="fourth-section-listing-card-wrap fourth-section-listing-card-wrap--space"
+              >
+                <FourthSectionListingCard
+                  className="fourth-section-listing-card--space"
+                  image={listing.image}
+                  alt={listing.alt}
+                  price={listing.pricePerHour}
+                  title={listing.title}
+                  subtitle={listing.subtitle}
+                  hosts={listing.hosts}
+                  rating={listing.rating}
+                  reviewCount={listing.reviewCount}
+                  main2Listings={main2Listings}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
 
       <div className="fourth-section__outro fourth-section-reveal">
         <div className="fourth-section__actions">
