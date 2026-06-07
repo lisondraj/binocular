@@ -1,5 +1,4 @@
-const MAIN2_PROMPT_TEXT =
-  "Show me the 3 closest spaces with a dishwasher, stairs, and a dog. Budget $500.";
+const MAIN2_NAV_PROMPT_INVITE = "Ask about spaces, people, or actions…";
 
 const upArrow = (
   <svg
@@ -30,7 +29,7 @@ export function Main2HeroPromptCard({ className = "" }: Main2HeroPromptCardProps
     >
       <div className="hero-prompt-card main2-hero-prompt-card main2-nav-prompt-card">
         <div className="hero-prompt-text main2-nav-prompt-card__text">
-          <span className="hero-prompt-typed">{MAIN2_PROMPT_TEXT}</span>
+          <span className="main2-nav-prompt-card__invite">{MAIN2_NAV_PROMPT_INVITE}</span>
         </div>
 
         <button
