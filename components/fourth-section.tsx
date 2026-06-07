@@ -335,8 +335,6 @@ function ListingProfessionCarousel() {
           }}
         >
           {extendedItems.map((profession, itemIndex) => {
-            if (itemIndex < renderStart || itemIndex > renderEnd) return null;
-
             const distance = itemIndex - position;
             const opacity = professionCarouselOpacity(distance);
 
