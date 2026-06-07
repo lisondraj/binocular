@@ -79,7 +79,7 @@ export function MobileNavBar({
             strokeLinecap="round"
             strokeLinejoin="round"
           >
-            <polyline points="6 15 12 9 18 15" />
+            <polyline points="6 9 12 15 18 9" />
           </svg>
         ) : (
           <svg

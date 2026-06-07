@@ -2796,13 +2796,15 @@ a.fourth-section__btn {
   --main2-hero-lift: 3.5em;
   --main2-section-two-gap: 0.12em;
   --main2-section-two-bottom: 0.45em;
-  --main2-section-two-top: 0.55em;
+  --main2-section-two-top: calc(
+    var(--main2-nav-inset-y) + var(--main2-nav-height) + var(--main2-section-two-gap)
+  );
 }
 
 .main2-nav-anchor {
   position: fixed;
-  top: auto;
-  bottom: var(--main2-nav-inset-y);
+  top: var(--main2-nav-inset-y);
+  bottom: auto;
   right: var(--main2-nav-inset-x);
   left: auto;
   width: auto;
@@ -2811,7 +2813,7 @@ a.fourth-section__btn {
   margin-right: auto;
   z-index: 10;
   display: flex;
-  flex-direction: column-reverse;
+  flex-direction: column;
   align-items: flex-end;
   gap: 0.5em;
   pointer-events: none;
@@ -2893,12 +2895,12 @@ a.fourth-section__btn {
 }
 
 .main2-nav-anchor.is-menu-open {
-  top: auto;
-  bottom: var(--main2-nav-inset-y);
+  top: var(--main2-nav-inset-y);
+  bottom: auto;
   right: var(--main2-nav-inset-x);
   left: var(--main2-nav-inset-x);
   width: auto;
-  flex-direction: column-reverse;
+  flex-direction: column;
   align-items: stretch;
   gap: 0;
   border-radius: max(
@@ -2945,15 +2947,15 @@ a.fourth-section__btn {
   display: flex;
   flex-direction: column;
   gap: 0.15em;
-  padding: 0.85em 0.78em 0.2em;
+  padding: 0.2em 0.78em 0.85em;
   min-height: 6.75em;
   border-radius: 0;
   background: transparent;
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
   box-shadow: none;
-  border-top: none;
-  border-bottom: 0.0625em solid rgba(0, 0, 0, 0.07);
+  border-top: 0.0625em solid rgba(0, 0, 0, 0.07);
+  border-bottom: none;
 }
 
 .main2-nav-menu-panel__link {
