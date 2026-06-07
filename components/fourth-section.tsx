@@ -249,6 +249,111 @@ function FourthSectionListingCard({
   );
 }
 
+const MAIN2_PROFESSION_CAROUSEL_ITEMS = [
+  "doctor",
+  "chef",
+  "picker",
+  "housekeeper",
+  "barista",
+] as const;
+
+function professionCarouselOpacity(distance: number) {
+  const magnitude = Math.abs(distance);
+  if (magnitude === 0) return 1;
+  if (magnitude === 1) return 0.52;
+  if (magnitude === 2) return 0.22;
+  return 0;
+}
+
+function ListingProfessionCarousel() {
+  const professionCount = MAIN2_PROFESSION_CAROUSEL_ITEMS.length;
+  const loopStart = professionCount;
+  const loopEnd = professionCount * 2;
+  const extendedItems = [
+    ...MAIN2_PROFESSION_CAROUSEL_ITEMS,
+    ...MAIN2_PROFESSION_CAROUSEL_ITEMS,
+    ...MAIN2_PROFESSION_CAROUSEL_ITEMS,
+  ];
+
+  const [position, setPosition] = useState<number>(loopStart);
+  const [instantReset, setInstantReset] = useState(false);
+  const trackRef = useRef<HTMLDivElement>(null);
+  const activeProfession =
+    MAIN2_PROFESSION_CAROUSEL_ITEMS[position % professionCount];
+
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      setPosition((current) => current + 1);
+    }, 1800);
+
+    return () => window.clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    if (position !== loopEnd) return;
+
+    const track = trackRef.current;
+    if (!track) return;
+
+    const onEnd = (event: TransitionEvent) => {
+      if (event.target !== track || event.propertyName !== "transform") return;
+      setInstantReset(true);
+      setPosition(loopStart);
+    };
+
+    track.addEventListener("transitionend", onEnd);
+    return () => track.removeEventListener("transitionend", onEnd);
+  }, [position, loopEnd, loopStart]);
+
+  useEffect(() => {
+    if (!instantReset || position !== loopStart) return;
+
+    const frame = window.requestAnimationFrame(() => {
+      setInstantReset(false);
+    });
+
+    return () => window.cancelAnimationFrame(frame);
+  }, [instantReset, position, loopStart]);
+
+  return (
+    <p
+      className="fourth-section__listing-grain-box__carousel"
+      aria-live="polite"
+      aria-atomic="true"
+      aria-label={`Book a ${activeProfession}`}
+    >
+      <span className="fourth-section__listing-grain-box__carousel-prefix">Book a</span>
+      <span className="fourth-section__listing-grain-box__carousel-window">
+        <span
+          ref={trackRef}
+          className={`fourth-section__listing-grain-box__carousel-track${
+            instantReset ? " is-instant" : ""
+          }`}
+          style={{
+            transform: `translate3d(0, calc((var(--profession-carousel-radius) - ${position}) * var(--profession-carousel-line)), 0)`,
+          }}
+        >
+          {extendedItems.map((profession, itemIndex) => {
+            const distance = itemIndex - position;
+            const opacity = professionCarouselOpacity(distance);
+
+            return (
+              <span
+                key={`profession-slot-${itemIndex}`}
+                className="fourth-section__listing-grain-box__carousel-item"
+                style={{ opacity }}
+                aria-hidden={distance !== 0}
+              >
+                {profession}
+              </span>
+            );
+          })}
+        </span>
+      </span>
+    </p>
+  );
+}
+
 function ListingGrainBox() {
   return (
     <div
@@ -264,7 +369,10 @@ function ListingProfessionGrainBox({ children }: { children: ReactNode }) {
   return (
     <div className="fourth-section__listing-slot-box fourth-section__listing-grain-box fourth-section__listing-grain-box--profession main2-grain-box">
       <div className="main2-grain-surface main2-hero-box__grain" aria-hidden />
-      <div className="fourth-section__listing-grain-box__listings">{children}</div>
+      <div className="fourth-section__listing-grain-box__profession-content">
+        <ListingProfessionCarousel />
+        <div className="fourth-section__listing-grain-box__listings">{children}</div>
+      </div>
     </div>
   );
 }

@@ -1797,14 +1797,87 @@ a.fourth-section__btn {
 .fourth-section__listing-grain-box--profession {
   --fourth-card-size: 7.35em;
   --fourth-card-space-width: 11.15em;
+}
+
+.fourth-section__listing-grain-box__profession-content {
+  position: relative;
+  z-index: 2;
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
+  justify-content: space-between;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+.fourth-section__listing-grain-box__carousel {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  gap: 0.3em;
+  width: 100%;
+  margin: 0;
+  padding: 0 var(--main2-hero-pad-x) 0 calc(var(--main2-hero-pad-x) + 1.85em);
+  box-sizing: border-box;
+  font-family: var(--font-suisse), system-ui, sans-serif;
+  font-size: 1.05em;
+  font-weight: 400;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: #ffffff;
+  text-align: left;
+}
+
+.fourth-section__listing-grain-box__carousel-prefix {
+  flex-shrink: 0;
+}
+
+.fourth-section__listing-grain-box__carousel-window {
+  --profession-carousel-line: 1.2em;
+  --profession-carousel-radius: 2;
+  display: inline-block;
+  height: calc(
+    (2 * var(--profession-carousel-radius) + 1) * var(--profession-carousel-line)
+  );
+  min-width: 6.5em;
+  overflow: hidden;
+  vertical-align: top;
+  -webkit-mask-image: linear-gradient(
+    180deg,
+    transparent 0%,
+    #000000 18%,
+    #000000 82%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    180deg,
+    transparent 0%,
+    #000000 18%,
+    #000000 82%,
+    transparent 100%
+  );
+}
+
+.fourth-section__listing-grain-box__carousel-track {
+  display: block;
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+}
+
+.fourth-section__listing-grain-box__carousel-track.is-instant {
+  transition: none;
+}
+
+.fourth-section__listing-grain-box__carousel-item {
+  display: block;
+  height: var(--profession-carousel-line);
+  line-height: var(--profession-carousel-line);
+  white-space: nowrap;
+  transition: opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .fourth-section__listing-grain-box__listings {
-  position: relative;
-  z-index: 2;
+  flex-shrink: 0;
   width: 100%;
   box-sizing: border-box;
   padding: 0 0 1.05em;
