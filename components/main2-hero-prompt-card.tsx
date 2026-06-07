@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 
-const MAIN2_NAV_PROMPT_INVITE = "Ask about spaces, people, or actions…";
+const MAIN2_NAV_PROMPT_INVITE = "Ask anything…";
 
 const upArrow = (
   <svg
