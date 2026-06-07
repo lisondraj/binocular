@@ -2067,7 +2067,7 @@ a.fourth-section__btn {
   padding: 0 var(--main2-hero-pad-x);
   box-sizing: border-box;
   font-size: clamp(1.92em, 6vw, 2.35em);
-  font-weight: 350;
+  font-weight: 380;
   line-height: 1.18;
   color: #000000;
 }
