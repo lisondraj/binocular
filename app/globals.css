@@ -2789,7 +2789,8 @@ a.fourth-section__btn {
   --main2-chrome-bottom: #050505;
   --main2-hero-inset-x: 1.15em;
   --main2-hero-inset-y: 0.85em;
-  --main2-hero-radius: 0.75em;
+  --main2-hero-radius: 0;
+  --listing-card-radius: 0;
   --main2-nav-inset-x: 1.15em;
   --main2-nav-inset-y: 1.15em;
   --main2-nav-inset: var(--main2-nav-inset-x);
@@ -2854,7 +2855,7 @@ a.fourth-section__btn {
   height: var(--main2-nav-button-size);
   margin: 0;
   padding: 0;
-  border-radius: 50%;
+  border-radius: 0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2906,10 +2907,7 @@ a.fourth-section__btn {
   flex-direction: column;
   align-items: stretch;
   gap: 0;
-  border-radius: max(
-    0.3em,
-    calc(var(--main2-hero-radius) - (var(--main2-nav-inset) * 0.5))
-  );
+  border-radius: 0;
   background: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(1.75em) saturate(1.15);
   -webkit-backdrop-filter: blur(1.75em) saturate(1.15);
@@ -3199,7 +3197,7 @@ a.fourth-section__btn {
   gap: 0.45em;
   padding: 0.72em 1.2em;
   border: 0.0625em solid #ffffff;
-  border-radius: 0.45em;
+  border-radius: 0;
   background: none;
   color: #ffffff;
   font-family: var(--font-suisse), system-ui, sans-serif;
@@ -3235,7 +3233,7 @@ a.fourth-section__btn {
 
 .mobile-view--main2 .main2-hero-prompt-card {
   padding: 0.7em 0.95em 0.58em;
-  border-radius: 0.55em;
+  border-radius: 0;
   box-shadow:
     0 0.18em 0.55em rgba(0, 0, 0, 0.1),
     0 0.04em 0.12em rgba(0, 0, 0, 0.04);
@@ -3282,7 +3280,7 @@ a.fourth-section__btn {
 
 .mobile-view--main2 .main2-hero-prompt-card .hero-prompt-menu {
   padding: 0.35em;
-  border-radius: 0.75em;
+  border-radius: 0;
   background: #1c1c1c;
   border: 0.0625em solid rgba(255, 255, 255, 0.08);
   backdrop-filter: none;
@@ -3292,7 +3290,7 @@ a.fourth-section__btn {
 
 .mobile-view--main2 .main2-hero-prompt-card .hero-prompt-menu-item {
   padding: 0.4em 0.55em;
-  border-radius: 0.45em;
+  border-radius: 0;
   color: #ffffff;
 }
 
@@ -3303,6 +3301,37 @@ a.fourth-section__btn {
 
 .mobile-view--main2 .main2-hero-prompt-card .type-caret::after {
   background: #3d3d3d;
+}
+
+/* /main2 — square edges on UI, listings, photos, and nav. */
+.mobile-view--main2 :where(
+  .main2-hero-btn,
+  .hero-prompt-card,
+  .hero-prompt-card::before,
+  .hero-prompt-chip,
+  .hero-prompt-menu,
+  .hero-prompt-menu-item,
+  .hero-prompt-send,
+  .hero-deck-tag,
+  .hero-info-card,
+  .hero-image-rise,
+  .fourth-section-listing-card,
+  .fourth-section-listing-card__stage,
+  .listing-card-image,
+  .listing-card-media,
+  .fourth-section-bundle__mini,
+  .fourth-section-bundle__mini-image,
+  .listing-card-avatar,
+  .fourth-section__filter-btn,
+  .fourth-section__filter-dropdown-panel,
+  .fourth-section__filter-budget-meter-track,
+  .fourth-section__filter-budget-meter-thumb,
+  .main2-nav-anchor.is-menu-open,
+  .main2-nav-menu-panel__link,
+  .main2-section-two-box,
+  .mobile-nav--main2 .mobile-nav-menu
+) {
+  border-radius: 0 !important;
 }
 
 /* Standalone /book page — full nav clearance, all content visible. */
