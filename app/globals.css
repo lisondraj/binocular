@@ -2101,6 +2101,14 @@ a.fourth-section__btn {
   justify-content: flex-start;
 }
 
+.mobile-view--main2
+  .fourth-section--main2-continuum
+  .fourth-section__listings-block:has(+ #main2-tab-audience)
+  .fourth-section__listing-white-box {
+  aspect-ratio: auto;
+  min-height: var(--main2-category-grain-min-height);
+}
+
 .mobile-view--main2 .fourth-section__white-box-intro-content.hero-intro-content {
   align-items: flex-start;
   gap: 0.75em;
