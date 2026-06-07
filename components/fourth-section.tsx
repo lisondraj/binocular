@@ -552,6 +552,11 @@ export const FourthSection = forwardRef(function FourthSection(
         ) : null}
 
         <div className="fourth-section__listings-block">
+          {main2Listings ? (
+            <ListingWhiteBox>
+              <ListingWhiteBoxTagline />
+            </ListingWhiteBox>
+          ) : null}
           <p className="fourth-section__category">By distance</p>
           <div
             className="fourth-section__listings-scroll fourth-section__listings-scroll--row"
@@ -613,14 +618,6 @@ export const FourthSection = forwardRef(function FourthSection(
             </div>
           </div>
         </div>
-
-        {main2Listings ? (
-          <div className="fourth-section__listings-block fourth-section__listings-block--white-tagline">
-            <ListingWhiteBox>
-              <ListingWhiteBoxTagline />
-            </ListingWhiteBox>
-          </div>
-        ) : null}
 
         <div
           id="main2-tab-people"
@@ -856,6 +853,9 @@ export const FourthSection = forwardRef(function FourthSection(
               />
             }
           >
+            <p className="fourth-section__category fourth-section__category--in-grain">
+              By audience
+            </p>
             <div
               className="fourth-section__listings-scroll fourth-section__listings-scroll--row"
               aria-label="Listings by audiences"
