@@ -1975,6 +1975,14 @@ a.fourth-section__btn {
   padding-bottom: var(--main2-category-grain-listings-lift);
 }
 
+.fourth-section__listing-grain-box--profession .fourth-section__category--in-grain,
+.fourth-section__listing-grain-box--audience .fourth-section__category--in-grain {
+  flex-shrink: 0;
+  margin: 0 0 0.42em;
+  padding: 0 0 0.28em var(--main2-listings-inset-x, 1.15em);
+  color: rgba(255, 255, 255, 0.45);
+}
+
 .fourth-section__listing-grain-box--profession .fourth-section__listings-scroll--row,
 .fourth-section__listing-grain-box--audience .fourth-section__listings-scroll--row {
   width: 100%;
@@ -2067,28 +2075,10 @@ a.fourth-section__btn {
   justify-content: flex-start;
 }
 
-.mobile-view--main2 .fourth-section__distance-intro-content.hero-intro-content {
-  align-items: flex-start;
-  gap: 0.75em;
-  padding: 1.75em var(--main2-hero-pad-x) 0;
-  box-sizing: border-box;
-}
-
-.mobile-view--main2 .fourth-section__distance-intro-title.hero-title {
-  justify-content: flex-start;
-  margin: 0;
-  font-family: var(--font-geist-mono), ui-monospace, monospace;
-  font-size: 1.08em;
-  font-weight: 400;
-  text-transform: uppercase;
-  letter-spacing: 0;
-  color: #000000;
-}
-
 .mobile-view--main2 .fourth-section__distance-intro.hero-description {
   align-items: flex-start;
-  margin: -0.15em 0 0;
-  padding: 0;
+  margin: 0;
+  padding: 1.75em var(--main2-hero-pad-x) 0;
   box-sizing: border-box;
   font-size: clamp(1.65em, 5vw, 2em);
   font-weight: 390;
