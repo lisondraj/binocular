@@ -1285,6 +1285,29 @@ export function HomePage({
     setMain2MenuOpen(false);
   }, [isMain2, showLogo]);
 
+  // /main2 — tint iOS status-bar chrome with hero grey; white after scroll.
+  useEffect(() => {
+    if (!isMain2) return;
+
+    let meta = document.querySelector<HTMLMetaElement>(
+      'meta[name="theme-color"]',
+    );
+    if (!meta) {
+      meta = document.createElement("meta");
+      meta.name = "theme-color";
+      document.head.appendChild(meta);
+    }
+
+    const apply = () => {
+      meta!.content = showLogo ? "#ffffff" : "#2a2a2a";
+    };
+    apply();
+
+    return () => {
+      meta!.content = "#ffffff";
+    };
+  }, [isMain2, showLogo]);
+
   // Keep the prompt slot height measured so hero layout stays stable.
   useLayoutEffect(() => {
     if (!showHeroPrompt) return;

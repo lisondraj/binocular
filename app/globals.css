@@ -21,6 +21,12 @@ body {
   font-family: var(--font-inter), system-ui, sans-serif;
 }
 
+/* /main2 — match status-bar / overscroll chrome to hero grain (not white). */
+html:has(.mobile-view--main2:not(.mobile-view--main2-past-hero)),
+html:has(.mobile-view--main2:not(.mobile-view--main2-past-hero)) body {
+  background-color: #2a2a2a;
+}
+
 h1,
 h2,
 h3,
