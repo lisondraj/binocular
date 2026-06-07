@@ -2057,52 +2057,12 @@ export default function Home() {
             <br />
             physical intelligence.
           </p>
-          <div
-            className="hero-actions"
-            style={{
-              alignSelf: "flex-start",
-              display: "flex",
-              gap: "0.75em",
-            }}
-          >
-            <button
-              type="button"
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "0.5em",
-                padding: "0.75em 1.25em",
-                border: "0.0625em solid #000000",
-                borderRadius: "0.5em",
-                background: "#000000",
-                color: "#ffffff",
-                fontFamily: "var(--font-suisse), system-ui, sans-serif",
-                fontSize: "0.95em",
-                fontWeight: 300,
-                cursor: "pointer",
-              }}
-            >
+          <div className="hero-actions">
+            <button type="button" className="ui-btn ui-btn--primary">
               Host
               {upRightArrow}
             </button>
-            <Link
-              href="/book"
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "0.5em",
-                padding: "0.75em 1.25em",
-                border: "0.0625em solid #000000",
-                borderRadius: "0.5em",
-                background: "none",
-                color: "#000000",
-                fontFamily: "var(--font-suisse), system-ui, sans-serif",
-                fontSize: "0.95em",
-                fontWeight: 300,
-                cursor: "pointer",
-                textDecoration: "none",
-              }}
-            >
+            <Link href="/book" className="ui-btn ui-btn--secondary">
               Book
               {upRightArrow}
             </Link>
@@ -2224,22 +2184,6 @@ export default function Home() {
               type="button"
               aria-label="Send"
               className={`hero-prompt-send${submitPressed ? " is-pressed" : ""}`}
-              style={{
-                position: "absolute",
-                bottom: "0.85em",
-                right: "1.15em",
-                fontSize: "inherit",
-                width: "1.8em",
-                height: "1.8em",
-                display: "inline-flex",
-                alignItems: "center",
-                justifyContent: "center",
-                borderRadius: "50%",
-                border: "none",
-                background: "#ffffff",
-                color: "#000000",
-                cursor: "pointer",
-              }}
             >
               {upArrow}
             </button>

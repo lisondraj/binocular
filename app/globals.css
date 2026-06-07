@@ -2,6 +2,134 @@
   /* iPad portrait width — the upper bound for the iPhone/mobile view so even
      the largest iPhones fall into it. At/above this we switch to desktop. */
   --ipad-width: 1024px;
+
+  /* Shared CTA buttons — soft corners, subtle vertical gradients. */
+  --ui-btn-radius: 0.72em;
+  --ui-btn-py: 0.72em;
+  --ui-btn-px: 1.2em;
+  --ui-btn-font-size: 0.95em;
+  --ui-btn-border: 0.0625em solid transparent;
+}
+
+/* --- UI buttons (gradient CTAs) ------------------------------------------ */
+.ui-btn,
+.fourth-section__btn,
+.main2-hero-btn,
+.fourth-section__filter-btn,
+.hero-prompt-send,
+.fourth-section__ai-composer-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45em;
+  padding: var(--ui-btn-py) var(--ui-btn-px);
+  border: var(--ui-btn-border);
+  border-radius: var(--ui-btn-radius);
+  font-family: var(--font-suisse), system-ui, sans-serif;
+  font-size: var(--ui-btn-font-size);
+  font-weight: 400;
+  line-height: 1.2;
+  text-decoration: none;
+  cursor: pointer;
+  box-sizing: border-box;
+  transition:
+    box-shadow 0.2s ease,
+    transform 0.15s ease,
+    border-color 0.2s ease;
+}
+
+.ui-btn--primary,
+.fourth-section__btn--primary {
+  border-color: #1a1a1a;
+  background: linear-gradient(180deg, #2e2e2e 0%, #181818 52%, #050505 100%);
+  color: #ffffff;
+  box-shadow:
+    inset 0 0.0625em 0 rgba(255, 255, 255, 0.08),
+    0 0.1em 0.24em rgba(0, 0, 0, 0.16);
+}
+
+.ui-btn--secondary,
+.fourth-section__btn:not(.fourth-section__btn--primary),
+.fourth-section__filter-btn {
+  border-color: #e5e7eb;
+  background: linear-gradient(180deg, #ffffff 0%, #f8f8f9 54%, #efeff1 100%);
+  color: #000000;
+  box-shadow:
+    inset 0 0.0625em 0 rgba(255, 255, 255, 0.92),
+    0 0.12em 0.3em rgba(0, 0, 0, 0.07);
+}
+
+.ui-btn--primary-on-dark,
+.main2-hero-btn--primary {
+  border-color: #f0f0f0;
+  background: linear-gradient(180deg, #ffffff 0%, #f5f5f6 54%, #e9e9eb 100%);
+  color: #000000;
+  box-shadow:
+    inset 0 0.0625em 0 rgba(255, 255, 255, 0.95),
+    0 0.12em 0.3em rgba(0, 0, 0, 0.14);
+}
+
+.ui-btn--secondary-on-dark,
+.main2-hero-btn:not(.main2-hero-btn--primary) {
+  border-color: rgba(255, 255, 255, 0.34);
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.16) 0%,
+    rgba(255, 255, 255, 0.08) 54%,
+    rgba(255, 255, 255, 0.03) 100%
+  );
+  color: #ffffff;
+  box-shadow:
+    inset 0 0.0625em 0 rgba(255, 255, 255, 0.14),
+    0 0.1em 0.24em rgba(0, 0, 0, 0.18);
+}
+
+.ui-btn--sm,
+.fourth-section__filter-btn {
+  --ui-btn-py: 0.4em;
+  --ui-btn-px: 0.75em;
+  --ui-btn-font-size: 0.78em;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+
+.fourth-section__filter-btn.is-open {
+  border-color: rgba(0, 0, 0, 0.22);
+}
+
+.ui-btn--icon,
+.hero-prompt-send,
+.fourth-section__ai-composer-btn {
+  width: 1.8em;
+  height: 1.8em;
+  min-width: 1.8em;
+  min-height: 1.8em;
+  padding: 0;
+  aspect-ratio: 1 / 1;
+  line-height: 0;
+}
+
+.hero-prompt-send,
+.fourth-section__ai-composer-btn--submit {
+  border-color: #e5e7eb;
+  background: linear-gradient(180deg, #ffffff 0%, #f8f8f9 54%, #efeff1 100%);
+  color: #000000;
+  box-shadow:
+    inset 0 0.0625em 0 rgba(255, 255, 255, 0.92),
+    0 0.1em 0.22em rgba(0, 0, 0, 0.08);
+}
+
+.fourth-section__ai-composer-btn:not(.fourth-section__ai-composer-btn--submit) {
+  border: none;
+  background: transparent;
+  box-shadow: none;
+  color: rgba(0, 0, 0, 0.46);
+}
+
+.hero-actions {
+  align-self: flex-start;
+  display: flex;
+  gap: 0.75em;
 }
 
 * {
@@ -350,9 +478,14 @@ h6 {
 }
 
 .hero-prompt-send {
-  box-sizing: border-box;
+  position: absolute;
+  bottom: 0.85em;
+  right: 1.15em;
+  font-size: inherit;
   flex-shrink: 0;
-  transition: transform 0.22s ease;
+  transition:
+    transform 0.22s ease,
+    box-shadow 0.2s ease;
 }
 
 .hero-prompt-send.is-pressed {
@@ -1416,26 +1549,6 @@ h6 {
   gap: 0.75em;
 }
 
-.fourth-section__btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5em;
-  padding: 0.75em 1.25em;
-  border: 0.0625em solid #000000;
-  border-radius: 0.5em;
-  background: none;
-  color: #000000;
-  font-family: var(--font-suisse), system-ui, sans-serif;
-  font-size: 0.95em;
-  font-weight: 300;
-  cursor: pointer;
-}
-
-.fourth-section__btn--primary {
-  background: #000000;
-  color: #ffffff;
-}
-
 a.fourth-section__btn {
   text-decoration: none;
 }
@@ -1491,20 +1604,8 @@ a.fourth-section__btn {
 .fourth-section__ai-composer-btn {
   width: 1.72em;
   height: 1.72em;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  border: none;
-  border-radius: 50%;
-  background: transparent;
-  color: rgba(0, 0, 0, 0.46);
-  cursor: pointer;
-}
-
-.fourth-section__ai-composer-btn--submit {
-  background: #000000;
-  color: #ffffff;
+  min-width: 1.72em;
+  min-height: 1.72em;
 }
 
 .fourth-section__listings-anchor {
@@ -1528,23 +1629,7 @@ a.fourth-section__btn {
 }
 
 .fourth-section__filter-btn {
-  display: inline-flex;
-  align-items: center;
   gap: 0.38em;
-  padding: 0.4em 0.75em;
-  border: 0.0625em solid rgba(0, 0, 0, 0.12);
-  border-radius: 0.42em;
-  background: #ffffff;
-  font-family: var(--font-suisse), system-ui, sans-serif;
-  font-size: 0.78em;
-  font-weight: 400;
-  color: #000000;
-  letter-spacing: -0.01em;
-  cursor: pointer;
-}
-
-.fourth-section__filter-btn.is-open {
-  border-color: rgba(0, 0, 0, 0.24);
 }
 
 .fourth-section__filter-dropdown {
@@ -3213,25 +3298,8 @@ a.fourth-section__btn {
 }
 
 .main2-hero-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45em;
-  padding: 0.72em 1.2em;
-  border: 0.0625em solid #ffffff;
-  border-radius: 0.45em;
-  background: none;
-  color: #ffffff;
-  font-family: var(--font-suisse), system-ui, sans-serif;
-  font-size: 0.98em;
-  font-weight: 300;
-  cursor: pointer;
+  --ui-btn-font-size: 0.98em;
   text-decoration: none;
-}
-
-.main2-hero-btn--primary {
-  background: #ffffff;
-  color: #000000;
-  border-color: #ffffff;
 }
 
 /* White chevron on hero until menu opens or user scrolls past hero. */
@@ -3290,8 +3358,14 @@ a.fourth-section__btn {
 }
 
 .mobile-view--main2 .main2-hero-prompt-send {
-  background: var(--main2-hero-grey);
+  bottom: 0.58em;
+  right: 0.95em;
+  border-color: #3a3a3a;
+  background: linear-gradient(180deg, #3a3a3a 0%, #2a2a2a 54%, #1a1a1a 100%);
   color: #ffffff;
+  box-shadow:
+    inset 0 0.0625em 0 rgba(255, 255, 255, 0.1),
+    0 0.1em 0.22em rgba(0, 0, 0, 0.22);
 }
 
 .mobile-view--main2 .main2-hero-prompt-card .hero-prompt-live .hero-prompt-chip-icon {

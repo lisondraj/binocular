@@ -1694,27 +1694,6 @@ export function HomePage({
               className={`hero-prompt-send${
                 submitPressed ? " is-pressed" : ""
               }${isMain2 ? " main2-hero-prompt-send" : ""}`}
-              style={{
-                position: "absolute",
-                bottom: isMain2 ? "0.58em" : "0.85em",
-                right: isMain2 ? "0.95em" : "1.15em",
-                fontSize: "inherit",
-                width: "1.8em",
-                height: "1.8em",
-                minWidth: "1.8em",
-                minHeight: "1.8em",
-                padding: 0,
-                display: "inline-flex",
-                alignItems: "center",
-                justifyContent: "center",
-                borderRadius: "50%",
-                aspectRatio: "1 / 1",
-                lineHeight: 0,
-                border: "none",
-                background: isMain2 ? undefined : "#ffffff",
-                color: isMain2 ? undefined : "#000000",
-                cursor: "pointer",
-              }}
             >
               {upArrow}
             </button>
@@ -1850,52 +1829,12 @@ export function HomePage({
             <span className="hero-description__line">Book spaces for</span>
             <span className="hero-description__line">physical intelligence.</span>
           </p>
-          <div
-            className="hero-actions"
-            style={{
-              alignSelf: "flex-start",
-              display: "flex",
-              gap: "0.75em",
-            }}
-          >
-            <button
-              type="button"
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "0.5em",
-                padding: "0.75em 1.25em",
-                border: "0.0625em solid #000000",
-                borderRadius: "0.5em",
-                background: "#000000",
-                color: "#ffffff",
-                fontFamily: "var(--font-suisse), system-ui, sans-serif",
-                fontSize: "0.95em",
-                fontWeight: 300,
-                cursor: "pointer",
-              }}
-            >
+          <div className="hero-actions">
+            <button type="button" className="ui-btn ui-btn--primary">
               Host
               {upRightArrow}
             </button>
-            <Link
-              href="/book"
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "0.5em",
-                padding: "0.75em 1.25em",
-                border: "0.0625em solid #000000",
-                borderRadius: "0.5em",
-                background: "none",
-                color: "#000000",
-                fontFamily: "var(--font-suisse), system-ui, sans-serif",
-                fontSize: "0.95em",
-                fontWeight: 300,
-                cursor: "pointer",
-                textDecoration: "none",
-              }}
-            >
+            <Link href="/book" className="ui-btn ui-btn--secondary">
               Book
               {upRightArrow}
             </Link>
