@@ -2329,7 +2329,22 @@ a.fourth-section__btn {
 }
 
 .mobile-view--main2 .mobile-site-footer--main2 .mobile-site-footer__box {
-  display: none;
+  position: relative;
+  flex: 1 1 auto;
+  min-height: calc(10.5em - var(--main2-nav-bar-height));
+  width: 100%;
+  max-width: calc(var(--ipad-width) - 2.7em);
+  margin: 0 auto;
+  padding: 0;
+  border-radius: 0;
+  background: #ffffff;
+  border: none;
+  overflow: visible;
+  isolation: isolate;
+  box-sizing: border-box;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 
 .mobile-view--main2 .mobile-site-footer--main2 .mobile-site-footer__chrome {
