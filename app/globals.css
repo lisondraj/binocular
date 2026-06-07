@@ -3314,7 +3314,7 @@ a.fourth-section__btn {
 }
 
 .main2-nav-search .main2-nav-prompt-card {
-  padding: 1em 0.9em 0.85em;
+  padding: 0.9em;
   min-height: var(--main2-nav-search-height);
   box-shadow: none;
   filter: none;
@@ -3698,7 +3698,7 @@ a.fourth-section__btn {
 }
 
 .mobile-view--main2 .main2-nav-search .main2-nav-prompt-card__send {
-  bottom: 0.58em;
+  bottom: 0.9em;
   right: 0.9em;
   border-color: #3a3a3a;
   background: linear-gradient(180deg, #3a3a3a 0%, #2a2a2a 54%, #1a1a1a 100%);
