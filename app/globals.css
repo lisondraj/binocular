@@ -1823,15 +1823,34 @@ a.fourth-section__btn {
 }
 
 .fourth-section__listing-grain-box__carousel-window {
+  --profession-carousel-line: 1.2em;
+  --profession-carousel-radius: 2;
   display: inline-block;
-  height: 1.2em;
+  height: calc(
+    (2 * var(--profession-carousel-radius) + 1) * var(--profession-carousel-line)
+  );
+  min-width: 6.5em;
   overflow: hidden;
   vertical-align: top;
+  -webkit-mask-image: linear-gradient(
+    180deg,
+    transparent 0%,
+    #000000 18%,
+    #000000 82%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    180deg,
+    transparent 0%,
+    #000000 18%,
+    #000000 82%,
+    transparent 100%
+  );
 }
 
 .fourth-section__listing-grain-box__carousel-track {
   display: block;
-  transition: transform 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
   will-change: transform;
 }
 
@@ -1841,9 +1860,10 @@ a.fourth-section__btn {
 
 .fourth-section__listing-grain-box__carousel-item {
   display: block;
-  height: 1.2em;
-  line-height: 1.2;
+  height: var(--profession-carousel-line);
+  line-height: var(--profession-carousel-line);
   white-space: nowrap;
+  transition: opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .fourth-section--main2-continuum .fourth-section__listing-white-box {

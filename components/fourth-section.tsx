@@ -256,24 +256,42 @@ const MAIN2_PROFESSION_CAROUSEL_ITEMS = [
   "barista",
 ] as const;
 
+const MAIN2_PROFESSION_CAROUSEL_RADIUS = 2;
+
+function professionCarouselOpacity(distance: number) {
+  const magnitude = Math.abs(distance);
+  if (magnitude === 0) return 1;
+  if (magnitude === 1) return 0.52;
+  if (magnitude === 2) return 0.22;
+  return 0;
+}
+
 function ListingProfessionCarousel() {
-  const [index, setIndex] = useState(0);
+  const professionCount = MAIN2_PROFESSION_CAROUSEL_ITEMS.length;
+  const loopStart = professionCount;
+  const loopEnd = professionCount * 2;
+  const extendedItems = [
+    ...MAIN2_PROFESSION_CAROUSEL_ITEMS,
+    ...MAIN2_PROFESSION_CAROUSEL_ITEMS,
+    ...MAIN2_PROFESSION_CAROUSEL_ITEMS,
+  ];
+
+  const [position, setPosition] = useState(loopStart);
   const [instantReset, setInstantReset] = useState(false);
   const trackRef = useRef<HTMLDivElement>(null);
-  const professionCount = MAIN2_PROFESSION_CAROUSEL_ITEMS.length;
   const activeProfession =
-    MAIN2_PROFESSION_CAROUSEL_ITEMS[index % professionCount];
+    MAIN2_PROFESSION_CAROUSEL_ITEMS[position % professionCount];
 
   useEffect(() => {
     const timer = window.setInterval(() => {
-      setIndex((current) => current + 1);
-    }, 1300);
+      setPosition((current) => current + 1);
+    }, 1800);
 
     return () => window.clearInterval(timer);
   }, []);
 
   useEffect(() => {
-    if (index !== professionCount) return;
+    if (position !== loopEnd) return;
 
     const track = trackRef.current;
     if (!track) return;
@@ -281,27 +299,25 @@ function ListingProfessionCarousel() {
     const onEnd = (event: TransitionEvent) => {
       if (event.target !== track || event.propertyName !== "transform") return;
       setInstantReset(true);
-      setIndex(0);
+      setPosition(loopStart);
     };
 
     track.addEventListener("transitionend", onEnd);
     return () => track.removeEventListener("transitionend", onEnd);
-  }, [index, professionCount]);
+  }, [position, loopEnd, loopStart]);
 
   useEffect(() => {
-    if (!instantReset || index !== 0) return;
+    if (!instantReset || position !== loopStart) return;
 
     const frame = window.requestAnimationFrame(() => {
       setInstantReset(false);
     });
 
     return () => window.cancelAnimationFrame(frame);
-  }, [instantReset, index]);
+  }, [instantReset, position, loopStart]);
 
-  const slides = [
-    ...MAIN2_PROFESSION_CAROUSEL_ITEMS,
-    MAIN2_PROFESSION_CAROUSEL_ITEMS[0],
-  ];
+  const renderStart = position - MAIN2_PROFESSION_CAROUSEL_RADIUS;
+  const renderEnd = position + MAIN2_PROFESSION_CAROUSEL_RADIUS;
 
   return (
     <p
@@ -317,16 +333,27 @@ function ListingProfessionCarousel() {
           className={`fourth-section__listing-grain-box__carousel-track${
             instantReset ? " is-instant" : ""
           }`}
-          style={{ transform: `translate3d(0, -${index * 100}%, 0)` }}
+          style={{
+            transform: `translate3d(0, calc((var(--profession-carousel-radius) - ${position}) * var(--profession-carousel-line)), 0)`,
+          }}
         >
-          {slides.map((profession, slideIndex) => (
-            <span
-              key={`${profession}-${slideIndex}`}
-              className="fourth-section__listing-grain-box__carousel-item"
-            >
-              {profession}
-            </span>
-          ))}
+          {extendedItems.map((profession, itemIndex) => {
+            if (itemIndex < renderStart || itemIndex > renderEnd) return null;
+
+            const distance = itemIndex - position;
+            const opacity = professionCarouselOpacity(distance);
+
+            return (
+              <span
+                key={`profession-slot-${itemIndex}`}
+                className="fourth-section__listing-grain-box__carousel-item"
+                style={{ opacity }}
+                aria-hidden={distance !== 0}
+              >
+                {profession}
+              </span>
+            );
+          })}
         </span>
       </span>
     </p>
