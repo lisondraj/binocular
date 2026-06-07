@@ -1794,62 +1794,70 @@ a.fourth-section__btn {
   margin-bottom: var(--main2-grain-box-gap-y, 0.65em);
 }
 
-.fourth-section--main2-continuum .fourth-section__listing-profession-box {
-  aspect-ratio: auto;
-  height: auto;
-  margin-top: 0;
-  margin-bottom: var(--main2-grain-box-gap-y, 0.65em);
-  background: #ffffff;
-  border: none;
-  box-shadow: none;
+.fourth-section__listing-grain-box--profession {
+  --fourth-card-size: 7.35em;
+  --fourth-card-space-width: 11.15em;
   display: flex;
-  align-items: center;
-  padding: 0.75em 0;
+  flex-direction: column;
+  justify-content: flex-end;
 }
 
-.fourth-section__listing-profession-box__carousel {
+.fourth-section__listing-grain-box__listings {
   position: relative;
+  z-index: 2;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0 0 1.05em;
+}
+
+.fourth-section__listing-grain-box--profession .fourth-section__listings-scroll--row {
   width: 100%;
   margin: 0;
-  padding: 0 var(--main2-hero-pad-x) 0
-    calc(var(--main2-listings-inset-x, 1.15em) + 0.7em);
-  box-sizing: border-box;
-  font-family: var(--font-suisse), system-ui, sans-serif;
-  font-size: 1.05em;
-  font-weight: 400;
-  line-height: 1.2;
-  letter-spacing: -0.02em;
-  color: #141414;
-  text-align: left;
+  padding: 0;
+  background: transparent;
 }
 
-.fourth-section__listing-profession-box__carousel-window {
-  --profession-carousel-line: 1.2em;
-  --profession-carousel-radius: 2;
-  display: block;
-  height: calc(
-    (2 * var(--profession-carousel-radius) + 1) * var(--profession-carousel-line)
-  );
-  min-width: 6.5em;
-  overflow: hidden;
+.fourth-section__listing-grain-box--profession .fourth-section__listings--row {
+  padding: 0 calc(50vw - 50% + 1.15em) 0 var(--main2-listings-inset-x, 1.15em);
 }
 
-.fourth-section__listing-profession-box__carousel-track {
-  display: block;
-  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
-  will-change: transform;
+.mobile-view--main2
+  .fourth-section__listing-grain-box--profession
+  .fourth-section-listing-card
+  .listing-card-title {
+  color: #ffffff;
 }
 
-.fourth-section__listing-profession-box__carousel-track.is-instant {
-  transition: none;
+.mobile-view--main2
+  .fourth-section__listing-grain-box--profession
+  .fourth-section-listing-card--space
+  .listing-card-distance {
+  color: rgba(255, 255, 255, 0.52);
 }
 
-.fourth-section__listing-profession-box__carousel-item {
-  display: block;
-  height: var(--profession-carousel-line);
-  line-height: var(--profession-carousel-line);
-  white-space: nowrap;
-  transition: opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+.mobile-view--main2
+  .fourth-section__listing-grain-box--profession
+  .fourth-section-listing-card__rating {
+  color: #ffffff;
+}
+
+.mobile-view--main2
+  .fourth-section__listing-grain-box--profession
+  .fourth-section-listing-card__price-usd {
+  color: rgba(255, 255, 255, 0.52);
+}
+
+.mobile-view--main2
+  .fourth-section__listing-grain-box--profession
+  .fourth-section-listing-card__rating
+  .listing-card-rating-star {
+  color: #ffffff;
+}
+
+.mobile-view--main2
+  .fourth-section__listing-grain-box--profession
+  .fourth-section-listing-card__review-count {
+  color: rgba(255, 255, 255, 0.45);
 }
 
 .fourth-section--main2-continuum .fourth-section__listing-white-box {

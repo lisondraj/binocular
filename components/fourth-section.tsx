@@ -6,6 +6,7 @@ import {
   useEffect,
   useRef,
   useState,
+  type ReactNode,
   type Ref,
 } from "react";
 import { paintMain2GrainSurfaces } from "@/lib/main2-grain";
@@ -248,123 +249,22 @@ function FourthSectionListingCard({
   );
 }
 
-const MAIN2_PROFESSION_CAROUSEL_ITEMS = [
-  "doctor",
-  "chef",
-  "picker",
-  "housekeeper",
-  "barista",
-] as const;
-
-const MAIN2_PROFESSION_CAROUSEL_RADIUS = 2;
-
-function professionCarouselOpacity(distance: number) {
-  const magnitude = Math.abs(distance);
-  if (magnitude === 0) return 1;
-  if (magnitude === 1) return 0.52;
-  if (magnitude === 2) return 0.22;
-  return 0;
-}
-
-function ListingProfessionCarousel() {
-  const professionCount = MAIN2_PROFESSION_CAROUSEL_ITEMS.length;
-  const loopStart = professionCount;
-  const loopEnd = professionCount * 2;
-  const extendedItems = [
-    ...MAIN2_PROFESSION_CAROUSEL_ITEMS,
-    ...MAIN2_PROFESSION_CAROUSEL_ITEMS,
-    ...MAIN2_PROFESSION_CAROUSEL_ITEMS,
-  ];
-
-  const [position, setPosition] = useState<number>(loopStart);
-  const [instantReset, setInstantReset] = useState(false);
-  const trackRef = useRef<HTMLDivElement>(null);
-  const activeProfession =
-    MAIN2_PROFESSION_CAROUSEL_ITEMS[position % professionCount];
-
-  useEffect(() => {
-    const timer = window.setInterval(() => {
-      setPosition((current) => current + 1);
-    }, 1800);
-
-    return () => window.clearInterval(timer);
-  }, []);
-
-  useEffect(() => {
-    if (position !== loopEnd) return;
-
-    const track = trackRef.current;
-    if (!track) return;
-
-    const onEnd = (event: TransitionEvent) => {
-      if (event.target !== track || event.propertyName !== "transform") return;
-      setInstantReset(true);
-      setPosition(loopStart);
-    };
-
-    track.addEventListener("transitionend", onEnd);
-    return () => track.removeEventListener("transitionend", onEnd);
-  }, [position, loopEnd, loopStart]);
-
-  useEffect(() => {
-    if (!instantReset || position !== loopStart) return;
-
-    const frame = window.requestAnimationFrame(() => {
-      setInstantReset(false);
-    });
-
-    return () => window.cancelAnimationFrame(frame);
-  }, [instantReset, position, loopStart]);
-
+function ListingGrainBox() {
   return (
-    <p
-      className="fourth-section__listing-grain-box__carousel"
-      aria-live="polite"
-      aria-atomic="true"
-      aria-label={`Book a ${activeProfession}`}
+    <div
+      className="fourth-section__listing-slot-box fourth-section__listing-grain-box main2-grain-box"
+      aria-hidden
     >
-      <span className="fourth-section__listing-grain-box__carousel-prefix">Book a</span>
-      <span className="fourth-section__listing-grain-box__carousel-window">
-        <span
-          ref={trackRef}
-          className={`fourth-section__listing-grain-box__carousel-track${
-            instantReset ? " is-instant" : ""
-          }`}
-          style={{
-            transform: `translate3d(0, calc((var(--profession-carousel-radius) - ${position}) * var(--profession-carousel-line)), 0)`,
-          }}
-        >
-          {extendedItems.map((profession, itemIndex) => {
-            const distance = itemIndex - position;
-            const opacity = professionCarouselOpacity(distance);
-
-            return (
-              <span
-                key={`profession-slot-${itemIndex}`}
-                className="fourth-section__listing-grain-box__carousel-item"
-                style={{ opacity }}
-                aria-hidden={distance !== 0}
-              >
-                {profession}
-              </span>
-            );
-          })}
-        </span>
-      </span>
-    </p>
+      <div className="main2-grain-surface main2-hero-box__grain" aria-hidden />
+    </div>
   );
 }
 
-function ListingGrainBox({ professionCarousel = false }: { professionCarousel?: boolean }) {
+function ListingProfessionGrainBox({ children }: { children: ReactNode }) {
   return (
-    <div
-      className={`fourth-section__listing-slot-box fourth-section__listing-grain-box main2-grain-box${
-        professionCarousel ? " fourth-section__listing-grain-box--labeled" : ""
-      }`}
-      aria-hidden={professionCarousel ? undefined : true}
-    >
+    <div className="fourth-section__listing-slot-box fourth-section__listing-grain-box fourth-section__listing-grain-box--profession main2-grain-box">
       <div className="main2-grain-surface main2-hero-box__grain" aria-hidden />
-      {professionCarousel ? <ListingProfessionCarousel /> : null}
+      <div className="fourth-section__listing-grain-box__listings">{children}</div>
     </div>
   );
 }
@@ -592,38 +492,69 @@ export const FourthSection = forwardRef(function FourthSection(
         id="main2-tab-people"
         className="fourth-section__listings-block fourth-section-reveal main2-tab-target"
       >
-        {main2Listings ? <ListingGrainBox professionCarousel /> : null}
-        <p className="fourth-section__category">By profession</p>
-        <div
-          className="fourth-section__listings-scroll fourth-section__listings-scroll--row"
-          aria-label="Listings by profession"
-        >
-          <div className="fourth-section__listings fourth-section__listings--row">
-            {FOURTH_SECTION_BY_PROFESSION.map((listing) => (
-              <div
-                key={`fourth-profession-${listing.title}`}
-                className="fourth-section-listing-card-wrap fourth-section-listing-card-wrap--space"
-              >
-                <FourthSectionListingCard
-                  className="fourth-section-listing-card--space"
-                  image={listing.image}
-                  alt={listing.alt}
-                  price={listing.pricePerHour}
-                  title={listing.title}
-                  subtitle={listing.subtitle}
-                  hosts={listing.hosts}
-                  rating={listing.rating}
-                  reviewCount={listing.reviewCount}
-                  main2Listings={main2Listings}
-                />
+        {main2Listings ? (
+          <ListingProfessionGrainBox>
+            <div
+              className="fourth-section__listings-scroll fourth-section__listings-scroll--row"
+              aria-label="Listings by profession"
+            >
+              <div className="fourth-section__listings fourth-section__listings--row">
+                {FOURTH_SECTION_BY_PROFESSION.map((listing) => (
+                  <div
+                    key={`fourth-profession-${listing.title}`}
+                    className="fourth-section-listing-card-wrap fourth-section-listing-card-wrap--space"
+                  >
+                    <FourthSectionListingCard
+                      className="fourth-section-listing-card--space"
+                      image={listing.image}
+                      alt={listing.alt}
+                      price={listing.pricePerHour}
+                      title={listing.title}
+                      subtitle={listing.subtitle}
+                      hosts={listing.hosts}
+                      rating={listing.rating}
+                      reviewCount={listing.reviewCount}
+                      main2Listings={main2Listings}
+                    />
+                  </div>
+                ))}
               </div>
-            ))}
+            </div>
+          </ListingProfessionGrainBox>
+        ) : null}
+        <p className="fourth-section__category">By profession</p>
+        {!main2Listings ? (
+          <div
+            className="fourth-section__listings-scroll fourth-section__listings-scroll--row"
+            aria-label="Listings by profession"
+          >
+            <div className="fourth-section__listings fourth-section__listings--row">
+              {FOURTH_SECTION_BY_PROFESSION.map((listing) => (
+                <div
+                  key={`fourth-profession-${listing.title}`}
+                  className="fourth-section-listing-card-wrap fourth-section-listing-card-wrap--space"
+                >
+                  <FourthSectionListingCard
+                    className="fourth-section-listing-card--space"
+                    image={listing.image}
+                    alt={listing.alt}
+                    price={listing.pricePerHour}
+                    title={listing.title}
+                    subtitle={listing.subtitle}
+                    hosts={listing.hosts}
+                    rating={listing.rating}
+                    reviewCount={listing.reviewCount}
+                    main2Listings={main2Listings}
+                  />
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
+        ) : null}
       </div>
 
       <div className="fourth-section__listings-block fourth-section-reveal">
-        {main2Listings ? <ListingGrainBox /> : null}
+        {main2Listings ? <ListingWhiteBox /> : null}
         <p className="fourth-section__category">By action</p>
         <div
           className="fourth-section__listings-scroll fourth-section__listings-scroll--row"
