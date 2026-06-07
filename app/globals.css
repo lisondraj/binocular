@@ -2061,10 +2061,16 @@ a.fourth-section__btn {
   box-shadow: none;
 }
 
+.fourth-section--main2-continuum
+  .fourth-section__listing-white-box:has(.fourth-section__distance-intro) {
+  align-items: flex-start;
+  justify-content: flex-start;
+}
+
 .mobile-view--main2 .fourth-section__distance-intro.hero-description {
   align-items: flex-start;
   margin: 0;
-  padding: 0 var(--main2-hero-pad-x);
+  padding: 1.75em var(--main2-hero-pad-x) 0;
   box-sizing: border-box;
   font-size: clamp(1.92em, 6vw, 2.35em);
   font-weight: 390;
