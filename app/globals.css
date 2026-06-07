@@ -1822,8 +1822,20 @@ a.fourth-section__btn {
 
 .mobile-view--main2 #main2-tab-people {
   margin-top: 0;
+  padding-top: 0;
+  box-sizing: border-box;
+}
+
+.mobile-view--main2 .fourth-section__listings-block--white-tagline {
+  margin-top: 0;
   padding-top: var(--main2-listings-section-pad);
   box-sizing: border-box;
+}
+
+.mobile-view--main2
+  .fourth-section__listings-block--white-tagline
+  .fourth-section__listing-white-box {
+  margin-top: 0;
 }
 
 .mobile-view--main2
@@ -2096,6 +2108,12 @@ a.fourth-section__btn {
   gap: 0.75em;
   padding: 1.75em var(--main2-hero-pad-x) 0;
   box-sizing: border-box;
+}
+
+.mobile-view--main2
+  .fourth-section__listings-block--white-tagline
+  .fourth-section__white-box-intro-content.hero-intro-content {
+  padding-top: calc(1.75em + var(--main2-listings-section-pad));
 }
 
 .mobile-view--main2 .fourth-section__distance-intro.hero-description {
