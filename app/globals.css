@@ -1892,7 +1892,7 @@ a.fourth-section__btn {
   flex-shrink: 0;
   width: 100%;
   box-sizing: border-box;
-  padding: 0 0 1.05em;
+  padding: 0;
 }
 
 .fourth-section__listing-grain-box--profession .fourth-section__listings-scroll--row {
@@ -1903,7 +1903,8 @@ a.fourth-section__btn {
 }
 
 .fourth-section__listing-grain-box--profession .fourth-section__listings--row {
-  padding: 0 calc(50vw - 50% + 1.15em) 0 var(--main2-listings-inset-x, 1.15em);
+  padding: 0 calc(50vw - 50% + 1.5em) var(--main2-listings-inset-x, 1.15em)
+    var(--main2-listings-inset-x, 1.15em);
 }
 
 .mobile-view--main2
