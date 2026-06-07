@@ -2110,12 +2110,6 @@ a.fourth-section__btn {
   box-sizing: border-box;
 }
 
-.mobile-view--main2
-  .fourth-section__listings-block--white-tagline
-  .fourth-section__white-box-intro-content.hero-intro-content {
-  padding-top: calc(1.75em + var(--main2-listings-section-pad));
-}
-
 .mobile-view--main2 .fourth-section__distance-intro.hero-description {
   align-items: flex-start;
   margin: 0;
