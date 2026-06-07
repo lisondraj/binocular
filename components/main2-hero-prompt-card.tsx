@@ -20,29 +20,23 @@ type Main2HeroPromptCardProps = {
   className?: string;
 };
 
-/** /main2 — white AI prompt card (static done state, nav search). */
+/** /main2 — white AI prompt card (nav search). */
 export function Main2HeroPromptCard({ className = "" }: Main2HeroPromptCardProps) {
   return (
     <div
-      className={`hero-prompt-card-shell main2-hero-prompt-card-shell is-visible${
+      className={`hero-prompt-card-shell main2-hero-prompt-card-shell main2-nav-prompt-card-shell is-visible${
         className ? ` ${className}` : ""
       }`}
     >
-      <div className="hero-prompt-card main2-hero-prompt-card">
-        <div className="hero-prompt-text">
-          <span className="hero-prompt-layout" aria-hidden>
-            {MAIN2_PROMPT_TEXT}
-          </span>
-
-          <span className="hero-prompt-live">
-            <span className="hero-prompt-typed">{MAIN2_PROMPT_TEXT}</span>
-          </span>
+      <div className="hero-prompt-card main2-hero-prompt-card main2-nav-prompt-card">
+        <div className="hero-prompt-text main2-nav-prompt-card__text">
+          <span className="hero-prompt-typed">{MAIN2_PROMPT_TEXT}</span>
         </div>
 
         <button
           type="button"
           aria-label="Send"
-          className="hero-prompt-send main2-hero-prompt-send"
+          className="hero-prompt-send main2-hero-prompt-send main2-nav-prompt-card__send"
         >
           {upArrow}
         </button>

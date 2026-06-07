@@ -3012,7 +3012,7 @@ a.fourth-section__btn {
   --main2-nav-row-height: calc(2.15em + (2 * 0.5em));
   --main2-nav-bar-height: var(--main2-nav-row-height);
   --main2-nav-tabs-height: calc(1.75em + (2 * 0.35em));
-  --main2-nav-search-height: 4.45em;
+  --main2-nav-search-height: 5.85em;
   --main2-nav-search-pad-y: 0.5em;
   --main2-nav-chrome-height: calc(
     var(--main2-nav-bar-height) + var(--main2-nav-tabs-height)
@@ -3304,17 +3304,20 @@ a.fourth-section__btn {
   overflow: visible;
 }
 
-.main2-nav-search .main2-hero-prompt-card-shell {
+.main2-nav-search .main2-nav-prompt-card-shell {
   width: 100%;
   max-width: 100%;
   margin: 0;
   font-size: 0.84em;
+  box-shadow: none;
+  filter: none;
 }
 
-.main2-nav-search .main2-hero-prompt-card {
-  padding: 0.62em 0.88em 0.52em;
+.main2-nav-search .main2-nav-prompt-card {
+  padding: 0.68em 0.9em 0.58em;
   min-height: var(--main2-nav-search-height);
   box-shadow: none;
+  filter: none;
 }
 
 .mobile-view--main2 .main2-tab-target {
