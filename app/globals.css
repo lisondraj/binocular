@@ -1798,6 +1798,11 @@ a.fourth-section__btn {
   aspect-ratio: auto;
 }
 
+.fourth-section--main2-continuum .fourth-section__listing-grain-box--profession {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
 .fourth-section__listing-grain-box__profession-content {
   position: relative;
   z-index: 2;

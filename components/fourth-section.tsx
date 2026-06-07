@@ -563,6 +563,73 @@ export const FourthSection = forwardRef(function FourthSection(
             </div>
           </div>
         </div>
+
+        <div
+          id="main2-tab-people"
+          className="fourth-section__listings-block fourth-section-reveal main2-tab-target"
+        >
+          {main2Listings ? (
+            <ListingProfessionGrainBox>
+              <div
+                className="fourth-section__listings-scroll fourth-section__listings-scroll--row"
+                aria-label="Listings by profession"
+              >
+                <div className="fourth-section__listings fourth-section__listings--row">
+                  {FOURTH_SECTION_BY_PROFESSION.map((listing) => (
+                    <div
+                      key={`fourth-profession-${listing.title}`}
+                      className="fourth-section-listing-card-wrap fourth-section-listing-card-wrap--space"
+                    >
+                      <FourthSectionListingCard
+                        className="fourth-section-listing-card--space"
+                        image={listing.image}
+                        alt={listing.alt}
+                        price={listing.pricePerHour}
+                        title={listing.title}
+                        subtitle={listing.subtitle}
+                        hosts={listing.hosts}
+                        rating={listing.rating}
+                        reviewCount={listing.reviewCount}
+                        main2Listings={main2Listings}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </ListingProfessionGrainBox>
+          ) : null}
+          {!main2Listings ? (
+            <>
+              <p className="fourth-section__category">By profession</p>
+              <div
+                className="fourth-section__listings-scroll fourth-section__listings-scroll--row"
+                aria-label="Listings by profession"
+              >
+                <div className="fourth-section__listings fourth-section__listings--row">
+                  {FOURTH_SECTION_BY_PROFESSION.map((listing) => (
+                    <div
+                      key={`fourth-profession-${listing.title}`}
+                      className="fourth-section-listing-card-wrap fourth-section-listing-card-wrap--space"
+                    >
+                      <FourthSectionListingCard
+                        className="fourth-section-listing-card--space"
+                        image={listing.image}
+                        alt={listing.alt}
+                        price={listing.pricePerHour}
+                        title={listing.title}
+                        subtitle={listing.subtitle}
+                        hosts={listing.hosts}
+                        rating={listing.rating}
+                        reviewCount={listing.reviewCount}
+                        main2Listings={main2Listings}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </>
+          ) : null}
+        </div>
       </div>
 
       <div
@@ -596,73 +663,6 @@ export const FourthSection = forwardRef(function FourthSection(
             ))}
           </div>
         </div>
-      </div>
-
-      <div
-        id="main2-tab-people"
-        className="fourth-section__listings-block fourth-section-reveal main2-tab-target"
-      >
-        {main2Listings ? (
-          <ListingProfessionGrainBox>
-            <div
-              className="fourth-section__listings-scroll fourth-section__listings-scroll--row"
-              aria-label="Listings by profession"
-            >
-              <div className="fourth-section__listings fourth-section__listings--row">
-                {FOURTH_SECTION_BY_PROFESSION.map((listing) => (
-                  <div
-                    key={`fourth-profession-${listing.title}`}
-                    className="fourth-section-listing-card-wrap fourth-section-listing-card-wrap--space"
-                  >
-                    <FourthSectionListingCard
-                      className="fourth-section-listing-card--space"
-                      image={listing.image}
-                      alt={listing.alt}
-                      price={listing.pricePerHour}
-                      title={listing.title}
-                      subtitle={listing.subtitle}
-                      hosts={listing.hosts}
-                      rating={listing.rating}
-                      reviewCount={listing.reviewCount}
-                      main2Listings={main2Listings}
-                    />
-                  </div>
-                ))}
-              </div>
-            </div>
-          </ListingProfessionGrainBox>
-        ) : null}
-        {!main2Listings ? (
-          <>
-            <p className="fourth-section__category">By profession</p>
-            <div
-              className="fourth-section__listings-scroll fourth-section__listings-scroll--row"
-              aria-label="Listings by profession"
-            >
-            <div className="fourth-section__listings fourth-section__listings--row">
-              {FOURTH_SECTION_BY_PROFESSION.map((listing) => (
-                <div
-                  key={`fourth-profession-${listing.title}`}
-                  className="fourth-section-listing-card-wrap fourth-section-listing-card-wrap--space"
-                >
-                  <FourthSectionListingCard
-                    className="fourth-section-listing-card--space"
-                    image={listing.image}
-                    alt={listing.alt}
-                    price={listing.pricePerHour}
-                    title={listing.title}
-                    subtitle={listing.subtitle}
-                    hosts={listing.hosts}
-                    rating={listing.rating}
-                    reviewCount={listing.reviewCount}
-                    main2Listings={main2Listings}
-                  />
-                </div>
-              ))}
-            </div>
-          </div>
-          </>
-        ) : null}
       </div>
 
       <div className="fourth-section__listings-block fourth-section-reveal">
