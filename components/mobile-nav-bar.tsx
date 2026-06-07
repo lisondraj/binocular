@@ -9,7 +9,7 @@ import { MOBILE_ROOT_FONT_SIZE } from "@/lib/mobile-layout";
 const MAIN2_NAV_TABS = [
   { id: "spaces", label: "Spaces" },
   { id: "people", label: "People" },
-  { id: "actions", label: "Actions" },
+  { id: "audience", label: "Audience" },
 ] as const;
 
 type Main2NavTabId = (typeof MAIN2_NAV_TABS)[number]["id"];
