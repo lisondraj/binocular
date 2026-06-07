@@ -2106,7 +2106,12 @@ a.fourth-section__btn {
   min-height: var(--main2-category-grain-min-height);
   display: flex;
   flex-direction: column;
-  margin-bottom: 0;
+  margin-bottom: calc(
+    -1 * (
+      var(--main2-white-box-listings-position-lift) -
+      var(--main2-category-grain-listings-lift)
+    )
+  );
 }
 
 .fourth-section__listing-white-box__content {
