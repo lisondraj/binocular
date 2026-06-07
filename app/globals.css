@@ -2103,8 +2103,7 @@ a.fourth-section__btn {
 
 .mobile-view--main2 .fourth-section__listing-white-box--full-height {
   aspect-ratio: auto;
-  min-height: auto;
-  height: auto;
+  min-height: var(--main2-category-grain-min-height);
   display: flex;
   flex-direction: column;
   margin-bottom: 0;
@@ -2120,15 +2119,14 @@ a.fourth-section__btn {
 }
 
 .mobile-view--main2 .fourth-section__listing-white-box--full-height .fourth-section__listing-white-box__content {
-  min-height: auto;
-  gap: var(--main2-white-box-action-gap);
+  min-height: var(--main2-category-grain-min-height);
 }
 
 .mobile-view--main2 .fourth-section__listing-white-box__listings {
-  flex: 0 0 auto;
+  flex: 1 1 var(--main2-category-grain-listings-flex);
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
+  justify-content: flex-end;
   min-height: 0;
   width: 100%;
   margin-top: 0;
@@ -3358,6 +3356,7 @@ a.fourth-section__btn {
   --main2-listings-section-pad: 2.35em;
   --main2-white-box-intro-pad-top: 2.85em;
   --main2-white-box-intro-pad-top-action: 1.75em;
+  --main2-white-box-listings-lift: 6.2em;
   --main2-category-grain-min-height: calc(
     100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)
   );
