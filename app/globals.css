@@ -1820,14 +1820,8 @@ a.fourth-section__btn {
   box-shadow: none;
 }
 
-.mobile-view--main2 #main2-tab-distance {
-  padding-top: 1.75em;
-  padding-bottom: 1.75em;
-  box-sizing: border-box;
-}
-
 .mobile-view--main2 #main2-tab-spaces {
-  padding-bottom: 1.75em;
+  padding-bottom: 2.35em;
   box-sizing: border-box;
 }
 
@@ -2105,7 +2099,7 @@ a.fourth-section__btn {
 .mobile-view--main2 .fourth-section__white-box-intro-content.hero-intro-content {
   align-items: flex-start;
   gap: 0.75em;
-  padding: 2.35em var(--main2-hero-pad-x) 0;
+  padding: 2.85em var(--main2-hero-pad-x) 0;
   box-sizing: border-box;
 }
 
