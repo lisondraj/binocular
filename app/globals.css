@@ -1989,12 +1989,14 @@ a.fourth-section__btn {
 }
 
 .mobile-view--main2
+  .fourth-section--main2-continuum
   .fourth-section__listing-grain-box--profession
   .fourth-section__category--in-grain,
 .mobile-view--main2
+  .fourth-section--main2-continuum
   .fourth-section__listing-grain-box--audience
   .fourth-section__category--in-grain {
-  color: rgba(255, 255, 255, 0.45);
+  color: #ffffff;
 }
 
 .fourth-section__listing-grain-box--profession .fourth-section__listings-scroll--row,
