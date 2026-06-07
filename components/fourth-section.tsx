@@ -567,6 +567,11 @@ export const FourthSection = forwardRef(function FourthSection(
         </div>
       </div>
 
+      {main2Listings ? (
+        <div className="fourth-section__listings-block fourth-section-reveal">
+          <ListingWhiteBox />
+        </div>
+      ) : (
       <div className="fourth-section__listings-block fourth-section-reveal">
         <p className="fourth-section__category">By bundle</p>
         <div
@@ -666,6 +671,7 @@ export const FourthSection = forwardRef(function FourthSection(
           </div>
         </div>
       </div>
+      )}
 
       <div className="fourth-section__outro fourth-section-reveal">
         <div className="fourth-section__actions">

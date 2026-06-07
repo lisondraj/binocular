@@ -1832,7 +1832,11 @@ export function HomePage({
             className="mobile-site-footer mobile-site-footer--main2"
             style={{ fontSize: MOBILE_ROOT_FONT_SIZE }}
           >
-            <div className="mobile-site-footer__box">
+            <div className="mobile-site-footer__box main2-grain-box">
+              <div
+                className="main2-grain-surface main2-hero-box__grain"
+                aria-hidden
+              />
               <p className="mobile-site-footer__wordmark">
                 <BinocularWordmark />
               </p>

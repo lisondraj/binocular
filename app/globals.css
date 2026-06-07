@@ -2075,33 +2075,38 @@ a.fourth-section__btn {
   transform-origin: center bottom;
 }
 
-/* /main2 — footer wordmark below listings, no card box. */
+/* /main2 — inset rounded grain footer with white wordmark. */
 .mobile-view--main2 .mobile-site-footer--main2 {
-  padding: 0;
+  padding: 1.5em var(--main2-hero-inset-x) calc(var(--main2-hero-inset-y) + env(safe-area-inset-bottom, 0px));
   margin: 0;
   background: transparent;
   box-sizing: border-box;
 }
 
 .mobile-view--main2 .mobile-site-footer--main2 .mobile-site-footer__box {
-  min-height: 0;
+  position: relative;
+  min-height: 10.5em;
   width: 100%;
-  padding: 2.25em 1.15em 0.85em;
-  border-radius: 0;
-  background: transparent;
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
-  border: none;
-  box-shadow: none;
+  padding: 1.35em 0.85em;
+  border-radius: var(--main2-hero-radius);
+  overflow: hidden;
+  isolation: isolate;
   justify-content: center;
   align-items: center;
   box-sizing: border-box;
+  box-shadow:
+    0 0.35em 1.4em rgba(0, 0, 0, 0.14),
+    inset 0 0.0625em 0 rgba(255, 255, 255, 0.06);
 }
 
 .mobile-view--main2 .mobile-site-footer--main2 .mobile-site-footer__wordmark {
-  color: #000000;
-  padding-bottom: 0.5em;
-  transform: scaleX(1.14);
+  position: relative;
+  z-index: 1;
+  color: #ffffff;
+  padding-bottom: 0;
+  font-size: 12cqi;
+  line-height: 0.9;
+  transform: scaleX(1.08);
   transform-origin: center center;
 }
 
