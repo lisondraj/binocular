@@ -21,10 +21,10 @@ body {
   font-family: var(--font-inter), system-ui, sans-serif;
 }
 
-/* /main2 — overscroll chrome tints (refined on scroll in home-page). */
+/* /main2 — white overscroll chrome (Dynamic Island + home bar). */
 html:has(.mobile-view--main2),
 html:has(.mobile-view--main2) body {
-  background-color: var(--main2-chrome-hero, #4a4a4a);
+  background-color: #ffffff;
 }
 
 h1,
@@ -1248,10 +1248,10 @@ h6 {
   font-weight: 400;
 }
 
-/* /main2 — dark continuum theme. */
+/* /main2 — listings on white page below hero grain box. */
 .mobile-view--main2 .fourth-section--main2-continuum {
-  padding: 0;
-  background-color: transparent;
+  padding: 0.85em 0 0;
+  background-color: #ffffff;
 }
 
 .mobile-view--main2 .fourth-section__inner {
@@ -1270,7 +1270,7 @@ h6 {
 .mobile-view--main2 .fourth-section--main2-continuum .fourth-section__category {
   margin: 0 0 0.42em;
   padding: 0 0 0.28em 1.15em;
-  color: #ffffff;
+  color: #000000;
   background: transparent;
 }
 
@@ -1278,7 +1278,7 @@ h6 {
   .fourth-section--main2-continuum
   .fourth-section-listing-card
   .listing-card-title {
-  color: #ffffff;
+  color: #1a1a1a;
 }
 
 .mobile-view--main2
@@ -1293,14 +1293,14 @@ h6 {
   .fourth-section--main2-continuum
   .fourth-section-bundle__meta
   .listing-card-distance {
-  color: rgba(255, 255, 255, 0.58);
+  color: rgba(0, 0, 0, 0.5);
 }
 
 .mobile-view--main2
   .fourth-section--main2-continuum
   .fourth-section-bundle__meta
   .listing-card-title {
-  color: #ffffff;
+  color: #1a1a1a;
 }
 
 .mobile-view--main2
@@ -1312,26 +1312,26 @@ h6 {
 .mobile-view--main2
   .fourth-section--main2-continuum
   .fourth-section-listing-card__rating {
-  color: rgba(255, 255, 255, 0.82);
+  color: #1a1a1a;
 }
 
 .mobile-view--main2
   .fourth-section--main2-continuum
   .fourth-section-listing-card__price-usd {
-  color: rgba(255, 255, 255, 0.5);
+  color: rgba(0, 0, 0, 0.5);
 }
 
 .mobile-view--main2
   .fourth-section--main2-continuum
   .fourth-section-listing-card__rating
   .listing-card-rating-star {
-  color: rgba(255, 255, 255, 0.72);
+  color: #1a1a1a;
 }
 
 .mobile-view--main2
   .fourth-section--main2-continuum
   .fourth-section-listing-card__review-count {
-  color: rgba(255, 255, 255, 0.48);
+  color: rgba(0, 0, 0, 0.45);
 }
 
 /* Home page (/) — main2 listing layout on white background. */
@@ -1978,7 +1978,7 @@ a.fourth-section__btn {
 }
 
 .mobile-view--main2 .mobile-site-footer--main2 .mobile-site-footer__wordmark {
-  color: #ffffff;
+  color: #000000;
   padding-bottom: 0.5em;
   transform: scaleX(1.14);
   transform-origin: center center;
@@ -2797,9 +2797,13 @@ a.fourth-section__btn {
 /* /main2 — shared inset + corner radius for nav and hero grain box. */
 .mobile-view--main2 {
   --main2-hero-grey: #2a2a2a;
-  --main2-chrome-hero: #4a4a4a;
+  --main2-chrome-hero: #ffffff;
   --main2-chrome-page: #ffffff;
-  --main2-chrome-bottom: #050505;
+  --main2-chrome-bottom: #ffffff;
+  background-color: #ffffff;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  box-sizing: border-box;
   --main2-hero-inset-x: 1.15em;
   --main2-hero-inset-y: 0.85em;
   --main2-hero-radius: 0.75em;
@@ -2819,7 +2823,7 @@ a.fourth-section__btn {
 
 .main2-nav-anchor {
   position: fixed;
-  top: var(--main2-nav-inset-y);
+  top: calc(var(--main2-nav-inset-y) + env(safe-area-inset-top, 0px));
   bottom: auto;
   right: var(--main2-nav-inset-x);
   left: auto;
@@ -2911,7 +2915,7 @@ a.fourth-section__btn {
 }
 
 .main2-nav-anchor.is-menu-open {
-  top: var(--main2-nav-inset-y);
+  top: calc(var(--main2-nav-inset-y) + env(safe-area-inset-top, 0px));
   bottom: auto;
   right: var(--main2-nav-inset-x);
   left: var(--main2-nav-inset-x);
@@ -3006,12 +3010,14 @@ a.fourth-section__btn {
   transition: transform 0.28s ease;
 }
 
-/* /main2 — full-bleed hero grain, white copy on dark. */
+/* /main2 — inset rounded hero grain box on white page. */
 .hero-stage--main2 {
   justify-content: stretch;
   gap: 0;
   box-sizing: border-box;
-  padding: 0;
+  padding: var(--main2-hero-inset-y) var(--main2-hero-inset-x);
+  min-height: calc(100vh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
+  background-color: #ffffff;
 }
 
 .main2-grain-box {
@@ -3029,9 +3035,12 @@ a.fourth-section__btn {
   position: relative;
   flex: 1 1 auto;
   width: 100%;
-  min-height: 100vh;
-  border-radius: 0;
-  overflow: visible;
+  min-height: calc(
+    100vh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px) -
+      (2 * var(--main2-hero-inset-y))
+  );
+  border-radius: var(--main2-hero-radius);
+  overflow: hidden;
   isolation: isolate;
   padding: 1.75em 1.4em;
   box-sizing: border-box;

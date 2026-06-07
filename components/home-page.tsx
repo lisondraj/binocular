@@ -6,7 +6,6 @@ import {
   useRef,
   useState,
   type CSSProperties,
-  type ReactNode,
 } from "react";
 import Link from "next/link";
 import { createPortal } from "react-dom";
@@ -105,28 +104,6 @@ const paintMain2GrainSurfaces = () => {
     layer.style.backgroundRepeat = "repeat";
   });
 };
-
-function Main2GrainContinuum({
-  active,
-  children,
-}: {
-  active: boolean;
-  children: ReactNode;
-}) {
-  if (!active) {
-    return <>{children}</>;
-  }
-
-  return (
-    <div className="main2-grain-continuum main2-grain-box">
-      <div
-        className="main2-grain-surface main2-grain-continuum__grain"
-        aria-hidden
-      />
-      <div className="main2-grain-continuum__inner">{children}</div>
-    </div>
-  );
-}
 
 /** Kitchen is the middle listing card — index 1 in LISTING_CARDS. */
 const KITCHEN_LISTING_INDEX = 1;
@@ -1829,7 +1806,6 @@ export function HomePage({
           onMenuToggle={() => setMain2MenuOpen((open) => !open)}
         />
 
-        <Main2GrainContinuum active={isMain2}>
         <div
           className={`hero-stage${isMain2 ? " hero-stage--main2" : ""}`}
           style={{
@@ -1868,7 +1844,11 @@ export function HomePage({
           ) : null}
 
           {isMain2 ? (
-            <div className="main2-hero-box">
+            <div className="main2-hero-box main2-grain-box">
+              <div
+                className="main2-grain-surface main2-hero-box__grain"
+                aria-hidden
+              />
               <div aria-hidden className="hero-intro-images main2-hero-deck">
                 {renderHeroDeck()}
               </div>
@@ -1991,7 +1971,6 @@ export function HomePage({
             </div>
           </footer>
         ) : null}
-        </Main2GrainContinuum>
 
         {!isMain2 ? (
         <>

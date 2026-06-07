@@ -1,7 +1,8 @@
 import type { Viewport } from "next";
 
 export const viewport: Viewport = {
-  themeColor: "#4a4a4a",
+  viewportFit: "cover",
+  themeColor: "#ffffff",
 };
 
 export default function Main2Layout({
