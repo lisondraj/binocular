@@ -1842,6 +1842,34 @@ export function HomePage({
                     <br />
                     San Francisco, CA 94104
                   </p>
+                </div>
+                <div className="mobile-site-footer__aside">
+                  <nav
+                    className="mobile-site-footer__pages"
+                    aria-label="Footer pages"
+                  >
+                    <Link className="mobile-site-footer__page-link" href="/book">
+                      Book
+                    </Link>
+                    <a
+                      className="mobile-site-footer__page-link"
+                      href="#main2-tab-spaces"
+                    >
+                      Spaces
+                    </a>
+                    <a
+                      className="mobile-site-footer__page-link"
+                      href="#main2-tab-people"
+                    >
+                      People
+                    </a>
+                    <a
+                      className="mobile-site-footer__page-link"
+                      href="#main2-tab-audience"
+                    >
+                      Audiences
+                    </a>
+                  </nav>
                   <div className="mobile-site-footer__social">
                     <a
                       className="mobile-site-footer__social-link"
@@ -1878,32 +1906,6 @@ export function HomePage({
                     </a>
                   </div>
                 </div>
-                <nav
-                  className="mobile-site-footer__pages"
-                  aria-label="Footer pages"
-                >
-                  <Link className="mobile-site-footer__page-link" href="/book">
-                    Book
-                  </Link>
-                  <a
-                    className="mobile-site-footer__page-link"
-                    href="#main2-tab-spaces"
-                  >
-                    Spaces
-                  </a>
-                  <a
-                    className="mobile-site-footer__page-link"
-                    href="#main2-tab-people"
-                  >
-                    People
-                  </a>
-                  <a
-                    className="mobile-site-footer__page-link"
-                    href="#main2-tab-audience"
-                  >
-                    Audiences
-                  </a>
-                </nav>
               </div>
             </div>
             <div className="mobile-site-footer__chrome">

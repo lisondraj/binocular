@@ -2553,11 +2553,19 @@ a.fourth-section__btn {
   color: rgba(0, 0, 0, 0.5);
 }
 
+.mobile-view--main2 .mobile-site-footer--main2 .mobile-site-footer__aside {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.65em;
+  flex-shrink: 0;
+}
+
 .mobile-view--main2 .mobile-site-footer--main2 .mobile-site-footer__social {
   display: flex;
   align-items: center;
   gap: 0.72em;
-  margin-top: 0.35em;
+  margin-top: 0;
 }
 
 .mobile-view--main2 .mobile-site-footer--main2 .mobile-site-footer__social-link {
