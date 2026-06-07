@@ -276,7 +276,7 @@ function ListingProfessionCarousel() {
     ...MAIN2_PROFESSION_CAROUSEL_ITEMS,
   ];
 
-  const [position, setPosition] = useState(loopStart);
+  const [position, setPosition] = useState<number>(loopStart);
   const [instantReset, setInstantReset] = useState(false);
   const trackRef = useRef<HTMLDivElement>(null);
   const activeProfession =
