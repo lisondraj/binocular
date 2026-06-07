@@ -1804,7 +1804,7 @@ a.fourth-section__btn {
   z-index: 2;
   width: 100%;
   margin: 0;
-  padding: 0 var(--main2-hero-pad-x);
+  padding: 0 var(--main2-hero-pad-x) 0 calc(var(--main2-hero-pad-x) + 0.75em);
   box-sizing: border-box;
   font-family: var(--font-suisse), system-ui, sans-serif;
   font-size: 1.05em;
