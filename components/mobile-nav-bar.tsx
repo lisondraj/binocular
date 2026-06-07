@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { BinocularWordmark } from "@/components/binocular-wordmark";
+import { Main2HeroPromptCard } from "@/components/main2-hero-prompt-card";
 import { MOBILE_ROOT_FONT_SIZE } from "@/lib/mobile-layout";
 
 const MAIN2_NAV_TABS = [
@@ -10,8 +11,6 @@ const MAIN2_NAV_TABS = [
   { id: "people", label: "People" },
   { id: "actions", label: "Actions" },
 ] as const;
-
-type Main2NavTabId = (typeof MAIN2_NAV_TABS)[number]["id"];
 
 type MobileNavBarProps = {
   /** When true, logo and header fill are always visible (e.g. /book). */
@@ -33,7 +32,7 @@ export function MobileNavBar({
   menuOpen = false,
   onMenuToggle,
 }: MobileNavBarProps) {
-  const [activeTab, setActiveTab] = useState<Main2NavTabId>("spaces");
+  const [searchOpen, setSearchOpen] = useState(false);
 
   const isMain2PastHero = isMain2;
   const expanded =
@@ -98,7 +97,9 @@ export function MobileNavBar({
   if (isMain2) {
     return (
       <div
-        className={`main2-nav-anchor${menuOpen ? " is-menu-open" : ""}`}
+        className={`main2-nav-anchor${menuOpen ? " is-menu-open" : ""}${
+          searchOpen ? " is-search-open" : ""
+        }`}
         style={{ fontSize: MOBILE_ROOT_FONT_SIZE }}
       >
         {navRow}
@@ -112,15 +113,23 @@ export function MobileNavBar({
               key={tab.id}
               type="button"
               role="tab"
-              aria-selected={activeTab === tab.id}
-              className={`main2-nav-tabs__tab${
-                activeTab === tab.id ? " is-active" : ""
-              }`}
-              onClick={() => setActiveTab(tab.id)}
+              aria-selected={false}
+              className="main2-nav-tabs__tab"
+              onClick={() => setSearchOpen((open) => !open)}
             >
               {tab.label}
             </button>
           ))}
+        </div>
+        <div
+          className={`main2-nav-search${searchOpen ? " is-open" : ""}`}
+          aria-hidden={!searchOpen}
+        >
+          <div className="main2-nav-search__inner">
+            <div className="hero-prompt-wrap main2-nav-search__wrap">
+              <Main2HeroPromptCard />
+            </div>
+          </div>
         </div>
         {menuOpen ? (
           <nav className="main2-nav-menu-panel" aria-label="Navigation">

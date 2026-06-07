@@ -3012,8 +3012,17 @@ a.fourth-section__btn {
   --main2-nav-row-height: calc(2.15em + (2 * 0.5em));
   --main2-nav-bar-height: var(--main2-nav-row-height);
   --main2-nav-tabs-height: calc(1.75em + (2 * 0.35em));
+  --main2-nav-search-height: 5.35em;
+  --main2-nav-search-pad-y: 0.55em;
   --main2-nav-chrome-height: calc(
     var(--main2-nav-bar-height) + var(--main2-nav-tabs-height)
+  );
+}
+
+.main2-nav-anchor.is-search-open {
+  --main2-nav-chrome-height: calc(
+    var(--main2-nav-bar-height) + var(--main2-nav-tabs-height) +
+      var(--main2-nav-search-height) + (2 * var(--main2-nav-search-pad-y))
   );
 }
 
@@ -3219,11 +3228,11 @@ a.fourth-section__btn {
   display: flex;
   align-items: stretch;
   width: 100%;
-  max-width: calc(var(--ipad-width) - 2.7em);
+  max-width: var(--ipad-width);
   min-height: var(--main2-nav-tabs-height);
   height: var(--main2-nav-tabs-height);
   margin: 0 auto;
-  padding: 0 1.15em;
+  padding: 0 var(--main2-hero-pad-x);
   box-sizing: border-box;
   flex-shrink: 0;
   border-top: 0.0625em solid rgba(0, 0, 0, 0.07);
@@ -3250,14 +3259,59 @@ a.fourth-section__btn {
     border-color 0.2s ease;
 }
 
-.main2-nav-tabs__tab.is-active {
-  color: #000000;
-  border-bottom-color: #000000;
-}
-
 .main2-nav-tabs__tab:hover,
 .main2-nav-tabs__tab:focus-visible {
   color: #000000;
+}
+
+.main2-nav-search {
+  pointer-events: none;
+  width: 100%;
+  max-width: var(--ipad-width);
+  margin: 0 auto;
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: #ffffff;
+  border-top: 0.0625em solid rgba(0, 0, 0, 0.07);
+  box-sizing: border-box;
+  transition:
+    max-height 0.34s cubic-bezier(0.33, 1, 0.68, 1),
+    opacity 0.26s ease;
+}
+
+.main2-nav-search.is-open {
+  pointer-events: auto;
+  max-height: calc(
+    var(--main2-nav-search-height) + (2 * var(--main2-nav-search-pad-y))
+  );
+  opacity: 1;
+}
+
+.main2-nav-search__inner {
+  padding: var(--main2-nav-search-pad-y) var(--main2-hero-pad-x);
+  box-sizing: border-box;
+}
+
+.main2-nav-search__wrap {
+  width: 100%;
+  overflow: visible;
+}
+
+.main2-nav-search .main2-hero-prompt-card-shell {
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  font-size: 0.84em;
+}
+
+.main2-nav-search .main2-hero-prompt-card {
+  padding: 0.7em 0.95em 0.58em;
+  min-height: var(--main2-nav-search-height);
+  box-shadow:
+    0 0.18em 0.55em rgba(0, 0, 0, 0.1),
+    0 0.04em 0.12em rgba(0, 0, 0, 0.04);
 }
 
 .mobile-view--main2 .main2-tab-target {
