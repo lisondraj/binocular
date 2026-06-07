@@ -1208,12 +1208,9 @@ export function HomePage({
   }, [kitchenAnchoredInThird]);
 
   useEffect(() => {
-    const onScroll = () => {
-      if (isMain2) {
-        setShowLogo(window.scrollY > 0);
-        return;
-      }
+    if (isMain2) return;
 
+    const onScroll = () => {
       // Fade in once the user scrolls roughly past the hero.
       setShowLogo(window.scrollY > window.innerHeight * 0.6);
     };
@@ -1590,7 +1587,7 @@ export function HomePage({
           <div
             className={`hero-prompt-card${isMain2 ? " main2-hero-prompt-card" : ""}`}
           >
-            <p className="hero-prompt-text">
+            <div className="hero-prompt-text">
               <span className="hero-prompt-layout" aria-hidden>
                 <span className="hero-prompt-chip">
                   {labIcon}
@@ -1650,7 +1647,7 @@ export function HomePage({
                   </>
                 )}
               </span>
-            </p>
+            </div>
 
             <button
               type="button"
@@ -1695,9 +1692,7 @@ export function HomePage({
           at the iPad width so even the largest iPhones are contained. Every
           size is in `em` so the whole view scales uniformly with the width. */}
       <section
-        className={`mobile-view${isMain2 ? " mobile-view--main2" : ""}${
-          isMain2 && showLogo ? " mobile-view--main2-past-hero" : ""
-        }`}
+        className={`mobile-view${isMain2 ? " mobile-view--main2 mobile-view--main2-past-hero" : ""}`}
         style={{
           position: "relative",
           fontSize: MOBILE_ROOT_FONT_SIZE,
@@ -1706,7 +1701,7 @@ export function HomePage({
         }}
       >
         <MobileNavBar
-          showLogo={showLogo}
+          showLogo={isMain2 || showLogo}
           showNav={showHeroUi}
           isMain2={isMain2}
           menuOpen={main2MenuOpen}
@@ -1832,11 +1827,7 @@ export function HomePage({
             className="mobile-site-footer mobile-site-footer--main2"
             style={{ fontSize: MOBILE_ROOT_FONT_SIZE }}
           >
-            <div className="mobile-site-footer__box main2-grain-box">
-              <div
-                className="main2-grain-surface main2-hero-box__grain"
-                aria-hidden
-              />
+            <div className="mobile-site-footer__box">
               <p className="mobile-site-footer__wordmark">
                 <BinocularWordmark />
               </p>

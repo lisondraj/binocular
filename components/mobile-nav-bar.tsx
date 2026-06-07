@@ -1,8 +1,17 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
 import { BinocularWordmark } from "@/components/binocular-wordmark";
 import { MOBILE_ROOT_FONT_SIZE } from "@/lib/mobile-layout";
+
+const MAIN2_NAV_TABS = [
+  { id: "spaces", label: "Spaces" },
+  { id: "people", label: "People" },
+  { id: "actions", label: "Actions" },
+] as const;
+
+type Main2NavTabId = (typeof MAIN2_NAV_TABS)[number]["id"];
 
 type MobileNavBarProps = {
   /** When true, logo and header fill are always visible (e.g. /book). */
@@ -10,7 +19,7 @@ type MobileNavBarProps = {
   showLogo?: boolean;
   /** Hero intro fade — nav row appears with the rest of the hero UI. */
   showNav?: boolean;
-  /** /main2 — chevron menu + detached dropdown panel. */
+  /** /main2 — hamburger menu + detached dropdown panel. */
   isMain2?: boolean;
   menuOpen?: boolean;
   onMenuToggle?: () => void;
@@ -24,11 +33,13 @@ export function MobileNavBar({
   menuOpen = false,
   onMenuToggle,
 }: MobileNavBarProps) {
-  const isMain2PastHero = isMain2 && showLogo;
+  const [activeTab, setActiveTab] = useState<Main2NavTabId>("spaces");
+
+  const isMain2PastHero = isMain2;
   const expanded =
-    staticNav || (isMain2 ? menuOpen || isMain2PastHero : showLogo);
+    staticNav || (isMain2 ? true : showLogo);
   const logoVisible =
-    staticNav || (isMain2 ? menuOpen || isMain2PastHero : showLogo);
+    staticNav || (isMain2 ? true : showLogo);
   const navVisible = staticNav || showNav;
   const logoClassName = `mobile-nav-logo mobile-nav-logo-link${
     logoVisible ? " is-visible" : ""
@@ -69,30 +80,17 @@ export function MobileNavBar({
         aria-expanded={isMain2 ? menuOpen : undefined}
         onClick={isMain2 ? onMenuToggle : undefined}
       >
-        {isMain2 ? (
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <polyline points="6 9 12 15 18 9" />
-          </svg>
-        ) : (
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-          >
-            <line x1="3" y1="6" x2="21" y2="6" />
-            <line x1="3" y1="12" x2="21" y2="12" />
-            <line x1="3" y1="18" x2="21" y2="18" />
-          </svg>
-        )}
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+        >
+          <line x1="3" y1="6" x2="21" y2="6" />
+          <line x1="3" y1="12" x2="21" y2="12" />
+          <line x1="3" y1="18" x2="21" y2="18" />
+        </svg>
       </button>
     </div>
   );
@@ -104,6 +102,26 @@ export function MobileNavBar({
         style={{ fontSize: MOBILE_ROOT_FONT_SIZE }}
       >
         {navRow}
+        <div
+          className="main2-nav-tabs"
+          role="tablist"
+          aria-label="Browse categories"
+        >
+          {MAIN2_NAV_TABS.map((tab) => (
+            <button
+              key={tab.id}
+              type="button"
+              role="tab"
+              aria-selected={activeTab === tab.id}
+              className={`main2-nav-tabs__tab${
+                activeTab === tab.id ? " is-active" : ""
+              }`}
+              onClick={() => setActiveTab(tab.id)}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
         {menuOpen ? (
           <nav className="main2-nav-menu-panel" aria-label="Navigation">
             <button type="button" className="main2-nav-menu-panel__link">

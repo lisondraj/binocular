@@ -2098,7 +2098,7 @@ export default function Home() {
             }`}
           >
           <div className="hero-prompt-card">
-            <p className="hero-prompt-text">
+            <div className="hero-prompt-text">
               {/* Full final layout always present — locks box size from first @. */}
               <span className="hero-prompt-layout" aria-hidden>
                 <span className="hero-prompt-chip">
@@ -2173,7 +2173,7 @@ export default function Home() {
                 )}
 
               </span>
-            </p>
+            </div>
 
             <button
               type="button"

@@ -259,15 +259,6 @@ function ListingGrainBox() {
   );
 }
 
-function ListingWhiteBox() {
-  return (
-    <div
-      className="fourth-section__listing-slot-box fourth-section__listing-white-box"
-      aria-hidden
-    />
-  );
-}
-
 type FourthSectionProps = {
   scrollReveal?: boolean;
   className?: string;
@@ -414,7 +405,7 @@ export const FourthSection = forwardRef(function FourthSection(
         ) : null}
 
         <div className="fourth-section__listings-block">
-          {main2Listings ? <ListingWhiteBox /> : null}
+          {main2Listings ? <ListingGrainBox /> : null}
           <p className="fourth-section__category">By distance</p>
           <div
             className="fourth-section__listings-scroll fourth-section__listings-scroll--row"
@@ -445,7 +436,10 @@ export const FourthSection = forwardRef(function FourthSection(
         </div>
       </div>
 
-      <div className="fourth-section__listings-block fourth-section-reveal">
+      <div
+        id="main2-tab-spaces"
+        className="fourth-section__listings-block fourth-section-reveal main2-tab-target"
+      >
         <p className="fourth-section__category">By space</p>
         <div
           className="fourth-section__listings-scroll fourth-section__listings-scroll--row"
@@ -475,7 +469,10 @@ export const FourthSection = forwardRef(function FourthSection(
         </div>
       </div>
 
-      <div className="fourth-section__listings-block fourth-section-reveal">
+      <div
+        id="main2-tab-people"
+        className="fourth-section__listings-block fourth-section-reveal main2-tab-target"
+      >
         {main2Listings ? <ListingGrainBox /> : null}
         <p className="fourth-section__category">By profession</p>
         <div
@@ -506,7 +503,10 @@ export const FourthSection = forwardRef(function FourthSection(
         </div>
       </div>
 
-      <div className="fourth-section__listings-block fourth-section-reveal">
+      <div
+        id="main2-tab-actions"
+        className="fourth-section__listings-block fourth-section-reveal main2-tab-target"
+      >
         {main2Listings ? <ListingGrainBox /> : null}
         <p className="fourth-section__category">By action</p>
         <div
@@ -639,7 +639,11 @@ export const FourthSection = forwardRef(function FourthSection(
       </div>
       ) : null}
 
-      <div className="fourth-section__listings-block fourth-section-reveal">
+      <div
+        className={`fourth-section__listings-block fourth-section-reveal${
+          main2Listings ? " fourth-section__listings-block--audience" : ""
+        }`}
+      >
         {main2Listings ? <ListingGrainBox /> : null}
         <p className="fourth-section__category">By audience</p>
         <div
