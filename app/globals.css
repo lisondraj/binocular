@@ -1936,6 +1936,7 @@ a.fourth-section__btn {
   flex-direction: column;
   justify-content: flex-end;
   min-height: 0;
+  padding-bottom: 2.25em;
 }
 
 .fourth-section__listing-grain-box--profession .fourth-section__listings-scroll--row,
@@ -1948,8 +1949,7 @@ a.fourth-section__btn {
 
 .fourth-section__listing-grain-box--profession .fourth-section__listings--row,
 .fourth-section__listing-grain-box--audience .fourth-section__listings--row {
-  padding: 0 calc(50vw - 50% + 1.5em) var(--main2-listings-inset-x, 1.15em)
-    var(--main2-listings-inset-x, 1.15em);
+  padding: 0 calc(50vw - 50% + 1.5em) 0.65em var(--main2-listings-inset-x, 1.15em);
 }
 
 .mobile-view--main2
