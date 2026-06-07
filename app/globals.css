@@ -2794,7 +2794,7 @@ a.fourth-section__btn {
   transform: none;
 }
 
-/* /main2 — shared inset + corner radius for nav and hero grain box. */
+/* /main2 — hero inset vars; fixed nav aligns to grain box top-right (outside the box). */
 .mobile-view--main2 {
   --main2-hero-grey: #2a2a2a;
   --main2-chrome-hero: #ffffff;
@@ -2807,9 +2807,6 @@ a.fourth-section__btn {
   --main2-hero-inset-x: 1.15em;
   --main2-hero-inset-y: 0.85em;
   --main2-hero-radius: 0.75em;
-  --main2-nav-inset-x: 1.15em;
-  --main2-nav-inset-y: 1.15em;
-  --main2-nav-inset: var(--main2-nav-inset-x);
   --main2-nav-button-size: 3.45em;
   --main2-nav-icon-size: 1.62em;
   --main2-nav-height: var(--main2-nav-button-size);
@@ -2817,18 +2814,18 @@ a.fourth-section__btn {
   --main2-section-two-gap: 0.12em;
   --main2-section-two-bottom: 0.45em;
   --main2-section-two-top: calc(
-    var(--main2-nav-inset-y) + var(--main2-nav-height) + var(--main2-section-two-gap)
+    var(--main2-hero-inset-y) + var(--main2-nav-height) + var(--main2-section-two-gap)
   );
 }
 
 .main2-nav-anchor {
   position: fixed;
-  top: calc(var(--main2-nav-inset-y) + env(safe-area-inset-top, 0px));
+  top: calc(var(--main2-hero-inset-y) + env(safe-area-inset-top, 0px));
   bottom: auto;
-  right: var(--main2-nav-inset-x);
+  right: var(--main2-hero-inset-x);
   left: auto;
   width: auto;
-  max-width: calc(var(--ipad-width) - (2 * var(--main2-nav-inset-x)));
+  max-width: calc(var(--ipad-width) - (2 * var(--main2-hero-inset-x)));
   margin-left: auto;
   margin-right: auto;
   z-index: 10;
@@ -2915,17 +2912,17 @@ a.fourth-section__btn {
 }
 
 .main2-nav-anchor.is-menu-open {
-  top: calc(var(--main2-nav-inset-y) + env(safe-area-inset-top, 0px));
+  top: calc(var(--main2-hero-inset-y) + env(safe-area-inset-top, 0px));
   bottom: auto;
-  right: var(--main2-nav-inset-x);
-  left: var(--main2-nav-inset-x);
+  right: var(--main2-hero-inset-x);
+  left: var(--main2-hero-inset-x);
   width: auto;
   flex-direction: column;
   align-items: stretch;
   gap: 0;
   border-radius: max(
     0.3em,
-    calc(var(--main2-hero-radius) - (var(--main2-nav-inset) * 0.5))
+    calc(var(--main2-hero-radius) - (var(--main2-hero-inset-x) * 0.5))
   );
   background: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(1.75em) saturate(1.15);
