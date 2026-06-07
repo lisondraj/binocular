@@ -3231,6 +3231,7 @@ a.fourth-section__btn {
   --main2-hero-extra-height: 3.75em;
   --main2-hero-pad-x: 1.4em;
   --main2-listings-inset-x: 1.15em;
+  --main2-listings-section-pad: 1.15em;
   --main2-category-grain-min-height: calc(
     100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)
   );
