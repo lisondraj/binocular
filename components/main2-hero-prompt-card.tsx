@@ -1,3 +1,7 @@
+"use client";
+
+import { useEffect, useRef, useState } from "react";
+
 const MAIN2_NAV_PROMPT_INVITE = "Ask about spaces, people, or actions…";
 
 const upArrow = (
@@ -17,10 +21,22 @@ const upArrow = (
 
 type Main2HeroPromptCardProps = {
   className?: string;
+  focusWhenOpen?: boolean;
 };
 
 /** /main2 — white AI prompt card (nav search). */
-export function Main2HeroPromptCard({ className = "" }: Main2HeroPromptCardProps) {
+export function Main2HeroPromptCard({
+  className = "",
+  focusWhenOpen = false,
+}: Main2HeroPromptCardProps) {
+  const [value, setValue] = useState("");
+  const inputRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    if (!focusWhenOpen) return;
+    inputRef.current?.focus();
+  }, [focusWhenOpen]);
+
   return (
     <div
       className={`hero-prompt-card-shell main2-hero-prompt-card-shell main2-nav-prompt-card-shell is-visible${
@@ -28,9 +44,15 @@ export function Main2HeroPromptCard({ className = "" }: Main2HeroPromptCardProps
       }`}
     >
       <div className="hero-prompt-card main2-hero-prompt-card main2-nav-prompt-card">
-        <div className="hero-prompt-text main2-nav-prompt-card__text">
-          <span className="main2-nav-prompt-card__invite">{MAIN2_NAV_PROMPT_INVITE}</span>
-        </div>
+        <textarea
+          ref={inputRef}
+          className="hero-prompt-text main2-nav-prompt-card__input"
+          placeholder={MAIN2_NAV_PROMPT_INVITE}
+          value={value}
+          rows={3}
+          aria-label="AI search"
+          onChange={(event) => setValue(event.target.value)}
+        />
 
         <button
           type="button"

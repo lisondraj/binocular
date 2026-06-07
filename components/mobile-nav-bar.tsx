@@ -160,7 +160,7 @@ export function MobileNavBar({
         >
           <div className="main2-nav-search__inner">
             <div className="hero-prompt-wrap main2-nav-search__wrap">
-              <Main2HeroPromptCard />
+              <Main2HeroPromptCard focusWhenOpen={searchOpen} />
             </div>
           </div>
         </div>
