@@ -248,18 +248,97 @@ function FourthSectionListingCard({
   );
 }
 
-function ListingGrainBox({ label }: { label?: string }) {
+const MAIN2_PROFESSION_CAROUSEL_LABELS = [
+  "Book a doctor",
+  "Book a chef",
+  "Book a picker",
+  "Book a housekeeper",
+  "Book a barista",
+] as const;
+
+function ListingProfessionCarousel() {
+  const [index, setIndex] = useState(0);
+  const [transitionEnabled, setTransitionEnabled] = useState(true);
+  const trackRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      setIndex((current) => current + 1);
+    }, 1100);
+
+    return () => window.clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    if (index !== MAIN2_PROFESSION_CAROUSEL_LABELS.length) return;
+
+    const track = trackRef.current;
+    if (!track) return;
+
+    const onEnd = (event: TransitionEvent) => {
+      if (event.propertyName !== "transform") return;
+      setTransitionEnabled(false);
+      setIndex(0);
+    };
+
+    track.addEventListener("transitionend", onEnd);
+    return () => track.removeEventListener("transitionend", onEnd);
+  }, [index]);
+
+  useEffect(() => {
+    if (transitionEnabled || index !== 0) return;
+
+    const frame = window.requestAnimationFrame(() => {
+      setTransitionEnabled(true);
+    });
+
+    return () => window.cancelAnimationFrame(frame);
+  }, [transitionEnabled, index]);
+
+  const slides = [
+    ...MAIN2_PROFESSION_CAROUSEL_LABELS,
+    MAIN2_PROFESSION_CAROUSEL_LABELS[0],
+  ];
+
+  return (
+    <div
+      className="fourth-section__listing-grain-box__carousel"
+      aria-live="polite"
+      aria-atomic="true"
+    >
+      <div
+        ref={trackRef}
+        className="fourth-section__listing-grain-box__carousel-track"
+        style={{
+          transform: `translate3d(0, -${index * 100}%, 0)`,
+          transition: transitionEnabled
+            ? "transform 0.38s cubic-bezier(0.33, 1, 0.68, 1)"
+            : "none",
+        }}
+      >
+        {slides.map((label, slideIndex) => (
+          <p
+            key={`${label}-${slideIndex}`}
+            className="fourth-section__listing-grain-box__carousel-item"
+          >
+            {label}
+          </p>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function ListingGrainBox({ professionCarousel = false }: { professionCarousel?: boolean }) {
   return (
     <div
       className={`fourth-section__listing-slot-box fourth-section__listing-grain-box main2-grain-box${
-        label ? " fourth-section__listing-grain-box--labeled" : ""
+        professionCarousel ? " fourth-section__listing-grain-box--labeled" : ""
       }`}
-      aria-hidden={label ? undefined : true}
+      aria-hidden={professionCarousel ? undefined : true}
     >
       <div className="main2-grain-surface main2-hero-box__grain" aria-hidden />
-      {label ? (
-        <p className="fourth-section__listing-grain-box__label">{label}</p>
-      ) : null}
+      {professionCarousel ? <ListingProfessionCarousel /> : null}
     </div>
   );
 }
@@ -487,7 +566,7 @@ export const FourthSection = forwardRef(function FourthSection(
         id="main2-tab-people"
         className="fourth-section__listings-block fourth-section-reveal main2-tab-target"
       >
-        {main2Listings ? <ListingGrainBox label="Book a doctor" /> : null}
+        {main2Listings ? <ListingGrainBox professionCarousel /> : null}
         <p className="fourth-section__category">By profession</p>
         <div
           className="fourth-section__listings-scroll fourth-section__listings-scroll--row"
