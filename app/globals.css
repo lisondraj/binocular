@@ -24,7 +24,7 @@ body {
 /* /main2 — match status-bar / overscroll chrome to hero grain (not white). */
 html:has(.mobile-view--main2:not(.mobile-view--main2-past-hero)),
 html:has(.mobile-view--main2:not(.mobile-view--main2-past-hero)) body {
-  background-color: #2a2a2a;
+  background-color: #3a3a3a;
 }
 
 h1,
@@ -2999,7 +2999,7 @@ a.fourth-section__btn {
   border-radius: 0;
   overflow: visible;
   isolation: isolate;
-  padding: 3.35em 1.4em 0.85em;
+  padding: 2.5em 1.4em 1.1em;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -3080,9 +3080,10 @@ a.fourth-section__btn {
   z-index: 2;
   display: flex;
   flex-direction: column;
-  gap: 1.2em;
+  gap: 1.35em;
   width: 100%;
   flex-shrink: 0;
+  transform: translateY(-1.65em);
 }
 
 .main2-hero-prompt-slot {
@@ -3108,27 +3109,32 @@ a.fourth-section__btn {
 .main2-hero-intro {
   position: relative;
   z-index: 1;
-  gap: 1em;
-  margin-top: -1.15em;
+  gap: 1.1em;
+  margin-top: 0;
+}
+
+.mobile-view--main2 .main2-hero-intro.hero-intro-content {
+  align-items: flex-start;
 }
 
 .mobile-view--main2 .main2-hero-box .hero-title {
-  justify-content: center;
-  text-align: center;
-  font-size: 0.92em;
+  justify-content: flex-start;
+  text-align: left;
+  font-size: 1.08em;
   text-transform: uppercase;
   letter-spacing: 0.42em;
 }
 
 .mobile-view--main2 .main2-hero-box .hero-description {
-  align-items: center;
-  text-align: center;
-  margin-top: -0.4em;
+  align-items: flex-start;
+  text-align: left;
+  margin-top: -0.15em;
+  font-size: clamp(1.92em, 6vw, 2.35em);
 }
 
 .mobile-view--main2 .main2-hero-box .main2-hero-actions {
-  align-self: center;
-  margin-top: 0.4em;
+  align-self: flex-start;
+  margin-top: 0.55em;
 }
 
 .mobile-view--main2 .main2-hero-box .hero-title-word,
@@ -3168,14 +3174,14 @@ a.fourth-section__btn {
 .main2-hero-btn {
   display: inline-flex;
   align-items: center;
-  gap: 0.4em;
-  padding: 0.58em 1em;
+  gap: 0.45em;
+  padding: 0.72em 1.2em;
   border: 0.0625em solid #ffffff;
   border-radius: 0.45em;
   background: none;
   color: #ffffff;
   font-family: var(--font-suisse), system-ui, sans-serif;
-  font-size: 0.84em;
+  font-size: 0.98em;
   font-weight: 300;
   cursor: pointer;
   text-decoration: none;
@@ -3199,7 +3205,9 @@ a.fourth-section__btn {
   font-size: calc(100vw / 24.375);
 }
 
-.mobile-view--main2 .main2-hero-prompt-card-shell {
+.mobile-view--main2 .main2-hero-box .main2-hero-prompt-card-shell {
+  width: 88%;
+  max-width: 88%;
   font-size: 0.84em;
 }
 
@@ -3209,6 +3217,11 @@ a.fourth-section__btn {
   box-shadow:
     0 0.18em 0.55em rgba(0, 0, 0, 0.1),
     0 0.04em 0.12em rgba(0, 0, 0, 0.04);
+}
+
+.mobile-view--main2 .main2-hero-box .main2-hero-prompt-card {
+  padding: 1.02em 0.95em 0.95em;
+  min-height: 4.65em;
 }
 
 .mobile-view--main2 .main2-hero-prompt-card .hero-prompt-text {
@@ -3230,9 +3243,9 @@ a.fourth-section__btn {
 }
 
 .mobile-view--main2 .main2-hero-prompt-card .hero-prompt-live .hero-prompt-chip {
-  background: var(--main2-hero-grey);
-  border-color: var(--main2-hero-grey);
-  color: #ffffff;
+  background: #ececec;
+  border-color: rgba(0, 0, 0, 0.14);
+  color: #4a4a4a;
 }
 
 .mobile-view--main2 .main2-hero-prompt-send {
@@ -3241,7 +3254,7 @@ a.fourth-section__btn {
 }
 
 .mobile-view--main2 .main2-hero-prompt-card .hero-prompt-live .hero-prompt-chip-icon {
-  color: #ffffff;
+  color: #5c5c5c;
   opacity: 1;
 }
 
