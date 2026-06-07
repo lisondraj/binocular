@@ -387,10 +387,24 @@ function ListingCategoryGrainBox({
   );
 }
 
-function ListingWhiteBox({ children }: { children?: ReactNode }) {
+function ListingWhiteBox({
+  children,
+  fullHeight = false,
+}: {
+  children?: ReactNode;
+  fullHeight?: boolean;
+}) {
   return (
-    <div className="fourth-section__listing-slot-box fourth-section__listing-white-box">
-      {children}
+    <div
+      className={`fourth-section__listing-slot-box fourth-section__listing-white-box${
+        fullHeight ? " fourth-section__listing-white-box--full-height" : ""
+      }`}
+    >
+      {fullHeight ? (
+        <div className="fourth-section__listing-white-box__content">{children}</div>
+      ) : (
+        children
+      )}
     </div>
   );
 }
@@ -551,10 +565,7 @@ export const FourthSection = forwardRef(function FourthSection(
         </div>
         ) : null}
 
-        <div
-          id="main2-tab-distance"
-          className="fourth-section__listings-block fourth-section-reveal main2-tab-target"
-        >
+        <div className="fourth-section__listings-block">
           {main2Listings ? (
             <ListingWhiteBox>
               <ListingWhiteBoxTagline />
@@ -704,37 +715,69 @@ export const FourthSection = forwardRef(function FourthSection(
 
       <div className="fourth-section__listings-block fourth-section-reveal">
         {main2Listings ? (
-          <ListingWhiteBox>
+          <ListingWhiteBox fullHeight>
             <ListingWhiteBoxTagline />
-          </ListingWhiteBox>
-        ) : null}
-        <p className="fourth-section__category">By action</p>
-        <div
-          className="fourth-section__listings-scroll fourth-section__listings-scroll--row"
-          aria-label="Listings by action"
-        >
-          <div className="fourth-section__listings fourth-section__listings--row">
-            {FOURTH_SECTION_BY_ACTION.map((listing) => (
+            <div className="fourth-section__listing-white-box__listings">
+              <p className="fourth-section__category">By action</p>
               <div
-                key={`fourth-action-${listing.title}`}
-                className="fourth-section-listing-card-wrap fourth-section-listing-card-wrap--space"
+                className="fourth-section__listings-scroll fourth-section__listings-scroll--row"
+                aria-label="Listings by action"
               >
-                <FourthSectionListingCard
-                  className="fourth-section-listing-card--space"
-                  image={listing.image}
-                  alt={listing.alt}
-                  price={listing.pricePerHour}
-                  title={listing.title}
-                  subtitle={listing.subtitle}
-                  hosts={listing.hosts}
-                  rating={listing.rating}
-                  reviewCount={listing.reviewCount}
-                  main2Listings={main2Listings}
-                />
+                <div className="fourth-section__listings fourth-section__listings--row">
+                  {FOURTH_SECTION_BY_ACTION.map((listing) => (
+                    <div
+                      key={`fourth-action-${listing.title}`}
+                      className="fourth-section-listing-card-wrap fourth-section-listing-card-wrap--space"
+                    >
+                      <FourthSectionListingCard
+                        className="fourth-section-listing-card--space"
+                        image={listing.image}
+                        alt={listing.alt}
+                        price={listing.pricePerHour}
+                        title={listing.title}
+                        subtitle={listing.subtitle}
+                        hosts={listing.hosts}
+                        rating={listing.rating}
+                        reviewCount={listing.reviewCount}
+                        main2Listings={main2Listings}
+                      />
+                    </div>
+                  ))}
+                </div>
               </div>
-            ))}
-          </div>
-        </div>
+            </div>
+          </ListingWhiteBox>
+        ) : (
+          <>
+            <p className="fourth-section__category">By action</p>
+            <div
+              className="fourth-section__listings-scroll fourth-section__listings-scroll--row"
+              aria-label="Listings by action"
+            >
+              <div className="fourth-section__listings fourth-section__listings--row">
+                {FOURTH_SECTION_BY_ACTION.map((listing) => (
+                  <div
+                    key={`fourth-action-${listing.title}`}
+                    className="fourth-section-listing-card-wrap fourth-section-listing-card-wrap--space"
+                  >
+                    <FourthSectionListingCard
+                      className="fourth-section-listing-card--space"
+                      image={listing.image}
+                      alt={listing.alt}
+                      price={listing.pricePerHour}
+                      title={listing.title}
+                      subtitle={listing.subtitle}
+                      hosts={listing.hosts}
+                      rating={listing.rating}
+                      reviewCount={listing.reviewCount}
+                      main2Listings={main2Listings}
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </>
+        )}
       </div>
 
       {!main2Listings ? (
