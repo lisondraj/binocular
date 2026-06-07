@@ -1800,7 +1800,7 @@ a.fourth-section__btn {
   margin-top: 0;
   margin-bottom: var(--main2-grain-box-gap-y, 0.65em);
   background: #ffffff;
-  border: 0.0625em solid rgba(0, 0, 0, 0.08);
+  border: none;
   box-shadow: none;
 }
 
