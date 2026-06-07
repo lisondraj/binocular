@@ -1816,8 +1816,22 @@ a.fourth-section__btn {
 
 .mobile-view--main2 #main2-tab-people {
   margin-top: 0;
-  padding-top: 1.15em;
+  padding-top: var(--main2-listings-section-pad);
   box-sizing: border-box;
+}
+
+.mobile-view--main2
+  .fourth-section--main2-continuum
+  .fourth-section__listings-block:has(+ #main2-tab-audience) {
+  padding-bottom: var(--main2-listings-section-pad);
+  box-sizing: border-box;
+}
+
+.mobile-view--main2
+  .fourth-section--main2-continuum
+  .fourth-section__listings-block:has(+ #main2-tab-audience)
+  + #main2-tab-audience {
+  margin-top: 0;
 }
 
 .fourth-section--main2-continuum .fourth-section__listing-grain-box--profession,
@@ -2035,6 +2049,8 @@ a.fourth-section__btn {
 }
 
 .fourth-section--main2-continuum .fourth-section__listing-white-box {
+  display: flex;
+  align-items: center;
   width: 100%;
   margin-left: 0;
   margin-right: 0;
@@ -2043,6 +2059,17 @@ a.fourth-section__btn {
   background: #ffffff;
   border: none;
   box-shadow: none;
+}
+
+.mobile-view--main2 .fourth-section__distance-intro.hero-description {
+  align-items: flex-start;
+  margin: 0;
+  padding: 0 var(--main2-hero-pad-x);
+  box-sizing: border-box;
+  font-size: clamp(1.92em, 6vw, 2.35em);
+  font-weight: 300;
+  line-height: 1.18;
+  color: #000000;
 }
 
 .fourth-section__category {

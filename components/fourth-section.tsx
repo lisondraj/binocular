@@ -387,12 +387,11 @@ function ListingCategoryGrainBox({
   );
 }
 
-function ListingWhiteBox() {
+function ListingWhiteBox({ children }: { children?: ReactNode }) {
   return (
-    <div
-      className="fourth-section__listing-slot-box fourth-section__listing-white-box"
-      aria-hidden
-    />
+    <div className="fourth-section__listing-slot-box fourth-section__listing-white-box">
+      {children}
+    </div>
   );
 }
 
@@ -542,7 +541,14 @@ export const FourthSection = forwardRef(function FourthSection(
         ) : null}
 
         <div className="fourth-section__listings-block">
-          {main2Listings ? <ListingWhiteBox /> : null}
+          {main2Listings ? (
+            <ListingWhiteBox>
+              <p className="hero-description fourth-section__distance-intro">
+                <span className="hero-description__line">We deliver</span>
+                <span className="hero-description__line">real-world context.</span>
+              </p>
+            </ListingWhiteBox>
+          ) : null}
           <p className="fourth-section__category">By distance</p>
           <div
             className="fourth-section__listings-scroll fourth-section__listings-scroll--row"
