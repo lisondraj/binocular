@@ -25,9 +25,9 @@ export function MobileNavBar({
 }: MobileNavBarProps) {
   const isMain2PastHero = isMain2 && showLogo;
   const expanded =
-    staticNav || (isMain2 ? menuOpen && !isMain2PastHero : showLogo);
+    staticNav || (isMain2 ? menuOpen || isMain2PastHero : showLogo);
   const logoVisible =
-    staticNav || (isMain2 ? menuOpen && !isMain2PastHero : showLogo);
+    staticNav || (isMain2 ? menuOpen || isMain2PastHero : showLogo);
   const navVisible = staticNav || showNav;
   const logoClassName = `mobile-nav-logo mobile-nav-logo-link${
     logoVisible ? " is-visible" : ""
@@ -45,23 +45,21 @@ export function MobileNavBar({
         isMain2PastHero ? " mobile-nav--main2-past-hero" : ""
       }${navVisible ? " is-visible" : ""}${expanded ? " is-expanded" : ""}`}
     >
-      {!isMain2PastHero ? (
-        staticNav ? (
-          <Link href="/" className={logoClassName} aria-hidden={!logoVisible}>
-            {isMain2 ? "BINOCULAR" : "Binocular"}
-          </Link>
-        ) : (
-          <button
-            type="button"
-            className={logoClassName}
-            aria-hidden={!logoVisible}
-            aria-label="Back to top"
-            onClick={scrollToTop}
-          >
-            {isMain2 ? "BINOCULAR" : "Binocular"}
-          </button>
-        )
-      ) : null}
+      {staticNav ? (
+        <Link href="/" className={logoClassName} aria-hidden={!logoVisible}>
+          {isMain2 ? "BINOCULAR" : "Binocular"}
+        </Link>
+      ) : (
+        <button
+          type="button"
+          className={logoClassName}
+          aria-hidden={!logoVisible}
+          aria-label="Back to top"
+          onClick={scrollToTop}
+        >
+          {isMain2 ? "BINOCULAR" : "Binocular"}
+        </button>
+      )}
 
       <button
         type="button"
