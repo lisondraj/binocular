@@ -1299,7 +1299,7 @@ export function HomePage({
     }
 
     const apply = () => {
-      meta!.content = showLogo ? "#ffffff" : "#3a3a3a";
+      meta!.content = showLogo ? "#ffffff" : "#4a4a4a";
     };
     apply();
 
