@@ -257,7 +257,15 @@ const MAIN2_PROFESSION_CAROUSEL_ITEMS = [
   "barista",
 ] as const;
 
-function professionCarouselOpacity(distance: number) {
+const MAIN2_AUDIENCE_CAROUSEL_ITEMS = [
+  "robotics teams",
+  "ML researchers",
+  "hardware startups",
+  "university labs",
+  "foundation models",
+] as const;
+
+function grainCarouselOpacity(distance: number) {
   const magnitude = Math.abs(distance);
   if (magnitude === 0) return 1;
   if (magnitude === 1) return 0.52;
@@ -265,21 +273,24 @@ function professionCarouselOpacity(distance: number) {
   return 0;
 }
 
-function ListingProfessionCarousel() {
-  const professionCount = MAIN2_PROFESSION_CAROUSEL_ITEMS.length;
-  const loopStart = professionCount;
-  const loopEnd = professionCount * 2;
-  const extendedItems = [
-    ...MAIN2_PROFESSION_CAROUSEL_ITEMS,
-    ...MAIN2_PROFESSION_CAROUSEL_ITEMS,
-    ...MAIN2_PROFESSION_CAROUSEL_ITEMS,
-  ];
+function ListingGrainCarousel({
+  prefix,
+  items,
+  slotKey,
+}: {
+  prefix: string;
+  items: readonly string[];
+  slotKey: string;
+}) {
+  const itemCount = items.length;
+  const loopStart = itemCount;
+  const loopEnd = itemCount * 2;
+  const extendedItems = [...items, ...items, ...items];
 
   const [position, setPosition] = useState<number>(loopStart);
   const [instantReset, setInstantReset] = useState(false);
   const trackRef = useRef<HTMLDivElement>(null);
-  const activeProfession =
-    MAIN2_PROFESSION_CAROUSEL_ITEMS[position % professionCount];
+  const activeItem = items[position % itemCount];
 
   useEffect(() => {
     const timer = window.setInterval(() => {
@@ -320,9 +331,9 @@ function ListingProfessionCarousel() {
       className="fourth-section__listing-grain-box__carousel"
       aria-live="polite"
       aria-atomic="true"
-      aria-label={`Book a ${activeProfession}`}
+      aria-label={`${prefix} ${activeItem}`}
     >
-      <span className="fourth-section__listing-grain-box__carousel-prefix">Book a</span>
+      <span className="fourth-section__listing-grain-box__carousel-prefix">{prefix}</span>
       <span className="fourth-section__listing-grain-box__carousel-window">
         <span
           ref={trackRef}
@@ -333,18 +344,18 @@ function ListingProfessionCarousel() {
             transform: `translate3d(0, calc((var(--profession-carousel-radius) - ${position}) * var(--profession-carousel-line)), 0)`,
           }}
         >
-          {extendedItems.map((profession, itemIndex) => {
+          {extendedItems.map((item, itemIndex) => {
             const distance = itemIndex - position;
-            const opacity = professionCarouselOpacity(distance);
+            const opacity = grainCarouselOpacity(distance);
 
             return (
               <span
-                key={`profession-slot-${itemIndex}`}
+                key={`${slotKey}-slot-${itemIndex}`}
                 className="fourth-section__listing-grain-box__carousel-item"
                 style={{ opacity }}
                 aria-hidden={distance !== 0}
               >
-                {profession}
+                {item}
               </span>
             );
           })}
@@ -601,7 +612,13 @@ export const FourthSection = forwardRef(function FourthSection(
           {main2Listings ? (
             <ListingCategoryGrainBox
               variant="profession"
-              carousel={<ListingProfessionCarousel />}
+              carousel={
+                <ListingGrainCarousel
+                  prefix="Book a"
+                  items={MAIN2_PROFESSION_CAROUSEL_ITEMS}
+                  slotKey="profession"
+                />
+              }
             >
               <div
                 className="fourth-section__listings-scroll fourth-section__listings-scroll--row"
@@ -805,7 +822,16 @@ export const FourthSection = forwardRef(function FourthSection(
         }`}
       >
         {main2Listings ? (
-          <ListingCategoryGrainBox variant="audience">
+          <ListingCategoryGrainBox
+            variant="audience"
+            carousel={
+              <ListingGrainCarousel
+                prefix="For"
+                items={MAIN2_AUDIENCE_CAROUSEL_ITEMS}
+                slotKey="audience"
+              />
+            }
+          >
             <div
               className="fourth-section__listings-scroll fourth-section__listings-scroll--row"
               aria-label="Listings by audience"
