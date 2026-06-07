@@ -250,9 +250,21 @@ function FourthSectionListingCard({
 
 function ListingGrainBox() {
   return (
-    <div className="fourth-section__listing-grain-box main2-grain-box" aria-hidden>
+    <div
+      className="fourth-section__listing-slot-box fourth-section__listing-grain-box main2-grain-box"
+      aria-hidden
+    >
       <div className="main2-grain-surface main2-hero-box__grain" />
     </div>
+  );
+}
+
+function ListingWhiteBox() {
+  return (
+    <div
+      className="fourth-section__listing-slot-box fourth-section__listing-white-box"
+      aria-hidden
+    />
   );
 }
 
@@ -342,6 +354,7 @@ export const FourthSection = forwardRef(function FourthSection(
       ) : null}
       <div className="fourth-section__inner">
       <div className="fourth-section__listings-anchor fourth-section-reveal">
+        {!main2Listings ? (
         <div className="fourth-section__listings-toolbar">
           <button
             type="button"
@@ -398,6 +411,7 @@ export const FourthSection = forwardRef(function FourthSection(
             </div>
           ) : null}
         </div>
+        ) : null}
 
         <div className="fourth-section__listings-block">
           <p className="fourth-section__category">By distance</p>
@@ -461,6 +475,7 @@ export const FourthSection = forwardRef(function FourthSection(
       </div>
 
       <div className="fourth-section__listings-block fourth-section-reveal">
+        {main2Listings ? <ListingWhiteBox /> : null}
         <p className="fourth-section__category">By price</p>
         <div
           className="fourth-section__listings-scroll fourth-section__listings-scroll--row"

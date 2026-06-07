@@ -208,6 +208,10 @@ h6 {
   flex-shrink: 0;
 }
 
+.wordmark-period {
+  margin-left: -0.14em;
+}
+
 /* Hero entrance — fade in + hover up for nav, copy, buttons, and AI box. */
 .hero-intro-fade {
   opacity: 0;
@@ -1396,8 +1400,12 @@ h6 {
   align-items: stretch;
 }
 
+.mobile-view--main2 .fourth-section--main2-continuum .fourth-section__listings-anchor {
+  padding-top: 1.85em;
+}
+
 .mobile-view--main2 .fourth-section--main2-continuum .fourth-section__listings-toolbar {
-  padding: 1.85em 1.15em 0.5em;
+  padding: 0 1.15em 0.5em;
 }
 
 .mobile-view--main2 .fourth-section--main2-continuum .fourth-section__category {
@@ -1480,8 +1488,12 @@ h6 {
   align-items: stretch;
 }
 
+.home-page .fourth-section--main2-continuum .fourth-section__listings-anchor {
+  padding-top: 1.85em;
+}
+
 .home-page .fourth-section--main2-continuum .fourth-section__listings-toolbar {
-  padding: 1.85em 1.15em 0.5em;
+  padding: 0 1.15em 0.5em;
 }
 
 .home-page .fourth-section--main2-continuum .fourth-section__category {
@@ -1747,21 +1759,28 @@ a.fourth-section__btn {
   margin-top: 1.35em;
 }
 
-.fourth-section__listing-grain-box {
+.fourth-section__listing-slot-box {
   position: relative;
   box-sizing: border-box;
   width: 100%;
   aspect-ratio: 1 / 1;
   border-radius: var(--main2-hero-radius, 0.75em);
-  overflow: hidden;
-  isolation: isolate;
   margin: 0 0 0.85em;
 }
 
-.fourth-section--main2-continuum .fourth-section__listing-grain-box {
+.fourth-section--main2-continuum .fourth-section__listing-slot-box {
   width: calc(100% - 2.3em);
   margin-left: 1.15em;
   margin-right: 1.15em;
+}
+
+.fourth-section__listing-grain-box {
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.fourth-section__listing-white-box {
+  background: #ffffff;
 }
 
 .fourth-section__category {
@@ -2912,7 +2931,6 @@ a.fourth-section__btn {
   --main2-nav-button-size: 3.45em;
   --main2-nav-icon-size: 1.62em;
   --main2-nav-height: var(--main2-nav-button-size);
-  --main2-hero-lift: 3.5em;
   --main2-section-two-gap: 0.12em;
   --main2-section-two-bottom: 0.45em;
   --main2-section-two-top: calc(
@@ -3252,31 +3270,15 @@ a.fourth-section__btn {
   pointer-events: auto;
 }
 
-.main2-hero-deck {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  border-radius: inherit;
-  pointer-events: none;
-  overflow: hidden;
-  contain: paint;
-  font-size: 0.9em;
-  transform: translateY(calc(-1 * var(--main2-hero-lift)));
-}
-
-.main2-hero-deck .listing-card-avatar {
-  filter: grayscale(100%);
-}
-
 .main2-hero-content {
   position: relative;
   z-index: 2;
   display: flex;
   flex-direction: column;
+  justify-content: center;
   gap: 1.35em;
   width: 100%;
-  flex-shrink: 0;
-  transform: translateY(calc(-1 * var(--main2-hero-lift)));
+  flex: 0 0 auto;
 }
 
 .main2-hero-prompt-slot {
@@ -3359,6 +3361,7 @@ a.fourth-section__btn {
 .mobile-view--main2 .main2-hero-box .main2-hero-prompt-slot {
   padding-bottom: 0;
   margin-bottom: 0;
+  margin-top: 0;
 }
 
 .main2-hero-actions {

@@ -9,6 +9,7 @@ import {
 } from "react";
 import Link from "next/link";
 import { createPortal } from "react-dom";
+import { BinocularWordmark } from "@/components/binocular-wordmark";
 import { FourthSection } from "@/components/fourth-section";
 import { MobileNavBar } from "@/components/mobile-nav-bar";
 import { paintMain2GrainSurfaces } from "@/lib/main2-grain";
@@ -504,14 +505,16 @@ export function HomePage({
     timers.push(setTimeout(() => setSubmitPressed(false), 780));
     timers.push(setTimeout(() => setScrollUnlocked(true), 780));
 
-    heroDeck.forEach((_, i) => {
-      timers.push(
-        setTimeout(() => setRevealedImageCount(i + 1), 950 + i * 220),
-      );
-    });
+    if (!isMain2) {
+      heroDeck.forEach((_, i) => {
+        timers.push(
+          setTimeout(() => setRevealedImageCount(i + 1), 950 + i * 220),
+        );
+      });
+    }
 
     return () => timers.forEach(clearTimeout);
-  }, [promptPhase]);
+  }, [promptPhase, isMain2]);
 
   // After all listing cards: hold 2s, then fade others and expand Kitchen card.
   useEffect(() => {
@@ -1206,6 +1209,11 @@ export function HomePage({
 
   useEffect(() => {
     const onScroll = () => {
+      if (isMain2) {
+        setShowLogo(window.scrollY > 0);
+        return;
+      }
+
       // Fade in once the user scrolls roughly past the hero.
       setShowLogo(window.scrollY > window.innerHeight * 0.6);
     };
@@ -1213,7 +1221,7 @@ export function HomePage({
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+  }, [isMain2]);
 
   useEffect(() => {
     if (!isMain2 || !showLogo) return;
@@ -1710,7 +1718,7 @@ export function HomePage({
           style={{
             position: "relative",
             zIndex:
-              scrollUnlocked && revealedListingCount < 1 ? 3 : 1,
+              !isMain2 && scrollUnlocked && revealedListingCount < 1 ? 3 : 1,
             maxWidth: "var(--ipad-width)",
             margin: "0 auto",
             minHeight: "100vh",
@@ -1748,13 +1756,12 @@ export function HomePage({
                 className="main2-grain-surface main2-hero-box__grain"
                 aria-hidden
               />
-              <div aria-hidden className="hero-intro-images main2-hero-deck">
-                {renderHeroDeck()}
-              </div>
               <div className="main2-hero-content">
                 <div className="hero-intro-content main2-hero-intro">
                   <h1 className="hero-title">
-                    <span className="hero-title-word">Binocular.</span>
+                    <span className="hero-title-word">
+                      <BinocularWordmark />
+                    </span>
                   </h1>
                   <p className="hero-description">
                     <span className="hero-description__line">Book spaces for</span>
@@ -1826,7 +1833,9 @@ export function HomePage({
             style={{ fontSize: MOBILE_ROOT_FONT_SIZE }}
           >
             <div className="mobile-site-footer__box">
-              <p className="mobile-site-footer__wordmark">Binocular.</p>
+              <p className="mobile-site-footer__wordmark">
+                <BinocularWordmark />
+              </p>
             </div>
           </footer>
         ) : null}

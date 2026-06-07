@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { BinocularWordmark } from "@/components/binocular-wordmark";
 import { MOBILE_ROOT_FONT_SIZE } from "@/lib/mobile-layout";
 
 type MobileNavBarProps = {
@@ -47,7 +48,7 @@ export function MobileNavBar({
     >
       {staticNav ? (
         <Link href="/" className={logoClassName} aria-hidden={!logoVisible}>
-          {isMain2 ? "Binocular." : "Binocular"}
+          {isMain2 ? <BinocularWordmark /> : "Binocular"}
         </Link>
       ) : (
         <button
@@ -57,7 +58,7 @@ export function MobileNavBar({
           aria-label="Back to top"
           onClick={scrollToTop}
         >
-          {isMain2 ? "Binocular." : "Binocular"}
+          {isMain2 ? <BinocularWordmark /> : "Binocular"}
         </button>
       )}
 
