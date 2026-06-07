@@ -261,7 +261,7 @@ const upRightArrow = (
 );
 
 const HERO_PROMPT =
-  "Show me the 3 closest spaces with a dishwasher, stairs, and a dog. Budget $500.";
+  "Show me the 3 closest spaces with a dishwasher, stairs, and a dog. Budget $500";
 
 const MENTION_OPTIONS = [
   "Astra Robotics",
