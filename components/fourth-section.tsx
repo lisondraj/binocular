@@ -259,6 +259,15 @@ function ListingGrainBox() {
   );
 }
 
+function ListingWhiteBox() {
+  return (
+    <div
+      className="fourth-section__listing-slot-box fourth-section__listing-white-box"
+      aria-hidden
+    />
+  );
+}
+
 type FourthSectionProps = {
   scrollReveal?: boolean;
   className?: string;
@@ -405,7 +414,7 @@ export const FourthSection = forwardRef(function FourthSection(
         ) : null}
 
         <div className="fourth-section__listings-block">
-          {main2Listings ? <ListingGrainBox /> : null}
+          {main2Listings ? <ListingWhiteBox /> : null}
           <p className="fourth-section__category">By distance</p>
           <div
             className="fourth-section__listings-scroll fourth-section__listings-scroll--row"
