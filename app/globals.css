@@ -1087,7 +1087,7 @@ h6 {
 }
 
 .mobile-view--main2 .fourth-section--second.fourth-section--main2-continuum {
-  padding-top: var(--main2-grain-box-gap-y);
+  padding-top: 0;
 }
 
 /* /main2 — shared hero + listings grain continuum (single surface, no seam). */
@@ -1392,7 +1392,7 @@ h6 {
 /* /main2 — listings on white page below hero grain box. */
 .mobile-view--main2 .fourth-section--main2-continuum {
   --listing-card-radius: var(--main2-surface-radius);
-  padding: var(--main2-grain-box-gap-y) 0 2em;
+  padding: 0 0 2em;
   background-color: #ffffff;
 }
 
@@ -1778,9 +1778,10 @@ a.fourth-section__btn {
 }
 
 .fourth-section--main2-continuum .fourth-section__listing-slot-box {
-  width: calc(100% - (2 * var(--main2-grain-box-gutter, 0.5em)));
-  margin-left: var(--main2-grain-box-gutter, 0.5em);
-  margin-right: var(--main2-grain-box-gutter, 0.5em);
+  width: 100%;
+  margin-left: 0;
+  margin-right: 0;
+  border-radius: 0;
 }
 
 .fourth-section__listing-grain-box {
