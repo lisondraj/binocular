@@ -2505,10 +2505,11 @@ a.fourth-section__btn {
 }
 
 .mobile-view--main2 .mobile-site-footer--main2 .mobile-site-footer__main {
-  position: relative;
-  flex: 1 1 auto;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1.5em;
   width: 100%;
-  min-height: 0;
 }
 
 .mobile-view--main2 .mobile-site-footer--main2 .mobile-site-footer__brand {
