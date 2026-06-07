@@ -632,12 +632,13 @@ export const FourthSection = forwardRef(function FourthSection(
             </div>
           </ListingProfessionGrainBox>
         ) : null}
-        <p className="fourth-section__category">By profession</p>
         {!main2Listings ? (
-          <div
-            className="fourth-section__listings-scroll fourth-section__listings-scroll--row"
-            aria-label="Listings by profession"
-          >
+          <>
+            <p className="fourth-section__category">By profession</p>
+            <div
+              className="fourth-section__listings-scroll fourth-section__listings-scroll--row"
+              aria-label="Listings by profession"
+            >
             <div className="fourth-section__listings fourth-section__listings--row">
               {FOURTH_SECTION_BY_PROFESSION.map((listing) => (
                 <div
@@ -660,6 +661,7 @@ export const FourthSection = forwardRef(function FourthSection(
               ))}
             </div>
           </div>
+          </>
         ) : null}
       </div>
 
