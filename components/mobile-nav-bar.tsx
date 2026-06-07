@@ -116,9 +116,9 @@ export function MobileNavBar({
               key={tab.id}
               type="button"
               role="tab"
-              aria-selected={activeTab === tab.id}
+              aria-selected={searchOpen && activeTab === tab.id}
               className={`main2-nav-tabs__tab${
-                activeTab === tab.id ? " is-active" : ""
+                searchOpen && activeTab === tab.id ? " is-active" : ""
               }`}
               onClick={() => {
                 if (activeTab === tab.id) {
