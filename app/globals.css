@@ -1821,7 +1821,12 @@ a.fourth-section__btn {
 }
 
 .mobile-view--main2 #main2-tab-spaces {
-  padding-bottom: 2.35em;
+  padding-bottom: var(--main2-listings-section-pad);
+  box-sizing: border-box;
+}
+
+.mobile-view--main2 .fourth-section__listings-anchor + .fourth-section__listings-block {
+  padding-top: var(--main2-listings-section-pad);
   box-sizing: border-box;
 }
 
@@ -3300,7 +3305,8 @@ a.fourth-section__btn {
   --main2-hero-extra-height: 3.75em;
   --main2-hero-pad-x: 1.4em;
   --main2-listings-inset-x: 1.15em;
-  --main2-listings-section-pad: 1.15em;
+  --main2-listings-section-pad: 2.35em;
+  --main2-white-box-intro-pad-top: 2.85em;
   --main2-category-grain-min-height: calc(
     100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)
   );
