@@ -1087,7 +1087,7 @@ h6 {
 }
 
 .mobile-view--main2 .fourth-section--second.fourth-section--main2-continuum {
-  padding-top: var(--main2-grain-box-gutter);
+  padding-top: var(--main2-grain-box-gap-y);
 }
 
 /* /main2 — shared hero + listings grain continuum (single surface, no seam). */
@@ -1165,7 +1165,7 @@ h6 {
 .fourth-section--main2-continuum
   .fourth-section__listings-block
   + .fourth-section__listings-block {
-  margin-top: 0.65em;
+  margin-top: var(--main2-grain-box-gap-y);
 }
 
 .fourth-section--main2-continuum .fourth-section__outro {
@@ -1392,7 +1392,7 @@ h6 {
 /* /main2 — listings on white page below hero grain box. */
 .mobile-view--main2 .fourth-section--main2-continuum {
   --listing-card-radius: var(--main2-surface-radius);
-  padding: var(--main2-grain-box-gutter) 0 2em;
+  padding: var(--main2-grain-box-gap-y) 0 2em;
   background-color: #ffffff;
 }
 
@@ -1785,7 +1785,8 @@ a.fourth-section__btn {
 }
 
 .fourth-section--main2-continuum .fourth-section__listing-grain-box {
-  margin-bottom: var(--main2-grain-box-gutter, 0.5em);
+  margin-top: 0;
+  margin-bottom: var(--main2-grain-box-gap-y, 0.65em);
 }
 
 .fourth-section__category {
@@ -2969,7 +2970,8 @@ a.fourth-section__btn {
   --main2-hero-radius: 0.3em;
   --main2-surface-radius: 0.3em;
   --main2-grain-box-gutter: 0.5em;
-  --main2-hero-extra-height: 2.5em;
+  --main2-grain-box-gap-y: 0.65em;
+  --main2-hero-extra-height: 3.75em;
   --main2-hero-pad-x: 1.4em;
   --ui-btn-radius: 0.4em;
   --main2-nav-button-size: 3.45em;
