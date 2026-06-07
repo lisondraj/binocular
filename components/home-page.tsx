@@ -1798,7 +1798,7 @@ export function HomePage({
               <div className="main2-hero-content">
                 <div className="hero-intro-content main2-hero-intro">
                   <h1 className="hero-title">
-                    <span className="hero-title-word">BINOCULAR</span>
+                    <span className="hero-title-word">Binocular</span>
                   </h1>
                   <p className="hero-description">
                     <span className="hero-description__line">Book spaces for</span>

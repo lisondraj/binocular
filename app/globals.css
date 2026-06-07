@@ -187,7 +187,7 @@ h6 {
   }
 }
 
-/* Hero title — Inter, wide tracking, compact size (nav logo unchanged). */
+/* Hero title — Geist Mono wordmark. */
 .hero-title {
   display: flex;
   align-items: center;
@@ -195,10 +195,10 @@ h6 {
   line-height: 1;
   width: 100%;
   text-align: left;
-  font-family: var(--font-inter), system-ui, sans-serif;
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
   font-size: 1.15em;
   font-weight: 400;
-  letter-spacing: 0.22em;
+  letter-spacing: 0;
   text-transform: none;
 }
 
@@ -2820,11 +2820,11 @@ a.fourth-section__btn {
 }
 
 .mobile-nav-logo {
-  font-family: var(--font-suisse), system-ui, sans-serif;
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
   font-size: calc(2.25em * 12.5 / 24);
   line-height: 1;
   font-weight: 400;
-  letter-spacing: -0.02em;
+  letter-spacing: 0;
   color: #000000;
   opacity: 0;
   visibility: hidden;
@@ -2846,7 +2846,7 @@ a.fourth-section__btn {
   padding: 0;
   cursor: pointer;
   color: inherit;
-  font-family: var(--font-suisse), system-ui, sans-serif;
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
 }
 
 .mobile-nav-logo.is-visible {
@@ -2937,15 +2937,15 @@ a.fourth-section__btn {
   justify-content: flex-end;
 }
 
-/* /main2 nav logo — match hero BINOCULAR (Inter, caps, wide tracking). */
+/* /main2 nav logo — match hero Binocular (Geist Mono). */
 .mobile-nav--main2 .mobile-nav-logo,
 .mobile-nav--main2 .mobile-nav-logo-link {
-  font-family: var(--font-inter), system-ui, sans-serif;
-  font-size: 0.76em;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.42em;
-  margin-left: 0.35em;
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 0.92em;
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+  margin-left: 0;
 }
 
 .mobile-nav--main2 .mobile-nav-menu {
@@ -3296,9 +3296,11 @@ a.fourth-section__btn {
 .mobile-view--main2 .main2-hero-box .hero-title {
   justify-content: flex-start;
   text-align: left;
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
   font-size: 1.08em;
-  text-transform: uppercase;
-  letter-spacing: 0.42em;
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
 }
 
 .mobile-view--main2 .main2-hero-box .hero-description {

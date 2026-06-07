@@ -1840,11 +1840,6 @@ export default function Home() {
             font-family: var(--font-geist-mono), ui-monospace, monospace;
           }
 
-          .home-page .mobile-nav-logo,
-          .home-page .mobile-nav-logo-link {
-            text-transform: uppercase;
-          }
-
           .home-page .third-section .kitchen-expand-overlay.is-compacting {
             transform-origin: top center;
           }
@@ -2037,10 +2032,10 @@ export default function Home() {
             style={{
               fontSize: "2.5em",
               fontWeight: 400,
-              letterSpacing: "-0.02em",
+              letterSpacing: 0,
             }}
           >
-            <span className="hero-title-word">BINOCULAR</span>
+            <span className="hero-title-word">Binocular</span>
           </h1>
           <p
             className="hero-description"
