@@ -2787,23 +2787,26 @@ a.fourth-section__btn {
   --main2-hero-inset-x: 1.15em;
   --main2-hero-inset-y: 0.85em;
   --main2-hero-radius: 0.75em;
-  --main2-nav-inset: 0.9em;
-  --main2-nav-button-size: 3em;
+  --main2-nav-inset-x: 1.15em;
+  --main2-nav-inset-y: 1.15em;
+  --main2-nav-inset: var(--main2-nav-inset-x);
+  --main2-nav-button-size: 3.45em;
+  --main2-nav-icon-size: 1.62em;
   --main2-nav-height: var(--main2-nav-button-size);
   --main2-section-two-gap: 0.12em;
   --main2-section-two-bottom: 0.45em;
   --main2-section-two-top: calc(
-    var(--main2-nav-inset) + var(--main2-nav-height) + var(--main2-section-two-gap)
+    var(--main2-nav-inset-y) + var(--main2-nav-height) + var(--main2-section-two-gap)
   );
 }
 
 .main2-nav-anchor {
   position: fixed;
-  top: var(--main2-nav-inset);
-  right: var(--main2-nav-inset);
+  top: var(--main2-nav-inset-y);
+  right: var(--main2-nav-inset-x);
   left: auto;
   width: auto;
-  max-width: calc(var(--ipad-width) - (2 * var(--main2-nav-inset)));
+  max-width: calc(var(--ipad-width) - (2 * var(--main2-nav-inset-x)));
   margin-left: auto;
   margin-right: auto;
   z-index: 10;
@@ -2845,10 +2848,13 @@ a.fourth-section__btn {
   width: var(--main2-nav-button-size);
   height: var(--main2-nav-button-size);
   margin: 0;
+  padding: 0;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
+  box-sizing: border-box;
   background: transparent;
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
@@ -2862,11 +2868,17 @@ a.fourth-section__btn {
 }
 
 .mobile-nav--main2 .mobile-nav-menu svg {
-  width: 1.42em;
-  height: 1.42em;
+  width: var(--main2-nav-icon-size);
+  height: var(--main2-nav-icon-size);
+  display: block;
+  flex-shrink: 0;
 }
 
-/* /main2 past hero — same corner; frosted circle fades in. */
+/* /main2 — hero + past hero share one corner; circle only fades in after hero. */
+.mobile-view--main2-past-hero
+  .main2-nav-anchor
+  .mobile-nav--main2
+  .mobile-nav-menu,
 .mobile-view--main2-past-hero
   .main2-nav-anchor
   .mobile-nav--main2-past-hero
@@ -2881,8 +2893,9 @@ a.fourth-section__btn {
 }
 
 .main2-nav-anchor.is-menu-open {
-  left: var(--main2-nav-inset);
-  right: var(--main2-nav-inset);
+  top: var(--main2-nav-inset-y);
+  right: var(--main2-nav-inset-x);
+  left: var(--main2-nav-inset-x);
   width: auto;
   align-items: stretch;
   gap: 0;
@@ -2913,10 +2926,10 @@ a.fourth-section__btn {
 }
 
 .main2-nav-anchor.is-menu-open .mobile-nav-menu {
-  width: auto;
-  height: auto;
-  min-width: 1.8em;
-  min-height: 1.8em;
+  width: var(--main2-nav-icon-size);
+  height: var(--main2-nav-icon-size);
+  min-width: var(--main2-nav-icon-size);
+  min-height: var(--main2-nav-icon-size);
   border-radius: 0;
   background: transparent;
   backdrop-filter: none;
