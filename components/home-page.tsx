@@ -1754,7 +1754,7 @@ export function HomePage({
               <div className="main2-hero-content">
                 <div className="hero-intro-content main2-hero-intro">
                   <h1 className="hero-title">
-                    <span className="hero-title-word">Binocular</span>
+                    <span className="hero-title-word">Binocular.</span>
                   </h1>
                   <p className="hero-description">
                     <span className="hero-description__line">Book spaces for</span>
@@ -1826,7 +1826,7 @@ export function HomePage({
             style={{ fontSize: MOBILE_ROOT_FONT_SIZE }}
           >
             <div className="mobile-site-footer__box">
-              <p className="mobile-site-footer__wordmark">BINOCULAR</p>
+              <p className="mobile-site-footer__wordmark">Binocular.</p>
             </div>
           </footer>
         ) : null}

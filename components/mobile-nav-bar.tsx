@@ -47,7 +47,7 @@ export function MobileNavBar({
     >
       {staticNav ? (
         <Link href="/" className={logoClassName} aria-hidden={!logoVisible}>
-          Binocular
+          {isMain2 ? "Binocular." : "Binocular"}
         </Link>
       ) : (
         <button
@@ -57,7 +57,7 @@ export function MobileNavBar({
           aria-label="Back to top"
           onClick={scrollToTop}
         >
-          Binocular
+          {isMain2 ? "Binocular." : "Binocular"}
         </button>
       )}
 
