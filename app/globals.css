@@ -3356,9 +3356,9 @@ a.fourth-section__btn {
   --main2-listings-section-pad: 2.35em;
   --main2-white-box-intro-pad-top: 2.85em;
   --main2-white-box-intro-pad-top-action: 1.75em;
-  --main2-white-box-carousel-flex: 26%;
-  --main2-white-box-listings-flex: 74%;
-  --main2-white-box-listings-lift: 13.85em;
+  --main2-white-box-carousel-flex: 30%;
+  --main2-white-box-listings-flex: 70%;
+  --main2-white-box-listings-lift: 12.25em;
   --main2-category-grain-min-height: calc(
     100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)
   );
