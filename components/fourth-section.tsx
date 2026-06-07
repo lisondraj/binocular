@@ -258,11 +258,11 @@ const MAIN2_PROFESSION_CAROUSEL_ITEMS = [
 ] as const;
 
 const MAIN2_AUDIENCE_CAROUSEL_ITEMS = [
-  "robotics teams",
-  "ML researchers",
-  "hardware startups",
-  "university labs",
-  "foundation models",
+  "kitchens",
+  "warehouses",
+  "factory floors",
+  "retail aisles",
+  "homes",
 ] as const;
 
 function grainCarouselOpacity(distance: number) {
@@ -834,7 +834,7 @@ export const FourthSection = forwardRef(function FourthSection(
           >
             <div
               className="fourth-section__listings-scroll fourth-section__listings-scroll--row"
-              aria-label="Listings by audience"
+              aria-label="Listings by audiences"
             >
               <div className="fourth-section__listings fourth-section__listings--row">
                 {FOURTH_SECTION_BY_AUDIENCE.map((listing) => (
@@ -862,10 +862,10 @@ export const FourthSection = forwardRef(function FourthSection(
         ) : null}
         {!main2Listings ? (
           <>
-            <p className="fourth-section__category">By audience</p>
+            <p className="fourth-section__category">By audiences</p>
             <div
               className="fourth-section__listings-scroll fourth-section__listings-scroll--row"
-              aria-label="Listings by audience"
+              aria-label="Listings by audiences"
             >
               <div className="fourth-section__listings fourth-section__listings--row">
                 {FOURTH_SECTION_BY_AUDIENCE.map((listing) => (
