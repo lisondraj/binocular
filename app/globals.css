@@ -1853,6 +1853,14 @@ a.fourth-section__btn {
   min-height: 0;
 }
 
+.mobile-view--main2
+  .fourth-section__listing-grain-box--profession
+  .fourth-section__listing-grain-box__carousel-stage {
+  flex: 1 1 58%;
+  align-items: flex-end;
+  padding-bottom: 1.85em;
+}
+
 .fourth-section__listing-grain-box__carousel {
   display: flex;
   align-items: center;
@@ -1938,6 +1946,13 @@ a.fourth-section__btn {
   min-height: 0;
   margin-top: 0;
   padding-bottom: var(--main2-category-grain-listings-lift);
+}
+
+.mobile-view--main2
+  .fourth-section__listing-grain-box--profession
+  .fourth-section__listing-grain-box__listings {
+  flex: 1 1 42%;
+  padding-bottom: 6.25em;
 }
 
 .fourth-section__listing-grain-box--profession .fourth-section__listings-scroll--row,
