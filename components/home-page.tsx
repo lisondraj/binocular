@@ -1823,15 +1823,6 @@ export function HomePage({
         />
 
         {isMain2 ? (
-          <div className="main2-pre-footer-grain main2-grain-box" aria-hidden>
-            <div
-              className="main2-grain-surface main2-hero-box__grain"
-              aria-hidden
-            />
-          </div>
-        ) : null}
-
-        {isMain2 ? (
           <footer
             className="mobile-site-footer mobile-site-footer--main2"
             style={{ fontSize: MOBILE_ROOT_FONT_SIZE }}

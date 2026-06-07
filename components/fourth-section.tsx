@@ -354,25 +354,22 @@ function ListingProfessionCarousel() {
   );
 }
 
-function ListingGrainBox() {
+function ListingCategoryGrainBox({
+  children,
+  variant,
+  carousel,
+}: {
+  children: ReactNode;
+  variant: "profession" | "audience";
+  carousel?: ReactNode;
+}) {
   return (
     <div
-      className="fourth-section__listing-slot-box fourth-section__listing-grain-box main2-grain-box"
-      aria-hidden
+      className={`fourth-section__listing-slot-box fourth-section__listing-grain-box fourth-section__listing-grain-box--${variant} main2-grain-box`}
     >
       <div className="main2-grain-surface main2-hero-box__grain" aria-hidden />
-    </div>
-  );
-}
-
-function ListingProfessionGrainBox({ children }: { children: ReactNode }) {
-  return (
-    <div className="fourth-section__listing-slot-box fourth-section__listing-grain-box fourth-section__listing-grain-box--profession main2-grain-box">
-      <div className="main2-grain-surface main2-hero-box__grain" aria-hidden />
-      <div className="fourth-section__listing-grain-box__profession-content">
-        <div className="fourth-section__listing-grain-box__carousel-stage">
-          <ListingProfessionCarousel />
-        </div>
+      <div className="fourth-section__listing-grain-box__category-content">
+        <div className="fourth-section__listing-grain-box__carousel-stage">{carousel}</div>
         <div className="fourth-section__listing-grain-box__listings">{children}</div>
       </div>
     </div>
@@ -569,7 +566,10 @@ export const FourthSection = forwardRef(function FourthSection(
           className="fourth-section__listings-block fourth-section-reveal main2-tab-target"
         >
           {main2Listings ? (
-            <ListingProfessionGrainBox>
+            <ListingCategoryGrainBox
+              variant="profession"
+              carousel={<ListingProfessionCarousel />}
+            >
               <div
                 className="fourth-section__listings-scroll fourth-section__listings-scroll--row"
                 aria-label="Listings by profession"
@@ -596,7 +596,7 @@ export const FourthSection = forwardRef(function FourthSection(
                   ))}
                 </div>
               </div>
-            </ListingProfessionGrainBox>
+            </ListingCategoryGrainBox>
           ) : null}
           {!main2Listings ? (
             <>
@@ -804,34 +804,67 @@ export const FourthSection = forwardRef(function FourthSection(
           main2Listings ? " fourth-section__listings-block--audience" : ""
         }`}
       >
-        {main2Listings ? <ListingGrainBox /> : null}
-        <p className="fourth-section__category">By audience</p>
-        <div
-          className="fourth-section__listings-scroll fourth-section__listings-scroll--row"
-          aria-label="Listings by audience"
-        >
-          <div className="fourth-section__listings fourth-section__listings--row">
-            {FOURTH_SECTION_BY_AUDIENCE.map((listing) => (
-              <div
-                key={`fourth-audience-${listing.title}`}
-                className="fourth-section-listing-card-wrap fourth-section-listing-card-wrap--space"
-              >
-                <FourthSectionListingCard
-                  className="fourth-section-listing-card--space"
-                  image={listing.image}
-                  alt={listing.alt}
-                  price={listing.pricePerHour}
-                  title={listing.title}
-                  subtitle={listing.subtitle}
-                  hosts={listing.hosts}
-                  rating={listing.rating}
-                  reviewCount={listing.reviewCount}
-                  main2Listings={main2Listings}
-                />
+        {main2Listings ? (
+          <ListingCategoryGrainBox variant="audience">
+            <div
+              className="fourth-section__listings-scroll fourth-section__listings-scroll--row"
+              aria-label="Listings by audience"
+            >
+              <div className="fourth-section__listings fourth-section__listings--row">
+                {FOURTH_SECTION_BY_AUDIENCE.map((listing) => (
+                  <div
+                    key={`fourth-audience-${listing.title}`}
+                    className="fourth-section-listing-card-wrap fourth-section-listing-card-wrap--space"
+                  >
+                    <FourthSectionListingCard
+                      className="fourth-section-listing-card--space"
+                      image={listing.image}
+                      alt={listing.alt}
+                      price={listing.pricePerHour}
+                      title={listing.title}
+                      subtitle={listing.subtitle}
+                      hosts={listing.hosts}
+                      rating={listing.rating}
+                      reviewCount={listing.reviewCount}
+                      main2Listings={main2Listings}
+                    />
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
-        </div>
+            </div>
+          </ListingCategoryGrainBox>
+        ) : null}
+        {!main2Listings ? (
+          <>
+            <p className="fourth-section__category">By audience</p>
+            <div
+              className="fourth-section__listings-scroll fourth-section__listings-scroll--row"
+              aria-label="Listings by audience"
+            >
+              <div className="fourth-section__listings fourth-section__listings--row">
+                {FOURTH_SECTION_BY_AUDIENCE.map((listing) => (
+                  <div
+                    key={`fourth-audience-${listing.title}`}
+                    className="fourth-section-listing-card-wrap fourth-section-listing-card-wrap--space"
+                  >
+                    <FourthSectionListingCard
+                      className="fourth-section-listing-card--space"
+                      image={listing.image}
+                      alt={listing.alt}
+                      price={listing.pricePerHour}
+                      title={listing.title}
+                      subtitle={listing.subtitle}
+                      hosts={listing.hosts}
+                      rating={listing.rating}
+                      reviewCount={listing.reviewCount}
+                      main2Listings={main2Listings}
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </>
+        ) : null}
       </div>
 
       <div className="fourth-section__outro fourth-section-reveal">
