@@ -1168,6 +1168,13 @@ h6 {
   margin-top: var(--main2-grain-box-gap-y);
 }
 
+.mobile-view--main2
+  .fourth-section--main2-continuum
+  #main2-tab-spaces
+  + #main2-tab-people {
+  margin-top: 0;
+}
+
 .fourth-section--main2-continuum .fourth-section__outro {
   margin-top: 2.5em;
 }
@@ -1804,6 +1811,13 @@ a.fourth-section__btn {
   min-height: var(--main2-category-grain-min-height);
   display: flex;
   flex-direction: column;
+  box-shadow: none;
+}
+
+.mobile-view--main2 #main2-tab-people {
+  margin-top: 0;
+  padding-top: 1.15em;
+  box-sizing: border-box;
 }
 
 .fourth-section--main2-continuum .fourth-section__listing-grain-box--profession,
