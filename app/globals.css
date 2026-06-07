@@ -1747,6 +1747,23 @@ a.fourth-section__btn {
   margin-top: 1.35em;
 }
 
+.fourth-section__profession-grain-box {
+  position: relative;
+  box-sizing: border-box;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: var(--main2-hero-radius, 0.75em);
+  overflow: hidden;
+  isolation: isolate;
+  margin: 0 0 0.85em;
+}
+
+.fourth-section--main2-continuum .fourth-section__profession-grain-box {
+  width: calc(100% - 2.3em);
+  margin-left: 1.15em;
+  margin-right: 1.15em;
+}
+
 .fourth-section__category {
   margin: 0 0 0.52em;
   padding-left: 1em;

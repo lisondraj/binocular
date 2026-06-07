@@ -8,6 +8,7 @@ import {
   useState,
   type Ref,
 } from "react";
+import { paintMain2GrainSurfaces } from "@/lib/main2-grain";
 import { MOBILE_ROOT_FONT_SIZE } from "@/lib/mobile-layout";
 import {
   FOURTH_SECTION_BUDGET_MAX,
@@ -312,6 +313,11 @@ export const FourthSection = forwardRef(function FourthSection(
     };
   }, [scrollReveal]);
 
+  useEffect(() => {
+    if (!main2Listings) return;
+    paintMain2GrainSurfaces();
+  }, [main2Listings]);
+
   return (
     <section
       ref={setSectionRef}
@@ -447,6 +453,14 @@ export const FourthSection = forwardRef(function FourthSection(
       </div>
 
       <div className="fourth-section__listings-block fourth-section-reveal">
+        {main2Listings ? (
+          <div
+            className="fourth-section__profession-grain-box main2-grain-box"
+            aria-hidden
+          >
+            <div className="main2-grain-surface main2-hero-box__grain" />
+          </div>
+        ) : null}
         <p className="fourth-section__category">By profession</p>
         <div
           className="fourth-section__listings-scroll fourth-section__listings-scroll--row"
