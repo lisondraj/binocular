@@ -2104,8 +2104,15 @@ a.fourth-section__btn {
 .mobile-view--main2 .fourth-section__white-box-intro-content.hero-intro-content {
   align-items: flex-start;
   gap: 0.75em;
-  padding: 2.85em var(--main2-hero-pad-x) 0;
+  padding: var(--main2-white-box-intro-pad-top) var(--main2-hero-pad-x) 0;
   box-sizing: border-box;
+}
+
+.mobile-view--main2
+  .fourth-section--main2-continuum
+  .fourth-section__listings-block:has(+ #main2-tab-audience)
+  .fourth-section__white-box-intro-content.hero-intro-content {
+  padding-top: var(--main2-white-box-intro-pad-top-action);
 }
 
 .mobile-view--main2 .fourth-section__distance-intro.hero-description {
@@ -3307,6 +3314,7 @@ a.fourth-section__btn {
   --main2-listings-inset-x: 1.15em;
   --main2-listings-section-pad: 2.35em;
   --main2-white-box-intro-pad-top: 2.85em;
+  --main2-white-box-intro-pad-top-action: 1.75em;
   --main2-category-grain-min-height: calc(
     100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)
   );
