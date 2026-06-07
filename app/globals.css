@@ -1820,6 +1820,12 @@ a.fourth-section__btn {
   box-shadow: none;
 }
 
+.mobile-view--main2 #main2-tab-distance {
+  padding-top: 1.75em;
+  padding-bottom: 1.75em;
+  box-sizing: border-box;
+}
+
 .mobile-view--main2 #main2-tab-spaces {
   padding-bottom: 1.75em;
   box-sizing: border-box;

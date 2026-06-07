@@ -551,7 +551,10 @@ export const FourthSection = forwardRef(function FourthSection(
         </div>
         ) : null}
 
-        <div className="fourth-section__listings-block">
+        <div
+          id="main2-tab-distance"
+          className="fourth-section__listings-block fourth-section-reveal main2-tab-target"
+        >
           {main2Listings ? (
             <ListingWhiteBox>
               <ListingWhiteBoxTagline />
