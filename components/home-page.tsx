@@ -1945,6 +1945,17 @@ export function HomePage({
           main2Grain={false}
           main2Listings={isMain2}
         />
+
+        {isMain2 ? (
+          <footer
+            className="mobile-site-footer mobile-site-footer--main2"
+            style={{ fontSize: MOBILE_ROOT_FONT_SIZE }}
+          >
+            <div className="mobile-site-footer__box">
+              <p className="mobile-site-footer__wordmark">BINOCULAR</p>
+            </div>
+          </footer>
+        ) : null}
         </Main2GrainContinuum>
 
         {!isMain2 ? (
@@ -2299,7 +2310,7 @@ export function HomePage({
         </>
         ) : null}
 
-        {isMain2 || thirdSectionAnimationComplete ? (
+        {!isMain2 && thirdSectionAnimationComplete ? (
           <footer
             className="mobile-site-footer"
             style={{ fontSize: MOBILE_ROOT_FONT_SIZE }}
