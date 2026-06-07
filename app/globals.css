@@ -21,10 +21,10 @@ body {
   font-family: var(--font-inter), system-ui, sans-serif;
 }
 
-/* /main2 — match status-bar / overscroll chrome to hero grain (not white). */
-html:has(.mobile-view--main2:not(.mobile-view--main2-past-hero)),
-html:has(.mobile-view--main2:not(.mobile-view--main2-past-hero)) body {
-  background-color: #4a4a4a;
+/* /main2 — overscroll chrome tints (refined on scroll in home-page). */
+html:has(.mobile-view--main2),
+html:has(.mobile-view--main2) body {
+  background-color: var(--main2-chrome-hero, #4a4a4a);
 }
 
 h1,
@@ -2784,6 +2784,9 @@ a.fourth-section__btn {
 /* /main2 — shared inset + corner radius for nav and hero grain box. */
 .mobile-view--main2 {
   --main2-hero-grey: #2a2a2a;
+  --main2-chrome-hero: #4a4a4a;
+  --main2-chrome-page: #ffffff;
+  --main2-chrome-bottom: #050505;
   --main2-hero-inset-x: 1.15em;
   --main2-hero-inset-y: 0.85em;
   --main2-hero-radius: 0.75em;

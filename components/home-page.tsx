@@ -1285,9 +1285,15 @@ export function HomePage({
     setMain2MenuOpen(false);
   }, [isMain2, showLogo]);
 
-  // /main2 — tint iOS status-bar chrome with hero grey; white after scroll.
+  // /main2 — match iOS overflow chrome to hero, page, or footer grain.
   useEffect(() => {
     if (!isMain2) return;
+
+    const CHROME = {
+      hero: "#4a4a4a",
+      page: "#ffffff",
+      bottom: "#050505",
+    } as const;
 
     let meta = document.querySelector<HTMLMetaElement>(
       'meta[name="theme-color"]',
@@ -1298,15 +1304,46 @@ export function HomePage({
       document.head.appendChild(meta);
     }
 
-    const apply = () => {
-      meta!.content = showLogo ? "#ffffff" : "#4a4a4a";
+    const applyChrome = (color: string) => {
+      meta!.content = color;
+      document.documentElement.style.backgroundColor = color;
+      document.body.style.backgroundColor = color;
     };
-    apply();
+
+    const resolveChrome = () => {
+      const footer = document.querySelector<HTMLElement>(
+        ".mobile-site-footer--main2",
+      );
+      if (footer) {
+        const footerBottom = footer.getBoundingClientRect().bottom;
+        if (footerBottom <= window.innerHeight + 24) {
+          return CHROME.bottom;
+        }
+      }
+
+      if (window.scrollY > window.innerHeight * 0.6) {
+        return CHROME.page;
+      }
+
+      return CHROME.hero;
+    };
+
+    const onScroll = () => {
+      applyChrome(resolveChrome());
+    };
+
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
 
     return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
       meta!.content = "#ffffff";
+      document.documentElement.style.backgroundColor = "";
+      document.body.style.backgroundColor = "";
     };
-  }, [isMain2, showLogo]);
+  }, [isMain2]);
 
   // Keep the prompt slot height measured so hero layout stays stable.
   useLayoutEffect(() => {
