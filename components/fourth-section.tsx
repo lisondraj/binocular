@@ -248,84 +248,90 @@ function FourthSectionListingCard({
   );
 }
 
-const MAIN2_PROFESSION_CAROUSEL_LABELS = [
-  "Book a doctor",
-  "Book a chef",
-  "Book a picker",
-  "Book a housekeeper",
-  "Book a barista",
+const MAIN2_PROFESSION_CAROUSEL_ITEMS = [
+  "doctor",
+  "chef",
+  "picker",
+  "housekeeper",
+  "barista",
 ] as const;
 
 function ListingProfessionCarousel() {
   const [index, setIndex] = useState(0);
-  const [transitionEnabled, setTransitionEnabled] = useState(true);
+  const [instantReset, setInstantReset] = useState(false);
   const trackRef = useRef<HTMLDivElement>(null);
+  const professionCount = MAIN2_PROFESSION_CAROUSEL_ITEMS.length;
+  const activeProfession =
+    MAIN2_PROFESSION_CAROUSEL_ITEMS[index % professionCount];
 
   useEffect(() => {
     const timer = window.setInterval(() => {
       setIndex((current) => current + 1);
-    }, 1100);
+    }, 1300);
 
     return () => window.clearInterval(timer);
   }, []);
 
   useEffect(() => {
-    if (index !== MAIN2_PROFESSION_CAROUSEL_LABELS.length) return;
+    if (index !== professionCount) return;
 
     const track = trackRef.current;
     if (!track) return;
 
     const onEnd = (event: TransitionEvent) => {
-      if (event.propertyName !== "transform") return;
-      setTransitionEnabled(false);
+      if (event.target !== track || event.propertyName !== "transform") return;
+      setInstantReset(true);
       setIndex(0);
     };
 
     track.addEventListener("transitionend", onEnd);
     return () => track.removeEventListener("transitionend", onEnd);
-  }, [index]);
+  }, [index, professionCount]);
 
   useEffect(() => {
-    if (transitionEnabled || index !== 0) return;
+    if (!instantReset || index !== 0) return;
 
     const frame = window.requestAnimationFrame(() => {
-      setTransitionEnabled(true);
+      setInstantReset(false);
     });
 
     return () => window.cancelAnimationFrame(frame);
-  }, [transitionEnabled, index]);
+  }, [instantReset, index]);
 
   const slides = [
-    ...MAIN2_PROFESSION_CAROUSEL_LABELS,
-    MAIN2_PROFESSION_CAROUSEL_LABELS[0],
+    ...MAIN2_PROFESSION_CAROUSEL_ITEMS,
+    MAIN2_PROFESSION_CAROUSEL_ITEMS[0],
   ];
 
   return (
-    <div
+    <p
       className="fourth-section__listing-grain-box__carousel"
       aria-live="polite"
       aria-atomic="true"
+      aria-label={`Book a ${activeProfession}`}
     >
-      <div
-        ref={trackRef}
-        className="fourth-section__listing-grain-box__carousel-track"
-        style={{
-          transform: `translate3d(0, -${index * 100}%, 0)`,
-          transition: transitionEnabled
-            ? "transform 0.38s cubic-bezier(0.33, 1, 0.68, 1)"
-            : "none",
-        }}
-      >
-        {slides.map((label, slideIndex) => (
-          <p
-            key={`${label}-${slideIndex}`}
-            className="fourth-section__listing-grain-box__carousel-item"
-          >
-            {label}
-          </p>
-        ))}
-      </div>
-    </div>
+      <span className="fourth-section__listing-grain-box__carousel-prefix">
+        Book a{" "}
+      </span>
+      <span className="fourth-section__listing-grain-box__carousel-window">
+        <span
+          ref={trackRef}
+          className={`fourth-section__listing-grain-box__carousel-track${
+            instantReset ? " is-instant" : ""
+          }`}
+          style={{ transform: `translate3d(0, -${index * 100}%, 0)` }}
+        >
+          {slides.map((profession, slideIndex) => (
+            <span
+              key={`${profession}-${slideIndex}`}
+              className="fourth-section__listing-grain-box__carousel-item"
+            >
+              {profession}
+            </span>
+          ))}
+        </span>
+      </span>
+    </p>
   );
 }
 
