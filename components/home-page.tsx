@@ -1716,7 +1716,7 @@ export function HomePage({
               !isMain2 && scrollUnlocked && revealedListingCount < 1 ? 3 : 1,
             maxWidth: "var(--ipad-width)",
             margin: "0 auto",
-            minHeight: "100vh",
+            minHeight: isMain2 ? undefined : "100vh",
             padding: isMain2 ? undefined : "1.5em",
             textAlign: "center",
           }}
