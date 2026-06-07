@@ -316,9 +316,6 @@ function ListingProfessionCarousel() {
     return () => window.cancelAnimationFrame(frame);
   }, [instantReset, position, loopStart]);
 
-  const renderStart = position - MAIN2_PROFESSION_CAROUSEL_RADIUS;
-  const renderEnd = position + MAIN2_PROFESSION_CAROUSEL_RADIUS;
-
   return (
     <p
       className="fourth-section__listing-grain-box__carousel"
