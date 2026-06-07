@@ -398,7 +398,7 @@ export function HomePage({
   const isMain2 = variant === "main2";
   const [showLogo, setShowLogo] = useState(false);
   const [main2MenuOpen, setMain2MenuOpen] = useState(false);
-  const [showHeroUi, setShowHeroUi] = useState(false);
+  const [showHeroUi, setShowHeroUi] = useState(isMain2);
   const [showHeroPrompt, setShowHeroPrompt] = useState(false);
   const [promptAnimReady, setPromptAnimReady] = useState(false);
   const [promptPhase, setPromptPhase] = useState<PromptPhase>("at");
@@ -491,7 +491,9 @@ export function HomePage({
       timers.push(setTimeout(fn, ms));
     };
 
-    schedule(() => setShowHeroUi(true), INTRO_UI_DELAY);
+    if (!isMain2) {
+      schedule(() => setShowHeroUi(true), INTRO_UI_DELAY);
+    }
     schedule(() => setShowHeroPrompt(true), introFade(1));
     schedule(
       () => setPromptAnimReady(true),
@@ -499,7 +501,7 @@ export function HomePage({
     );
 
     return () => timers.forEach(clearTimeout);
-  }, []);
+  }, [isMain2]);
 
   // /main2 — paint tiny grain tiles on every grain surface (hero + listings + section two).
   useEffect(() => {
@@ -1871,11 +1873,7 @@ export function HomePage({
                 {renderHeroDeck()}
               </div>
               <div className="main2-hero-content">
-                <div
-                  className={`hero-intro-content main2-hero-intro hero-intro-fade${
-                    showHeroUi ? " is-visible" : ""
-                  }`}
-                >
+                <div className="hero-intro-content main2-hero-intro">
                   <h1 className="hero-title">
                     <span className="hero-title-word">BINOCULAR</span>
                   </h1>

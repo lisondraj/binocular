@@ -84,6 +84,140 @@ export const FOURTH_SECTION_BY_SPACE = [
   },
 ] as const;
 
+export const FOURTH_SECTION_BY_PROFESSION = [
+  {
+    title: "Robotics engineer",
+    subtitle: "Locomotion & controls",
+    pricePerHour: "$68",
+    rating: 4.9,
+    reviewCount: 94,
+    hosts: [
+      { initials: "MR", gradient: "135deg, #5c7cfa 0%, #364fc7 100%" },
+      { initials: "KL", gradient: "135deg, #e64980 0%, #c2255c 100%" },
+    ],
+    image: "/images/warehouse-1.png",
+    alt: "Robotics engineer workspace",
+  },
+  {
+    title: "ML researcher",
+    subtitle: "Policy learning",
+    pricePerHour: "$54",
+    rating: 4.8,
+    reviewCount: 71,
+    hosts: [{ initials: "JS", gradient: "135deg, #38d9a9 0%, #12b886 100%" }],
+    image: "/images/kitchen.png",
+    alt: "ML researcher lab",
+  },
+  {
+    title: "Hardware engineer",
+    subtitle: "Sensor integration",
+    pricePerHour: "$62",
+    rating: 4.7,
+    reviewCount: 58,
+    hosts: [
+      { initials: "AN", gradient: "135deg, #fcc419 0%, #f59f00 100%" },
+      { initials: "RP", gradient: "135deg, #da77f2 0%, #9c36b5 100%" },
+    ],
+    image: "/images/warehouse-1.png",
+    alt: "Hardware engineer bench",
+  },
+  {
+    title: "Computer vision engineer",
+    subtitle: "Perception pipelines",
+    pricePerHour: "$58",
+    rating: 4.8,
+    reviewCount: 63,
+    hosts: [{ initials: "DF", gradient: "135deg, #748ffc 0%, #5c7cfa 100%" }],
+    image: "/images/kitchen.png",
+    alt: "Computer vision setup",
+  },
+  {
+    title: "Research scientist",
+    subtitle: "Benchmark experiments",
+    pricePerHour: "$49",
+    rating: 4.6,
+    reviewCount: 44,
+    hosts: [
+      { initials: "AL", gradient: "135deg, #ffa94d 0%, #fd7e14 100%" },
+      { initials: "JS", gradient: "135deg, #38d9a9 0%, #12b886 100%" },
+    ],
+    image: "/images/courtyard.png",
+    alt: "Research scientist field testing",
+  },
+] as const;
+
+export const FOURTH_SECTION_BY_ACTION = [
+  {
+    title: "Navigation",
+    subtitle: "Path planning & SLAM",
+    pricePerHour: "$72",
+    rating: 4.9,
+    reviewCount: 112,
+    hosts: [
+      { initials: "MR", gradient: "135deg, #5c7cfa 0%, #364fc7 100%" },
+      { initials: "KL", gradient: "135deg, #e64980 0%, #c2255c 100%" },
+    ],
+    image: "/images/warehouse-1.png",
+    alt: "Navigation testing space",
+  },
+  {
+    title: "Grasping",
+    subtitle: "Pick-and-place",
+    pricePerHour: "$48",
+    rating: 4.7,
+    reviewCount: 86,
+    hosts: [{ initials: "JS", gradient: "135deg, #38d9a9 0%, #12b886 100%" }],
+    image: "/images/kitchen.png",
+    alt: "Grasping and manipulation lab",
+  },
+  {
+    title: "Teleoperation",
+    subtitle: "Remote control",
+    pricePerHour: "$44",
+    rating: 4.6,
+    reviewCount: 52,
+    hosts: [
+      { initials: "AN", gradient: "135deg, #fcc419 0%, #f59f00 100%" },
+      { initials: "DF", gradient: "135deg, #748ffc 0%, #5c7cfa 100%" },
+    ],
+    image: "/images/kitchen.png",
+    alt: "Teleoperation station",
+  },
+  {
+    title: "Manipulation",
+    subtitle: "Force-sensitive tasks",
+    pricePerHour: "$51",
+    rating: 4.8,
+    reviewCount: 67,
+    hosts: [{ initials: "RP", gradient: "135deg, #da77f2 0%, #9c36b5 100%" }],
+    image: "/images/kitchen.png",
+    alt: "Manipulation testing bench",
+  },
+  {
+    title: "Mobility testing",
+    subtitle: "Terrain traversal",
+    pricePerHour: "$34",
+    rating: 4.8,
+    reviewCount: 41,
+    hosts: [
+      { initials: "DF", gradient: "135deg, #748ffc 0%, #5c7cfa 100%" },
+      { initials: "AL", gradient: "135deg, #ffa94d 0%, #fd7e14 100%" },
+    ],
+    image: "/images/courtyard.png",
+    alt: "Outdoor mobility course",
+  },
+  {
+    title: "Object detection",
+    subtitle: "Visual recognition",
+    pricePerHour: "$56",
+    rating: 4.7,
+    reviewCount: 59,
+    hosts: [{ initials: "MR", gradient: "135deg, #5c7cfa 0%, #364fc7 100%" }],
+    image: "/images/warehouse-1.png",
+    alt: "Object detection environment",
+  },
+] as const;
+
 export const FOURTH_SECTION_BY_PRICE = [
   {
     title: "Garden terrace",

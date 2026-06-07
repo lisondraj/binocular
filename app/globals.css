@@ -1963,7 +1963,7 @@ a.fourth-section__btn {
 }
 
 .mobile-view--main2 .mobile-site-footer--main2 .mobile-site-footer__box {
-  min-height: 32vh;
+  min-height: 38vh;
   width: 100%;
   padding: 1.35em 0.85em 1.1em;
   border-radius: 0.35em;
@@ -1982,8 +1982,8 @@ a.fourth-section__btn {
 .mobile-view--main2 .mobile-site-footer--main2 .mobile-site-footer__wordmark {
   color: #000000;
   padding-bottom: 0.15em;
-  font-size: 12cqi;
-  line-height: 0.9;
+  font-size: 24cqi;
+  line-height: 0.88;
   transform: scaleX(1.08);
   transform-origin: center bottom;
 }

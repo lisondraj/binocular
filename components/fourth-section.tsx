@@ -14,6 +14,8 @@ import {
   FOURTH_SECTION_BUDGET_MIN,
   FOURTH_SECTION_BY_BUNDLE,
   FOURTH_SECTION_BY_PRICE,
+  FOURTH_SECTION_BY_PROFESSION,
+  FOURTH_SECTION_BY_ACTION,
   FOURTH_SECTION_BY_SPACE,
   LISTING_CARDS,
   type ListingHost,
@@ -424,6 +426,66 @@ export const FourthSection = forwardRef(function FourthSection(
             {FOURTH_SECTION_BY_SPACE.map((listing) => (
               <div
                 key={`fourth-space-${listing.title}`}
+                className="fourth-section-listing-card-wrap fourth-section-listing-card-wrap--space"
+              >
+                <FourthSectionListingCard
+                  className="fourth-section-listing-card--space"
+                  image={listing.image}
+                  alt={listing.alt}
+                  price={listing.pricePerHour}
+                  title={listing.title}
+                  subtitle={listing.subtitle}
+                  hosts={listing.hosts}
+                  rating={listing.rating}
+                  reviewCount={listing.reviewCount}
+                  main2Listings={main2Listings}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="fourth-section__listings-block fourth-section-reveal">
+        <p className="fourth-section__category">By profession</p>
+        <div
+          className="fourth-section__listings-scroll fourth-section__listings-scroll--row"
+          aria-label="Listings by profession"
+        >
+          <div className="fourth-section__listings fourth-section__listings--row">
+            {FOURTH_SECTION_BY_PROFESSION.map((listing) => (
+              <div
+                key={`fourth-profession-${listing.title}`}
+                className="fourth-section-listing-card-wrap fourth-section-listing-card-wrap--space"
+              >
+                <FourthSectionListingCard
+                  className="fourth-section-listing-card--space"
+                  image={listing.image}
+                  alt={listing.alt}
+                  price={listing.pricePerHour}
+                  title={listing.title}
+                  subtitle={listing.subtitle}
+                  hosts={listing.hosts}
+                  rating={listing.rating}
+                  reviewCount={listing.reviewCount}
+                  main2Listings={main2Listings}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="fourth-section__listings-block fourth-section-reveal">
+        <p className="fourth-section__category">By action</p>
+        <div
+          className="fourth-section__listings-scroll fourth-section__listings-scroll--row"
+          aria-label="Listings by action"
+        >
+          <div className="fourth-section__listings fourth-section__listings--row">
+            {FOURTH_SECTION_BY_ACTION.map((listing) => (
+              <div
+                key={`fourth-action-${listing.title}`}
                 className="fourth-section-listing-card-wrap fourth-section-listing-card-wrap--space"
               >
                 <FourthSectionListingCard

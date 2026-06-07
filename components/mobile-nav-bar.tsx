@@ -40,7 +40,7 @@ export function MobileNavBar({
   const navRow = (
     <div
       className={`mobile-nav${
-        staticNav ? " mobile-nav--static" : " hero-intro-fade"
+        staticNav || isMain2 ? " mobile-nav--static" : " hero-intro-fade"
       }${isMain2 ? " mobile-nav--main2" : ""}${
         isMain2PastHero ? " mobile-nav--main2-past-hero" : ""
       }${navVisible ? " is-visible" : ""}${expanded ? " is-expanded" : ""}`}
@@ -101,9 +101,7 @@ export function MobileNavBar({
   if (isMain2) {
     return (
       <div
-        className={`main2-nav-anchor hero-intro-fade${
-          navVisible ? " is-visible" : ""
-        }${menuOpen ? " is-menu-open" : ""}`}
+        className={`main2-nav-anchor${menuOpen ? " is-menu-open" : ""}`}
         style={{ fontSize: MOBILE_ROOT_FONT_SIZE }}
       >
         {navRow}
