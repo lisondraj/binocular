@@ -370,7 +370,9 @@ function ListingProfessionGrainBox({ children }: { children: ReactNode }) {
     <div className="fourth-section__listing-slot-box fourth-section__listing-grain-box fourth-section__listing-grain-box--profession main2-grain-box">
       <div className="main2-grain-surface main2-hero-box__grain" aria-hidden />
       <div className="fourth-section__listing-grain-box__profession-content">
-        <ListingProfessionCarousel />
+        <div className="fourth-section__listing-grain-box__carousel-stage">
+          <ListingProfessionCarousel />
+        </div>
         <div className="fourth-section__listing-grain-box__listings">{children}</div>
       </div>
     </div>
