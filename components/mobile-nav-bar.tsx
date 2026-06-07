@@ -39,23 +39,24 @@ export function MobileNavBar({
   const navAnchorRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!isMain2 || !searchOpen) return;
+    if (!isMain2 || (!searchOpen && !menuOpen)) return;
 
-    const closeSearch = (event: MouseEvent | TouchEvent) => {
+    const closePanels = (event: MouseEvent | TouchEvent) => {
       const target = event.target;
       if (!(target instanceof Node)) return;
       if (navAnchorRef.current?.contains(target)) return;
-      setSearchOpen(false);
+      if (searchOpen) setSearchOpen(false);
+      if (menuOpen) onMenuToggle?.();
     };
 
-    document.addEventListener("mousedown", closeSearch);
-    document.addEventListener("touchstart", closeSearch);
+    document.addEventListener("mousedown", closePanels);
+    document.addEventListener("touchstart", closePanels);
 
     return () => {
-      document.removeEventListener("mousedown", closeSearch);
-      document.removeEventListener("touchstart", closeSearch);
+      document.removeEventListener("mousedown", closePanels);
+      document.removeEventListener("touchstart", closePanels);
     };
-  }, [isMain2, searchOpen]);
+  }, [isMain2, searchOpen, menuOpen, onMenuToggle]);
 
   const isMain2PastHero = isMain2;
   const expanded =
@@ -164,20 +165,25 @@ export function MobileNavBar({
             </div>
           </div>
         </div>
-        {menuOpen ? (
-          <nav className="main2-nav-menu-panel" aria-label="Navigation">
-            <button type="button" className="main2-nav-menu-panel__link">
-              Host
-            </button>
-            <Link
-              href="/book"
-              className="main2-nav-menu-panel__link"
-              onClick={() => onMenuToggle?.()}
-            >
-              Book
-            </Link>
-          </nav>
-        ) : null}
+        <div
+          className={`main2-nav-menu${menuOpen ? " is-open" : ""}`}
+          aria-hidden={!menuOpen}
+        >
+          <div className="main2-nav-menu__inner">
+            <nav className="main2-nav-menu-panel" aria-label="Navigation">
+              <button type="button" className="main2-nav-menu-panel__link">
+                Host
+              </button>
+              <Link
+                href="/book"
+                className="main2-nav-menu-panel__link"
+                onClick={() => onMenuToggle?.()}
+              >
+                Book
+              </Link>
+            </nav>
+          </div>
+        </div>
       </div>
     );
   }
