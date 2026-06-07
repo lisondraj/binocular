@@ -1986,6 +1986,14 @@ a.fourth-section__btn {
   flex-shrink: 0;
   margin: 0 0 0.42em;
   padding: 0 0 0.28em var(--main2-listings-inset-x, 1.15em);
+}
+
+.mobile-view--main2
+  .fourth-section__listing-grain-box--profession
+  .fourth-section__category--in-grain,
+.mobile-view--main2
+  .fourth-section__listing-grain-box--audience
+  .fourth-section__category--in-grain {
   color: rgba(255, 255, 255, 0.45);
 }
 
