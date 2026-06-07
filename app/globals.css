@@ -2123,14 +2123,14 @@ a.fourth-section__btn {
 }
 
 .mobile-view--main2 .fourth-section__listing-white-box__listings {
-  flex: 1 1 var(--main2-category-grain-listings-flex);
+  flex: 1 1 var(--main2-white-box-listings-flex);
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
   min-height: 0;
   width: 100%;
   margin-top: 0;
-  padding-bottom: var(--main2-white-box-listings-lift);
+  padding-bottom: var(--main2-category-grain-listings-lift);
   box-sizing: border-box;
 }
 
@@ -3356,7 +3356,8 @@ a.fourth-section__btn {
   --main2-listings-section-pad: 2.35em;
   --main2-white-box-intro-pad-top: 2.85em;
   --main2-white-box-intro-pad-top-action: 1.75em;
-  --main2-white-box-listings-lift: 8.75em;
+  --main2-white-box-carousel-flex: 54%;
+  --main2-white-box-listings-flex: 46%;
   --main2-category-grain-min-height: calc(
     100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)
   );
