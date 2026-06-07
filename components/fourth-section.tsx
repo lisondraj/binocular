@@ -414,6 +414,7 @@ export const FourthSection = forwardRef(function FourthSection(
         ) : null}
 
         <div className="fourth-section__listings-block">
+          {main2Listings ? <ListingWhiteBox /> : null}
           <p className="fourth-section__category">By distance</p>
           <div
             className="fourth-section__listings-scroll fourth-section__listings-scroll--row"
@@ -475,7 +476,6 @@ export const FourthSection = forwardRef(function FourthSection(
       </div>
 
       <div className="fourth-section__listings-block fourth-section-reveal">
-        {main2Listings ? <ListingWhiteBox /> : null}
         <p className="fourth-section__category">By price</p>
         <div
           className="fourth-section__listings-scroll fourth-section__listings-scroll--row"
