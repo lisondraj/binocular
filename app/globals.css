@@ -1398,6 +1398,11 @@ h6 {
 
 /* /main2 — listings on white page below hero grain box. */
 .mobile-view--main2 .fourth-section--main2-continuum {
+  --main2-listings-scale: 0.92;
+  --fourth-card-size: calc(9.75em * var(--main2-listings-scale));
+  --fourth-card-space-width: calc(15.25em * var(--main2-listings-scale));
+  --fourth-bundle-stack-step: calc(0.52em * var(--main2-listings-scale));
+  --fourth-bundle-stack-offset: calc(1.04em * var(--main2-listings-scale));
   --listing-card-radius: var(--main2-surface-radius);
   padding: 0;
   background-color: #ffffff;
@@ -1429,6 +1434,7 @@ h6 {
 
 .mobile-view--main2 .fourth-section--main2-continuum .fourth-section__listings--row {
   padding-left: var(--main2-listings-inset-x);
+  font-size: calc(1em * var(--main2-listings-scale));
 }
 
 .mobile-view--main2
