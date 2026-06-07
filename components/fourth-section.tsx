@@ -248,6 +248,14 @@ function FourthSectionListingCard({
   );
 }
 
+function ListingGrainBox() {
+  return (
+    <div className="fourth-section__listing-grain-box main2-grain-box" aria-hidden>
+      <div className="main2-grain-surface main2-hero-box__grain" />
+    </div>
+  );
+}
+
 type FourthSectionProps = {
   scrollReveal?: boolean;
   className?: string;
@@ -453,14 +461,37 @@ export const FourthSection = forwardRef(function FourthSection(
       </div>
 
       <div className="fourth-section__listings-block fourth-section-reveal">
-        {main2Listings ? (
-          <div
-            className="fourth-section__profession-grain-box main2-grain-box"
-            aria-hidden
-          >
-            <div className="main2-grain-surface main2-hero-box__grain" />
+        <p className="fourth-section__category">By price</p>
+        <div
+          className="fourth-section__listings-scroll fourth-section__listings-scroll--row"
+          aria-label="Listings by price"
+        >
+          <div className="fourth-section__listings fourth-section__listings--row">
+            {FOURTH_SECTION_BY_PRICE.map((listing) => (
+              <div
+                key={`fourth-price-${listing.title}`}
+                className="fourth-section-listing-card-wrap fourth-section-listing-card-wrap--distance"
+              >
+                <FourthSectionListingCard
+                  className="fourth-section-listing-card--distance"
+                  image={listing.image}
+                  alt={listing.alt}
+                  price={listing.pricePerHour}
+                  title={listing.title}
+                  subtitle={listing.subtitle}
+                  hosts={listing.hosts}
+                  rating={listing.rating}
+                  reviewCount={listing.reviewCount}
+                  main2Listings={main2Listings}
+                />
+              </div>
+            ))}
           </div>
-        ) : null}
+        </div>
+      </div>
+
+      <div className="fourth-section__listings-block fourth-section-reveal">
+        {main2Listings ? <ListingGrainBox /> : null}
         <p className="fourth-section__category">By profession</p>
         <div
           className="fourth-section__listings-scroll fourth-section__listings-scroll--row"
@@ -491,6 +522,7 @@ export const FourthSection = forwardRef(function FourthSection(
       </div>
 
       <div className="fourth-section__listings-block fourth-section-reveal">
+        {main2Listings ? <ListingGrainBox /> : null}
         <p className="fourth-section__category">By action</p>
         <div
           className="fourth-section__listings-scroll fourth-section__listings-scroll--row"
@@ -504,36 +536,6 @@ export const FourthSection = forwardRef(function FourthSection(
               >
                 <FourthSectionListingCard
                   className="fourth-section-listing-card--space"
-                  image={listing.image}
-                  alt={listing.alt}
-                  price={listing.pricePerHour}
-                  title={listing.title}
-                  subtitle={listing.subtitle}
-                  hosts={listing.hosts}
-                  rating={listing.rating}
-                  reviewCount={listing.reviewCount}
-                  main2Listings={main2Listings}
-                />
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      <div className="fourth-section__listings-block fourth-section-reveal">
-        <p className="fourth-section__category">By price</p>
-        <div
-          className="fourth-section__listings-scroll fourth-section__listings-scroll--row"
-          aria-label="Listings by price"
-        >
-          <div className="fourth-section__listings fourth-section__listings--row">
-            {FOURTH_SECTION_BY_PRICE.map((listing) => (
-              <div
-                key={`fourth-price-${listing.title}`}
-                className="fourth-section-listing-card-wrap fourth-section-listing-card-wrap--distance"
-              >
-                <FourthSectionListingCard
-                  className="fourth-section-listing-card--distance"
                   image={listing.image}
                   alt={listing.alt}
                   price={listing.pricePerHour}

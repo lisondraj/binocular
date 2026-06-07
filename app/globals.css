@@ -1747,7 +1747,7 @@ a.fourth-section__btn {
   margin-top: 1.35em;
 }
 
-.fourth-section__profession-grain-box {
+.fourth-section__listing-grain-box {
   position: relative;
   box-sizing: border-box;
   width: 100%;
@@ -1758,7 +1758,7 @@ a.fourth-section__btn {
   margin: 0 0 0.85em;
 }
 
-.fourth-section--main2-continuum .fourth-section__profession-grain-box {
+.fourth-section--main2-continuum .fourth-section__listing-grain-box {
   width: calc(100% - 2.3em);
   margin-left: 1.15em;
   margin-right: 1.15em;
