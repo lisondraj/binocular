@@ -318,16 +318,15 @@ function ListingProfessionCarousel() {
 
   return (
     <p
-      className="fourth-section__listing-grain-box__carousel"
+      className="fourth-section__listing-profession-box__carousel"
       aria-live="polite"
       aria-atomic="true"
-      aria-label={`Book a ${activeProfession}`}
+      aria-label={activeProfession}
     >
-      <span className="fourth-section__listing-grain-box__carousel-prefix">Book a</span>
-      <span className="fourth-section__listing-grain-box__carousel-window">
+      <span className="fourth-section__listing-profession-box__carousel-window">
         <span
           ref={trackRef}
-          className={`fourth-section__listing-grain-box__carousel-track${
+          className={`fourth-section__listing-profession-box__carousel-track${
             instantReset ? " is-instant" : ""
           }`}
           style={{
@@ -341,7 +340,7 @@ function ListingProfessionCarousel() {
             return (
               <span
                 key={`profession-slot-${itemIndex}`}
-                className="fourth-section__listing-grain-box__carousel-item"
+                className="fourth-section__listing-profession-box__carousel-item"
                 style={{ opacity }}
                 aria-hidden={distance !== 0}
               >
@@ -355,16 +354,21 @@ function ListingProfessionCarousel() {
   );
 }
 
-function ListingGrainBox({ professionCarousel = false }: { professionCarousel?: boolean }) {
+function ListingGrainBox() {
   return (
     <div
-      className={`fourth-section__listing-slot-box fourth-section__listing-grain-box main2-grain-box${
-        professionCarousel ? " fourth-section__listing-grain-box--labeled" : ""
-      }`}
-      aria-hidden={professionCarousel ? undefined : true}
+      className="fourth-section__listing-slot-box fourth-section__listing-grain-box main2-grain-box"
+      aria-hidden
     >
       <div className="main2-grain-surface main2-hero-box__grain" aria-hidden />
-      {professionCarousel ? <ListingProfessionCarousel /> : null}
+    </div>
+  );
+}
+
+function ListingProfessionBox() {
+  return (
+    <div className="fourth-section__listing-slot-box fourth-section__listing-profession-box">
+      <ListingProfessionCarousel />
     </div>
   );
 }
@@ -592,7 +596,7 @@ export const FourthSection = forwardRef(function FourthSection(
         id="main2-tab-people"
         className="fourth-section__listings-block fourth-section-reveal main2-tab-target"
       >
-        {main2Listings ? <ListingGrainBox professionCarousel /> : null}
+        {main2Listings ? <ListingProfessionBox /> : null}
         <p className="fourth-section__category">By profession</p>
         <div
           className="fourth-section__listings-scroll fourth-section__listings-scroll--row"
@@ -626,7 +630,7 @@ export const FourthSection = forwardRef(function FourthSection(
         id="main2-tab-actions"
         className="fourth-section__listings-block fourth-section-reveal main2-tab-target"
       >
-        {main2Listings ? <ListingGrainBox /> : null}
+        {main2Listings ? <ListingWhiteBox /> : null}
         <p className="fourth-section__category">By action</p>
         <div
           className="fourth-section__listings-scroll fourth-section__listings-scroll--row"

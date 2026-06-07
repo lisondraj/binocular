@@ -1794,72 +1794,57 @@ a.fourth-section__btn {
   margin-bottom: var(--main2-grain-box-gap-y, 0.65em);
 }
 
-.fourth-section__listing-grain-box--labeled {
+.fourth-section--main2-continuum .fourth-section__listing-profession-box {
+  aspect-ratio: auto;
+  height: auto;
+  margin-top: 0;
+  margin-bottom: var(--main2-grain-box-gap-y, 0.65em);
+  background: #ffffff;
+  border: none;
+  box-shadow: none;
   display: flex;
   align-items: center;
-  justify-content: flex-start;
+  padding: 0.75em 0;
 }
 
-.fourth-section__listing-grain-box__carousel {
+.fourth-section__listing-profession-box__carousel {
   position: relative;
-  z-index: 2;
-  display: flex;
-  align-items: center;
-  gap: 0.3em;
   width: 100%;
   margin: 0;
-  padding: 0 var(--main2-hero-pad-x) 0 calc(var(--main2-hero-pad-x) + 1.85em);
+  padding: 0 var(--main2-hero-pad-x) 0
+    calc(var(--main2-listings-inset-x, 1.15em) + 0.7em);
   box-sizing: border-box;
   font-family: var(--font-suisse), system-ui, sans-serif;
   font-size: 1.05em;
   font-weight: 400;
   line-height: 1.2;
   letter-spacing: -0.02em;
-  color: #ffffff;
+  color: #141414;
   text-align: left;
 }
 
-.fourth-section__listing-grain-box__carousel-prefix {
-  flex-shrink: 0;
-}
-
-.fourth-section__listing-grain-box__carousel-window {
+.fourth-section__listing-profession-box__carousel-window {
   --profession-carousel-line: 1.2em;
   --profession-carousel-radius: 2;
-  display: inline-block;
+  display: block;
   height: calc(
     (2 * var(--profession-carousel-radius) + 1) * var(--profession-carousel-line)
   );
   min-width: 6.5em;
   overflow: hidden;
-  vertical-align: top;
-  -webkit-mask-image: linear-gradient(
-    180deg,
-    transparent 0%,
-    #000000 18%,
-    #000000 82%,
-    transparent 100%
-  );
-  mask-image: linear-gradient(
-    180deg,
-    transparent 0%,
-    #000000 18%,
-    #000000 82%,
-    transparent 100%
-  );
 }
 
-.fourth-section__listing-grain-box__carousel-track {
+.fourth-section__listing-profession-box__carousel-track {
   display: block;
   transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
   will-change: transform;
 }
 
-.fourth-section__listing-grain-box__carousel-track.is-instant {
+.fourth-section__listing-profession-box__carousel-track.is-instant {
   transition: none;
 }
 
-.fourth-section__listing-grain-box__carousel-item {
+.fourth-section__listing-profession-box__carousel-item {
   display: block;
   height: var(--profession-carousel-line);
   line-height: var(--profession-carousel-line);
