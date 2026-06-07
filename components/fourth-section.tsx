@@ -543,10 +543,15 @@ export const FourthSection = forwardRef(function FourthSection(
         <div className="fourth-section__listings-block">
           {main2Listings ? (
             <ListingWhiteBox>
-              <p className="hero-description fourth-section__distance-intro">
-                <span className="hero-description__line">We make the physical</span>
-                <span className="hero-description__line">world searchable.</span>
-              </p>
+              <div className="fourth-section__distance-intro-content hero-intro-content">
+                <h2 className="hero-title fourth-section__distance-intro-title">
+                  <span className="hero-title-word">SPACES</span>
+                </h2>
+                <p className="hero-description fourth-section__distance-intro">
+                  <span className="hero-description__line">We make the physical</span>
+                  <span className="hero-description__line">world searchable.</span>
+                </p>
+              </div>
             </ListingWhiteBox>
           ) : null}
           <p className="fourth-section__category">By distance</p>
