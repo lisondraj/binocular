@@ -258,11 +258,11 @@ const MAIN2_PROFESSION_CAROUSEL_ITEMS = [
 ] as const;
 
 const MAIN2_AUDIENCE_CAROUSEL_ITEMS = [
-  "kitchens",
-  "warehouses",
-  "factory floors",
-  "retail aisles",
-  "homes",
+  "elderly",
+  "caregivers",
+  "families",
+  "busy parents",
+  "mobility needs",
 ] as const;
 
 function grainCarouselOpacity(distance: number) {
