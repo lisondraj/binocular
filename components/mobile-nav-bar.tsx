@@ -98,22 +98,53 @@ export function MobileNavBar({
 
       <button
         type="button"
-        className={`mobile-nav-menu${menuOpen ? " is-open" : ""}`}
-        aria-label={menuOpen ? "Close navigation menu" : "Open navigation menu"}
-        aria-expanded={isMain2 ? menuOpen : undefined}
-        onClick={isMain2 ? onMenuToggle : undefined}
+        className={`mobile-nav-menu${
+          menuOpen || (isMain2 && searchOpen) ? " is-open" : ""
+        }`}
+        aria-label={
+          isMain2 && searchOpen
+            ? "Close search"
+            : menuOpen
+              ? "Close navigation menu"
+              : "Open navigation menu"
+        }
+        aria-expanded={isMain2 ? menuOpen || searchOpen : undefined}
+        onClick={
+          isMain2
+            ? () => {
+                if (searchOpen) {
+                  setSearchOpen(false);
+                  return;
+                }
+                onMenuToggle?.();
+              }
+            : undefined
+        }
       >
-        <svg
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-        >
-          <line x1="3" y1="6" x2="21" y2="6" />
-          <line x1="3" y1="12" x2="21" y2="12" />
-          <line x1="3" y1="18" x2="21" y2="18" />
-        </svg>
+        {isMain2 && searchOpen ? (
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+          >
+            <line x1="6" y1="6" x2="18" y2="18" />
+            <line x1="18" y1="6" x2="6" y2="18" />
+          </svg>
+        ) : (
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+          >
+            <line x1="3" y1="6" x2="21" y2="6" />
+            <line x1="3" y1="12" x2="21" y2="12" />
+            <line x1="3" y1="18" x2="21" y2="18" />
+          </svg>
+        )}
       </button>
     </div>
   );
@@ -143,6 +174,7 @@ export function MobileNavBar({
                 searchOpen && activeTab === tab.id ? " is-active" : ""
               }`}
               onClick={() => {
+                if (menuOpen) onMenuToggle?.();
                 if (activeTab === tab.id) {
                   setSearchOpen((open) => !open);
                 } else {
