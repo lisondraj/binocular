@@ -248,13 +248,18 @@ function FourthSectionListingCard({
   );
 }
 
-function ListingGrainBox() {
+function ListingGrainBox({ label }: { label?: string }) {
   return (
     <div
-      className="fourth-section__listing-slot-box fourth-section__listing-grain-box main2-grain-box"
-      aria-hidden
+      className={`fourth-section__listing-slot-box fourth-section__listing-grain-box main2-grain-box${
+        label ? " fourth-section__listing-grain-box--labeled" : ""
+      }`}
+      aria-hidden={label ? undefined : true}
     >
-      <div className="main2-grain-surface main2-hero-box__grain" />
+      <div className="main2-grain-surface main2-hero-box__grain" aria-hidden />
+      {label ? (
+        <p className="fourth-section__listing-grain-box__label">{label}</p>
+      ) : null}
     </div>
   );
 }
@@ -482,7 +487,7 @@ export const FourthSection = forwardRef(function FourthSection(
         id="main2-tab-people"
         className="fourth-section__listings-block fourth-section-reveal main2-tab-target"
       >
-        {main2Listings ? <ListingGrainBox /> : null}
+        {main2Listings ? <ListingGrainBox label="Book a doctor" /> : null}
         <p className="fourth-section__category">By profession</p>
         <div
           className="fourth-section__listings-scroll fourth-section__listings-scroll--row"
