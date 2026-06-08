@@ -1062,6 +1062,23 @@ h6 {
   transform: translate3d(0, 0, 0);
 }
 
+/* /main2 — scroll blocks unblur + rise (no opacity fade). */
+.mobile-view--main2 .fourth-section-reveal {
+  opacity: 1;
+  filter: blur(0.72em);
+  transform: translate3d(0, 2.25em, 0);
+  transition:
+    filter 1.1s cubic-bezier(0.33, 1, 0.68, 1),
+    transform 1.1s cubic-bezier(0.33, 1, 0.68, 1);
+  will-change: filter, transform;
+}
+
+.mobile-view--main2 .fourth-section-reveal.is-visible {
+  opacity: 1;
+  filter: blur(0);
+  transform: translate3d(0, 0, 0);
+}
+
 /* Fourth section — static browse listings. */
 .fourth-section {
   --fourth-card-size: 9.75em;
@@ -3178,6 +3195,17 @@ a.fourth-section__btn {
   }
 
   .mobile-nav-logo.is-visible {
+    transform: none;
+  }
+
+  .mobile-view--main2 .fourth-section-reveal {
+    transition: none;
+    filter: none;
+    transform: none;
+  }
+
+  .mobile-view--main2 .fourth-section-reveal.is-visible {
+    filter: none;
     transform: none;
   }
 }
