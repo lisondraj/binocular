@@ -3386,7 +3386,7 @@ a.fourth-section__btn {
 
 .mobile-nav .mobile-nav-logo,
 .mobile-nav .mobile-nav-menu,
-.mobile-nav .mobile-nav-start {
+.mobile-nav .mobile-nav-end {
   position: relative;
   z-index: 1;
   flex-shrink: 0;
@@ -3571,7 +3571,7 @@ a.fourth-section__btn {
   pointer-events: auto;
 }
 
-.mobile-nav--main2 .mobile-nav-start {
+.mobile-nav--main2 .mobile-nav-end {
   display: flex;
   align-items: center;
   gap: 0.65em;

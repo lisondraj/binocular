@@ -152,11 +152,11 @@ export function MobileNavBar({
     >
       {isMain2 ? (
         <>
-          <div className="mobile-nav-start">
+          {logoControl}
+          <div className="mobile-nav-end">
             <Main2LocationSelector />
             {menuButton}
           </div>
-          {logoControl}
         </>
       ) : (
         <>
