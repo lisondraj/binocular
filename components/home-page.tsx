@@ -1753,16 +1753,14 @@ export function HomePage({
               />
               <div className="main2-hero-content">
                 <div className="hero-intro-content main2-hero-intro">
-                  <h1 className="hero-title">
-                    <span className="hero-title-word">
-                      <BinocularWordmark />
-                    </span>
+                  <h1 className="hero-title main2-hero-enter main2-hero-enter--embark">
+                    <span className="hero-title-word">Embark</span>
                   </h1>
-                  <p className="hero-description">
+                  <p className="hero-description main2-hero-enter main2-hero-enter--description">
                     <span className="hero-description__line">Book spaces for</span>
                     <span className="hero-description__line">physical intelligence.</span>
                   </p>
-                  <div className="hero-actions main2-hero-actions">
+                  <div className="hero-actions main2-hero-actions main2-hero-enter main2-hero-enter--actions">
                     <button type="button" className="main2-hero-btn main2-hero-btn--primary">
                       Host
                       {upRightArrow}

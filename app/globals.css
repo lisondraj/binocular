@@ -1079,6 +1079,34 @@ h6 {
   transform: translate3d(0, 0, 0);
 }
 
+/* /main2 — hero load: segmented unblur + rise (description → buttons → Embark). */
+@keyframes main2-hero-enter {
+  to {
+    filter: blur(0);
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.mobile-view--main2 .main2-hero-enter {
+  opacity: 1;
+  filter: blur(0.72em);
+  transform: translate3d(0, 2.25em, 0);
+  animation: main2-hero-enter 1.1s cubic-bezier(0.33, 1, 0.68, 1) forwards;
+  will-change: filter, transform;
+}
+
+.mobile-view--main2 .main2-hero-enter--description {
+  animation-delay: 0.2s;
+}
+
+.mobile-view--main2 .main2-hero-enter--actions {
+  animation-delay: 1.65s;
+}
+
+.mobile-view--main2 .main2-hero-enter--embark {
+  animation-delay: 3.1s;
+}
+
 /* Fourth section — static browse listings. */
 .fourth-section {
   --fourth-card-size: 9.75em;
@@ -3205,6 +3233,12 @@ a.fourth-section__btn {
   }
 
   .mobile-view--main2 .fourth-section-reveal.is-visible {
+    filter: none;
+    transform: none;
+  }
+
+  .mobile-view--main2 .main2-hero-enter {
+    animation: none;
     filter: none;
     transform: none;
   }
