@@ -411,11 +411,17 @@ function ListingWhiteBox({
 
 function ListingWhiteBoxTagline({
   variant = "distance",
+  revealClass = "",
 }: {
   variant?: "distance" | "action";
+  revealClass?: string;
 }) {
   return (
-    <div className="fourth-section__white-box-intro-content hero-intro-content">
+    <div
+      className={`fourth-section__white-box-intro-content hero-intro-content${
+        revealClass ? ` ${revealClass}` : ""
+      }`}
+    >
       {variant === "action" ? (
         <p className="hero-description fourth-section__distance-intro">
           <span className="hero-description__line">Find.</span>
@@ -588,7 +594,7 @@ export const FourthSection = forwardRef(function FourthSection(
         <div className="fourth-section__listings-block">
           {main2Listings ? (
             <ListingWhiteBox>
-              <ListingWhiteBoxTagline />
+              <ListingWhiteBoxTagline revealClass={listingRowReveal} />
             </ListingWhiteBox>
           ) : null}
           <div
@@ -760,7 +766,10 @@ export const FourthSection = forwardRef(function FourthSection(
       >
         {main2Listings ? (
           <ListingWhiteBox fullHeight>
-            <ListingWhiteBoxTagline variant="action" />
+            <ListingWhiteBoxTagline
+              variant="action"
+              revealClass={listingRowReveal}
+            />
             <div className="fourth-section__listing-white-box__listings">
               <div className="fourth-section__listing-white-box__listings-inner">
                 <div

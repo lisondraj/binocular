@@ -1109,8 +1109,7 @@ h6 {
 .mobile-view--main2 .fourth-section__listing-grain-box,
 .mobile-view--main2 .fourth-section__listing-grain-box__carousel-stage,
 .mobile-view--main2 .fourth-section__listing-grain-box__carousel,
-.mobile-view--main2 .fourth-section__listing-white-box,
-.mobile-view--main2 .fourth-section__white-box-intro-content {
+.mobile-view--main2 .fourth-section__listing-white-box {
   opacity: 1;
   filter: none;
   transform: none;
