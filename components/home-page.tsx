@@ -1843,75 +1843,73 @@ export function HomePage({
                     San Francisco, CA 94104
                   </p>
                 </div>
-                <div className="mobile-site-footer__aside">
-                  <nav
-                    className="mobile-site-footer__pages"
-                    aria-label="Footer pages"
+                <nav
+                  className="mobile-site-footer__pages"
+                  aria-label="Footer pages"
+                >
+                  <Link className="mobile-site-footer__page-link" href="/book">
+                    Book
+                  </Link>
+                  <a
+                    className="mobile-site-footer__page-link"
+                    href="#main2-tab-spaces"
                   >
-                    <Link className="mobile-site-footer__page-link" href="/book">
-                      Book
-                    </Link>
-                    <a
-                      className="mobile-site-footer__page-link"
-                      href="#main2-tab-spaces"
-                    >
-                      Spaces
-                    </a>
-                    <a
-                      className="mobile-site-footer__page-link"
-                      href="#main2-tab-people"
-                    >
-                      People
-                    </a>
-                    <a
-                      className="mobile-site-footer__page-link"
-                      href="#main2-tab-audience"
-                    >
-                      Audiences
-                    </a>
-                  </nav>
-                  <div className="mobile-site-footer__social">
-                    <a
-                      className="mobile-site-footer__social-link"
-                      href="https://www.linkedin.com/"
-                      aria-label="LinkedIn"
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-                        <path d="M20.45 20.45h-3.56v-5.59c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.69H9.34V9h3.42v1.56h.05c.48-.9 1.64-1.85 3.38-1.85 3.62 0 4.28 2.38 4.28 5.48v6.26zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zM7.12 20.45H3.56V9h3.56v11.45z" />
-                      </svg>
-                    </a>
-                    <a
-                      className="mobile-site-footer__social-link"
-                      href="https://twitter.com/"
-                      aria-label="Twitter"
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-                        <path d="M18.24 7.57c.01.14.01.28.01.43 0 4.39-3.34 9.45-9.45 9.45-1.88 0-3.63-.55-5.1-1.5.26.03.53.04.8.04 1.56 0 2.99-.53 4.13-1.43-1.46-.03-2.69-.99-3.11-2.31.2.04.41.06.63.06.3 0 .6-.04.88-.11-1.53-.31-2.68-1.65-2.68-3.27v-.04c.45.25.97.4 1.52.42-.9-.6-1.49-1.63-1.49-2.79 0-.61.16-1.19.45-1.69 1.64 2.01 4.09 3.33 6.85 3.47-.05-.22-.08-.46-.08-.7 0-1.7 1.38-3.08 3.08-3.08.89 0 1.69.37 2.25.97.7-.14 1.36-.39 1.95-.74-.23.72-.72 1.33-1.36 1.71.63-.07 1.23-.24 1.79-.49-.42.62-.94 1.17-1.55 1.61z" />
-                      </svg>
-                    </a>
-                    <a
-                      className="mobile-site-footer__social-link"
-                      href="https://www.instagram.com/"
-                      aria-label="Instagram"
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-                        <path d="M7.8 2h8.4C19.4 2 22 4.6 22 7.8v8.4c0 3.2-2.6 5.8-5.8 5.8H7.8C4.6 22 2 19.4 2 16.2V7.8C2 4.6 4.6 2 7.8 2zm-.2 2C5.6 4 4 5.6 4 7.6v8.8c0 2 1.6 3.6 3.6 3.6h8.8c2 0 3.6-1.6 3.6-3.6V7.6c0-2-1.6-3.6-3.6-3.6H7.6zm9.65 1.5a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5zM12 7a5 5 0 1 1 0 10 5 5 0 0 1 0-10zm0 2a3 3 0 1 0 0 6 3 3 0 0 0 0-6z" />
-                      </svg>
-                    </a>
-                  </div>
-                </div>
+                    Spaces
+                  </a>
+                  <a
+                    className="mobile-site-footer__page-link"
+                    href="#main2-tab-people"
+                  >
+                    People
+                  </a>
+                  <a
+                    className="mobile-site-footer__page-link"
+                    href="#main2-tab-audience"
+                  >
+                    Audiences
+                  </a>
+                </nav>
               </div>
             </div>
             <div className="mobile-site-footer__chrome">
               <p className="mobile-site-footer__chrome-wordmark">
                 <BinocularWordmark />
               </p>
+              <div className="mobile-site-footer__social">
+                <a
+                  className="mobile-site-footer__social-link"
+                  href="https://www.linkedin.com/"
+                  aria-label="LinkedIn"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+                    <path d="M20.45 20.45h-3.56v-5.59c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.69H9.34V9h3.42v1.56h.05c.48-.9 1.64-1.85 3.38-1.85 3.62 0 4.28 2.38 4.28 5.48v6.26zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zM7.12 20.45H3.56V9h3.56v11.45z" />
+                  </svg>
+                </a>
+                <a
+                  className="mobile-site-footer__social-link"
+                  href="https://twitter.com/"
+                  aria-label="Twitter"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+                    <path d="M18.24 7.57c.01.14.01.28.01.43 0 4.39-3.34 9.45-9.45 9.45-1.88 0-3.63-.55-5.1-1.5.26.03.53.04.8.04 1.56 0 2.99-.53 4.13-1.43-1.46-.03-2.69-.99-3.11-2.31.2.04.41.06.63.06.3 0 .6-.04.88-.11-1.53-.31-2.68-1.65-2.68-3.27v-.04c.45.25.97.4 1.52.42-.9-.6-1.49-1.63-1.49-2.79 0-.61.16-1.19.45-1.69 1.64 2.01 4.09 3.33 6.85 3.47-.05-.22-.08-.46-.08-.7 0-1.7 1.38-3.08 3.08-3.08.89 0 1.69.37 2.25.97.7-.14 1.36-.39 1.95-.74-.23.72-.72 1.33-1.36 1.71.63-.07 1.23-.24 1.79-.49-.42.62-.94 1.17-1.55 1.61z" />
+                  </svg>
+                </a>
+                <a
+                  className="mobile-site-footer__social-link"
+                  href="https://www.instagram.com/"
+                  aria-label="Instagram"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+                    <path d="M7.8 2h8.4C19.4 2 22 4.6 22 7.8v8.4c0 3.2-2.6 5.8-5.8 5.8H7.8C4.6 22 2 19.4 2 16.2V7.8C2 4.6 4.6 2 7.8 2zm-.2 2C5.6 4 4 5.6 4 7.6v8.8c0 2 1.6 3.6 3.6 3.6h8.8c2 0 3.6-1.6 3.6-3.6V7.6c0-2-1.6-3.6-3.6-3.6H7.6zm9.65 1.5a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5zM12 7a5 5 0 1 1 0 10 5 5 0 0 1 0-10zm0 2a3 3 0 1 0 0 6 3 3 0 0 0 0-6z" />
+                  </svg>
+                </a>
+              </div>
             </div>
           </footer>
         ) : null}
