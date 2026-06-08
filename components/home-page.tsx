@@ -278,9 +278,8 @@ type PromptPhase = "at" | "menu" | "chip" | "typing" | "done";
 const INTRO_UI_DELAY = 200;
 const INTRO_FADE_MS = 1200;
 const INTRO_GAP_MS = 400;
-const MAIN2_RISE_MS = 1100;
-const MAIN2_RISE_GAP_MS = 350;
-const MAIN2_HERO_START_MS = 200;
+const MAIN2_HERO_START_MS = 100;
+const MAIN2_PROMPT_ANIM_DELAY_MS = 350;
 
 // @ icon for the "Dr. Frank's Lab" context chip.
 const labIcon = (
@@ -336,13 +335,8 @@ export function HomePage({
   const [showLogo, setShowLogo] = useState(false);
   const [main2MenuOpen, setMain2MenuOpen] = useState(false);
   const [showHeroUi, setShowHeroUi] = useState(isMain2);
-  const [main2HeroReveal, setMain2HeroReveal] = useState({
-    embark: false,
-    description: false,
-    actions: false,
-    prompt: false,
-  });
-  const [showHeroPrompt, setShowHeroPrompt] = useState(false);
+  const [main2HeroRevealed, setMain2HeroRevealed] = useState(false);
+  const [showHeroPrompt, setShowHeroPrompt] = useState(isMain2);
   const [promptAnimReady, setPromptAnimReady] = useState(false);
   const [promptPhase, setPromptPhase] = useState<PromptPhase>("at");
   const [atChar, setAtChar] = useState("");
@@ -452,44 +446,19 @@ export function HomePage({
     paintMain2GrainSurfaces();
   }, [isMain2]);
 
-  // /main2 — hero unblur + rise top to bottom (Embark → copy → buttons → prompt).
+  // /main2 — hero copy + buttons unblur + rise together; AI box stays static.
   useEffect(() => {
     if (!isMain2) return;
 
-    setMain2HeroReveal({
-      embark: false,
-      description: false,
-      actions: false,
-      prompt: false,
-    });
-    setShowHeroPrompt(false);
+    setMain2HeroRevealed(false);
+    setShowHeroPrompt(true);
     setPromptAnimReady(false);
 
-    const embarkAt = MAIN2_HERO_START_MS;
-    const descriptionAt = embarkAt + MAIN2_RISE_MS + MAIN2_RISE_GAP_MS;
-    const actionsAt = descriptionAt + MAIN2_RISE_MS + MAIN2_RISE_GAP_MS;
-    const promptAt = actionsAt + MAIN2_RISE_MS + MAIN2_RISE_GAP_MS;
-
     const timers = [
-      setTimeout(
-        () => setMain2HeroReveal((state) => ({ ...state, embark: true })),
-        embarkAt,
-      ),
-      setTimeout(
-        () => setMain2HeroReveal((state) => ({ ...state, description: true })),
-        descriptionAt,
-      ),
-      setTimeout(
-        () => setMain2HeroReveal((state) => ({ ...state, actions: true })),
-        actionsAt,
-      ),
-      setTimeout(() => {
-        setMain2HeroReveal((state) => ({ ...state, prompt: true }));
-        setShowHeroPrompt(true);
-      }, promptAt),
+      setTimeout(() => setMain2HeroRevealed(true), MAIN2_HERO_START_MS),
       setTimeout(
         () => setPromptAnimReady(true),
-        promptAt + MAIN2_RISE_MS + 200,
+        MAIN2_HERO_START_MS + MAIN2_PROMPT_ANIM_DELAY_MS,
       ),
     ];
 
@@ -1635,7 +1604,7 @@ export function HomePage({
         <div
           className={`hero-prompt-card-shell${
             isMain2
-              ? ` ${main2HeroReveal.prompt ? "main2-rise" : "main2-hero-pending"}`
+              ? ""
               : ` hero-intro-fade${showHeroPrompt ? " is-visible" : ""}`
           }${isMain2 ? " main2-hero-prompt-card-shell" : ""}`}
         >
@@ -1807,37 +1776,29 @@ export function HomePage({
                 aria-hidden
               />
               <div className="main2-hero-content">
-                <div className="hero-intro-content main2-hero-intro">
-                  <h1
-                    className={`hero-title ${
-                      main2HeroReveal.embark ? "main2-rise" : "main2-hero-pending"
-                    }`}
-                  >
-                    <span className="hero-title-word">Embark</span>
-                  </h1>
-                  <p
-                    className={`hero-description ${
-                      main2HeroReveal.description
-                        ? "main2-rise"
-                        : "main2-hero-pending"
-                    }`}
-                  >
-                    <span className="hero-description__line">Book spaces for</span>
-                    <span className="hero-description__line">physical intelligence.</span>
-                  </p>
-                  <div
-                    className={`hero-actions main2-hero-actions ${
-                      main2HeroReveal.actions ? "main2-rise" : "main2-hero-pending"
-                    }`}
-                  >
-                    <button type="button" className="main2-hero-btn main2-hero-btn--primary">
-                      Host
-                      {upRightArrow}
-                    </button>
-                    <Link href="/book" className="main2-hero-btn">
-                      Book
-                      {upRightArrow}
-                    </Link>
+                <div
+                  className={`main2-hero-enter ${
+                    main2HeroRevealed ? "main2-rise" : "main2-hero-pending"
+                  }`}
+                >
+                  <div className="hero-intro-content main2-hero-intro">
+                    <h1 className="hero-title">
+                      <span className="hero-title-word">Embark</span>
+                    </h1>
+                    <p className="hero-description">
+                      <span className="hero-description__line">Book spaces for</span>
+                      <span className="hero-description__line">physical intelligence.</span>
+                    </p>
+                    <div className="hero-actions main2-hero-actions">
+                      <button type="button" className="main2-hero-btn main2-hero-btn--primary">
+                        Host
+                        {upRightArrow}
+                      </button>
+                      <Link href="/book" className="main2-hero-btn">
+                        Book
+                        {upRightArrow}
+                      </Link>
+                    </div>
                   </div>
                 </div>
                 {renderHeroPrompt()}

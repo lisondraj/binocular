@@ -490,7 +490,7 @@ export const FourthSection = forwardRef(function FourthSection(
           });
         },
         main2Listings
-          ? { threshold: 0.45, rootMargin: "0px 0px -22% 0px" }
+          ? { threshold: 0.1, rootMargin: "0px 0px -4% 0px" }
           : { threshold: 0.1, rootMargin: "0px 0px -10% 0px" },
       );
 

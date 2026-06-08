@@ -1129,7 +1129,11 @@ h6 {
   }
 }
 
-/* Hero load — fully hidden until its reveal turn (no blurred ghost). */
+/* Hero load — copy + buttons rise together; AI prompt stays static. */
+.mobile-view--main2 .main2-hero-enter {
+  width: 100%;
+}
+
 .mobile-view--main2 .main2-hero-box .main2-hero-pending {
   opacity: 0;
   visibility: hidden;
