@@ -1101,6 +1101,22 @@ h6 {
   transform: translate3d(0, 0, 0);
 }
 
+/* /main2 — only listing rows reveal; grain/white shells + carousels stay static. */
+.fourth-section__listing-row-reveal {
+  width: 100%;
+}
+
+.mobile-view--main2 .fourth-section__listing-grain-box,
+.mobile-view--main2 .fourth-section__listing-grain-box__carousel-stage,
+.mobile-view--main2 .fourth-section__listing-grain-box__carousel,
+.mobile-view--main2 .fourth-section__listing-white-box,
+.mobile-view--main2 .fourth-section__white-box-intro-content {
+  opacity: 1;
+  filter: none;
+  transform: none;
+  transition: none;
+}
+
 @keyframes main2-hero-rise-in {
   from {
     filter: blur(var(--main2-rise-blur));
