@@ -278,6 +278,9 @@ type PromptPhase = "at" | "menu" | "chip" | "typing" | "done";
 const INTRO_UI_DELAY = 200;
 const INTRO_FADE_MS = 1200;
 const INTRO_GAP_MS = 400;
+const MAIN2_RISE_MS = 1100;
+const MAIN2_RISE_GAP_MS = 350;
+const MAIN2_HERO_START_MS = 200;
 
 // @ icon for the "Dr. Frank's Lab" context chip.
 const labIcon = (
@@ -333,6 +336,12 @@ export function HomePage({
   const [showLogo, setShowLogo] = useState(false);
   const [main2MenuOpen, setMain2MenuOpen] = useState(false);
   const [showHeroUi, setShowHeroUi] = useState(isMain2);
+  const [main2HeroReveal, setMain2HeroReveal] = useState({
+    embark: false,
+    description: false,
+    actions: false,
+    prompt: false,
+  });
   const [showHeroPrompt, setShowHeroPrompt] = useState(false);
   const [promptAnimReady, setPromptAnimReady] = useState(false);
   const [promptPhase, setPromptPhase] = useState<PromptPhase>("at");
@@ -427,12 +436,12 @@ export function HomePage({
 
     if (!isMain2) {
       schedule(() => setShowHeroUi(true), INTRO_UI_DELAY);
+      schedule(() => setShowHeroPrompt(true), introFade(1));
+      schedule(
+        () => setPromptAnimReady(true),
+        introFade(1) + INTRO_FADE_MS + 200,
+      );
     }
-    schedule(() => setShowHeroPrompt(true), introFade(1));
-    schedule(
-      () => setPromptAnimReady(true),
-      introFade(1) + INTRO_FADE_MS + 200,
-    );
 
     return () => timers.forEach(clearTimeout);
   }, [isMain2]);
@@ -441,6 +450,50 @@ export function HomePage({
   useEffect(() => {
     if (!isMain2) return;
     paintMain2GrainSurfaces();
+  }, [isMain2]);
+
+  // /main2 — hero unblur + rise top to bottom (Embark → copy → buttons → prompt).
+  useEffect(() => {
+    if (!isMain2) return;
+
+    setMain2HeroReveal({
+      embark: false,
+      description: false,
+      actions: false,
+      prompt: false,
+    });
+    setShowHeroPrompt(false);
+    setPromptAnimReady(false);
+
+    const embarkAt = MAIN2_HERO_START_MS;
+    const descriptionAt = embarkAt + MAIN2_RISE_MS + MAIN2_RISE_GAP_MS;
+    const actionsAt = descriptionAt + MAIN2_RISE_MS + MAIN2_RISE_GAP_MS;
+    const promptAt = actionsAt + MAIN2_RISE_MS + MAIN2_RISE_GAP_MS;
+
+    const timers = [
+      setTimeout(
+        () => setMain2HeroReveal((state) => ({ ...state, embark: true })),
+        embarkAt,
+      ),
+      setTimeout(
+        () => setMain2HeroReveal((state) => ({ ...state, description: true })),
+        descriptionAt,
+      ),
+      setTimeout(
+        () => setMain2HeroReveal((state) => ({ ...state, actions: true })),
+        actionsAt,
+      ),
+      setTimeout(() => {
+        setMain2HeroReveal((state) => ({ ...state, prompt: true }));
+        setShowHeroPrompt(true);
+      }, promptAt),
+      setTimeout(
+        () => setPromptAnimReady(true),
+        promptAt + MAIN2_RISE_MS + 200,
+      ),
+    ];
+
+    return () => timers.forEach(clearTimeout);
   }, [isMain2]);
 
   // @ types in → mention menu → chip → prompt typing (after AI box fade-in)
@@ -1580,8 +1633,10 @@ export function HomePage({
         }}
       >
         <div
-          className={`hero-prompt-card-shell hero-intro-fade${
-            showHeroPrompt ? " is-visible" : ""
+          className={`hero-prompt-card-shell${
+            isMain2
+              ? ` main2-rise${main2HeroReveal.prompt ? " is-visible" : ""}`
+              : ` hero-intro-fade${showHeroPrompt ? " is-visible" : ""}`
           }${isMain2 ? " main2-hero-prompt-card-shell" : ""}`}
         >
           <div
@@ -1753,14 +1808,26 @@ export function HomePage({
               />
               <div className="main2-hero-content">
                 <div className="hero-intro-content main2-hero-intro">
-                  <h1 className="hero-title main2-hero-enter main2-hero-enter--embark">
+                  <h1
+                    className={`hero-title main2-rise${
+                      main2HeroReveal.embark ? " is-visible" : ""
+                    }`}
+                  >
                     <span className="hero-title-word">Embark</span>
                   </h1>
-                  <p className="hero-description main2-hero-enter main2-hero-enter--description">
+                  <p
+                    className={`hero-description main2-rise${
+                      main2HeroReveal.description ? " is-visible" : ""
+                    }`}
+                  >
                     <span className="hero-description__line">Book spaces for</span>
                     <span className="hero-description__line">physical intelligence.</span>
                   </p>
-                  <div className="hero-actions main2-hero-actions main2-hero-enter main2-hero-enter--actions">
+                  <div
+                    className={`hero-actions main2-hero-actions main2-rise${
+                      main2HeroReveal.actions ? " is-visible" : ""
+                    }`}
+                  >
                     <button type="button" className="main2-hero-btn main2-hero-btn--primary">
                       Host
                       {upRightArrow}

@@ -1062,14 +1062,36 @@ h6 {
   transform: translate3d(0, 0, 0);
 }
 
-/* /main2 — scroll blocks unblur + rise (no opacity fade). */
+/* /main2 — shared unblur + rise (hero load + scroll blocks). */
+.mobile-view--main2 {
+  --main2-rise-blur: 0.72em;
+  --main2-rise-offset: 2.25em;
+  --main2-rise-duration: 1.1s;
+  --main2-rise-ease: cubic-bezier(0.33, 1, 0.68, 1);
+}
+
+.mobile-view--main2 .main2-rise {
+  opacity: 1;
+  filter: blur(var(--main2-rise-blur));
+  transform: translate3d(0, var(--main2-rise-offset), 0);
+  transition:
+    filter var(--main2-rise-duration) var(--main2-rise-ease),
+    transform var(--main2-rise-duration) var(--main2-rise-ease);
+  will-change: filter, transform;
+}
+
+.mobile-view--main2 .main2-rise.is-visible {
+  filter: blur(0);
+  transform: translate3d(0, 0, 0);
+}
+
 .mobile-view--main2 .fourth-section-reveal {
   opacity: 1;
-  filter: blur(0.72em);
-  transform: translate3d(0, 2.25em, 0);
+  filter: blur(var(--main2-rise-blur));
+  transform: translate3d(0, var(--main2-rise-offset), 0);
   transition:
-    filter 1.1s cubic-bezier(0.33, 1, 0.68, 1),
-    transform 1.1s cubic-bezier(0.33, 1, 0.68, 1);
+    filter var(--main2-rise-duration) var(--main2-rise-ease),
+    transform var(--main2-rise-duration) var(--main2-rise-ease);
   will-change: filter, transform;
 }
 
@@ -1079,32 +1101,24 @@ h6 {
   transform: translate3d(0, 0, 0);
 }
 
-/* /main2 — hero load: segmented unblur + rise (description → buttons → Embark). */
-@keyframes main2-hero-enter {
-  to {
-    filter: blur(0);
-    transform: translate3d(0, 0, 0);
-  }
+.mobile-view--main2 .main2-hero-box .main2-rise:not(.is-visible) {
+  opacity: 0;
+  pointer-events: none;
 }
 
-.mobile-view--main2 .main2-hero-enter {
+.mobile-view--main2 .main2-hero-box .main2-rise {
+  transition:
+    opacity var(--main2-rise-duration) var(--main2-rise-ease),
+    filter var(--main2-rise-duration) var(--main2-rise-ease),
+    transform var(--main2-rise-duration) var(--main2-rise-ease);
+}
+
+.mobile-view--main2 .main2-hero-box .main2-rise.is-visible {
   opacity: 1;
-  filter: blur(0.72em);
-  transform: translate3d(0, 2.25em, 0);
-  animation: main2-hero-enter 1.1s cubic-bezier(0.33, 1, 0.68, 1) forwards;
-  will-change: filter, transform;
 }
 
-.mobile-view--main2 .main2-hero-enter--description {
-  animation-delay: 0.2s;
-}
-
-.mobile-view--main2 .main2-hero-enter--actions {
-  animation-delay: 1.65s;
-}
-
-.mobile-view--main2 .main2-hero-enter--embark {
-  animation-delay: 3.1s;
+.mobile-view--main2 .main2-hero-box .main2-hero-actions:not(.is-visible) .main2-hero-btn {
+  transition: none;
 }
 
 /* Fourth section — static browse listings. */
@@ -3237,10 +3251,20 @@ a.fourth-section__btn {
     transform: none;
   }
 
-  .mobile-view--main2 .main2-hero-enter {
-    animation: none;
+  .mobile-view--main2 .main2-rise {
+    transition: none;
     filter: none;
     transform: none;
+  }
+
+  .mobile-view--main2 .main2-rise.is-visible {
+    filter: none;
+    transform: none;
+  }
+
+  .mobile-view--main2 .main2-hero-box .main2-rise,
+  .mobile-view--main2 .main2-hero-box .main2-rise.is-visible {
+    opacity: 1;
   }
 }
 
