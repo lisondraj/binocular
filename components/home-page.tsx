@@ -278,8 +278,9 @@ type PromptPhase = "at" | "menu" | "chip" | "typing" | "done";
 const INTRO_UI_DELAY = 200;
 const INTRO_FADE_MS = 1200;
 const INTRO_GAP_MS = 400;
-const MAIN2_HERO_START_MS = 100;
-const MAIN2_PROMPT_ANIM_DELAY_MS = 350;
+const MAIN2_HERO_START_MS = 150;
+const MAIN2_HERO_RISE_MS = 1450;
+const MAIN2_PROMPT_FADE_MS = 950;
 
 // @ icon for the "Dr. Frank's Lab" context chip.
 const labIcon = (
@@ -336,6 +337,7 @@ export function HomePage({
   const [main2MenuOpen, setMain2MenuOpen] = useState(false);
   const [showHeroUi, setShowHeroUi] = useState(isMain2);
   const [main2HeroRevealed, setMain2HeroRevealed] = useState(false);
+  const [main2PromptRevealed, setMain2PromptRevealed] = useState(false);
   const [showHeroPrompt, setShowHeroPrompt] = useState(isMain2);
   const [promptAnimReady, setPromptAnimReady] = useState(false);
   const [promptPhase, setPromptPhase] = useState<PromptPhase>("at");
@@ -446,20 +448,22 @@ export function HomePage({
     paintMain2GrainSurfaces();
   }, [isMain2]);
 
-  // /main2 — hero copy + buttons unblur + rise together; AI box stays static.
+  // /main2 — hero copy + buttons rise together, then AI box fades in.
   useEffect(() => {
     if (!isMain2) return;
 
     setMain2HeroRevealed(false);
+    setMain2PromptRevealed(false);
     setShowHeroPrompt(true);
     setPromptAnimReady(false);
 
+    const promptAt = MAIN2_HERO_START_MS + MAIN2_HERO_RISE_MS;
+    const promptAnimAt = promptAt + MAIN2_PROMPT_FADE_MS + 150;
+
     const timers = [
       setTimeout(() => setMain2HeroRevealed(true), MAIN2_HERO_START_MS),
-      setTimeout(
-        () => setPromptAnimReady(true),
-        MAIN2_HERO_START_MS + MAIN2_PROMPT_ANIM_DELAY_MS,
-      ),
+      setTimeout(() => setMain2PromptRevealed(true), promptAt),
+      setTimeout(() => setPromptAnimReady(true), promptAnimAt),
     ];
 
     return () => timers.forEach(clearTimeout);
@@ -1604,7 +1608,9 @@ export function HomePage({
         <div
           className={`hero-prompt-card-shell${
             isMain2
-              ? ""
+              ? ` main2-hero-prompt-fade hero-intro-fade${
+                  main2PromptRevealed ? " is-visible" : ""
+                }`
               : ` hero-intro-fade${showHeroPrompt ? " is-visible" : ""}`
           }${isMain2 ? " main2-hero-prompt-card-shell" : ""}`}
         >
