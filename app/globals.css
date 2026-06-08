@@ -1101,23 +1101,36 @@ h6 {
   transform: translate3d(0, 0, 0);
 }
 
-.mobile-view--main2 .main2-hero-box .main2-rise:not(.is-visible) {
+@keyframes main2-hero-rise-in {
+  from {
+    filter: blur(var(--main2-rise-blur));
+    transform: translate3d(0, var(--main2-rise-offset), 0);
+  }
+
+  to {
+    filter: blur(0);
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+/* Hero load — fully hidden until its reveal turn (no blurred ghost). */
+.mobile-view--main2 .main2-hero-box .main2-hero-pending {
   opacity: 0;
+  visibility: hidden;
   pointer-events: none;
 }
 
 .mobile-view--main2 .main2-hero-box .main2-rise {
-  transition:
-    opacity var(--main2-rise-duration) var(--main2-rise-ease),
-    filter var(--main2-rise-duration) var(--main2-rise-ease),
-    transform var(--main2-rise-duration) var(--main2-rise-ease);
-}
-
-.mobile-view--main2 .main2-hero-box .main2-rise.is-visible {
   opacity: 1;
+  visibility: visible;
+  filter: blur(0);
+  transform: translate3d(0, 0, 0);
+  transition: none;
+  animation: main2-hero-rise-in var(--main2-rise-duration) var(--main2-rise-ease) both;
+  will-change: filter, transform;
 }
 
-.mobile-view--main2 .main2-hero-box .main2-hero-actions:not(.is-visible) .main2-hero-btn {
+.mobile-view--main2 .main2-hero-box .main2-hero-actions.main2-hero-pending .main2-hero-btn {
   transition: none;
 }
 
@@ -3262,9 +3275,15 @@ a.fourth-section__btn {
     transform: none;
   }
 
-  .mobile-view--main2 .main2-hero-box .main2-rise,
-  .mobile-view--main2 .main2-hero-box .main2-rise.is-visible {
+  .mobile-view--main2 .main2-hero-box .main2-rise {
+    animation: none;
+    filter: none;
+    transform: none;
+  }
+
+  .mobile-view--main2 .main2-hero-box .main2-hero-pending {
     opacity: 1;
+    visibility: visible;
   }
 }
 

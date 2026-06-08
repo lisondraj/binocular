@@ -1635,7 +1635,7 @@ export function HomePage({
         <div
           className={`hero-prompt-card-shell${
             isMain2
-              ? ` main2-rise${main2HeroReveal.prompt ? " is-visible" : ""}`
+              ? ` ${main2HeroReveal.prompt ? "main2-rise" : "main2-hero-pending"}`
               : ` hero-intro-fade${showHeroPrompt ? " is-visible" : ""}`
           }${isMain2 ? " main2-hero-prompt-card-shell" : ""}`}
         >
@@ -1809,23 +1809,25 @@ export function HomePage({
               <div className="main2-hero-content">
                 <div className="hero-intro-content main2-hero-intro">
                   <h1
-                    className={`hero-title main2-rise${
-                      main2HeroReveal.embark ? " is-visible" : ""
+                    className={`hero-title ${
+                      main2HeroReveal.embark ? "main2-rise" : "main2-hero-pending"
                     }`}
                   >
                     <span className="hero-title-word">Embark</span>
                   </h1>
                   <p
-                    className={`hero-description main2-rise${
-                      main2HeroReveal.description ? " is-visible" : ""
+                    className={`hero-description ${
+                      main2HeroReveal.description
+                        ? "main2-rise"
+                        : "main2-hero-pending"
                     }`}
                   >
                     <span className="hero-description__line">Book spaces for</span>
                     <span className="hero-description__line">physical intelligence.</span>
                   </p>
                   <div
-                    className={`hero-actions main2-hero-actions main2-rise${
-                      main2HeroReveal.actions ? " is-visible" : ""
+                    className={`hero-actions main2-hero-actions ${
+                      main2HeroReveal.actions ? "main2-rise" : "main2-hero-pending"
                     }`}
                   >
                     <button type="button" className="main2-hero-btn main2-hero-btn--primary">
