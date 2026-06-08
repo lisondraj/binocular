@@ -3385,7 +3385,8 @@ a.fourth-section__btn {
 }
 
 .mobile-nav .mobile-nav-logo,
-.mobile-nav .mobile-nav-menu {
+.mobile-nav .mobile-nav-menu,
+.mobile-nav .mobile-nav-start {
   position: relative;
   z-index: 1;
   flex-shrink: 0;
@@ -3568,6 +3569,56 @@ a.fourth-section__btn {
   opacity: 1;
   visibility: visible;
   pointer-events: auto;
+}
+
+.mobile-nav--main2 .mobile-nav-start {
+  display: flex;
+  align-items: center;
+  gap: 0.65em;
+  min-width: 0;
+}
+
+.main2-location-selector {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.28em;
+  max-width: 9.5em;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  font-family: var(--font-suisse), system-ui, sans-serif;
+  font-size: 0.78em;
+  font-weight: 400;
+  line-height: 1.1;
+  color: rgba(0, 0, 0, 0.34);
+  cursor: pointer;
+  box-sizing: border-box;
+  flex-shrink: 1;
+  min-width: 0;
+  transition: color 0.2s ease;
+}
+
+.main2-location-selector.is-active {
+  color: #000000;
+}
+
+.main2-location-selector.is-loading {
+  color: rgba(0, 0, 0, 0.5);
+  cursor: wait;
+}
+
+.main2-location-selector__icon {
+  width: 0.95em;
+  height: 0.95em;
+  flex-shrink: 0;
+  display: block;
+}
+
+.main2-location-selector__label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .mobile-nav--main2 .mobile-nav-menu {

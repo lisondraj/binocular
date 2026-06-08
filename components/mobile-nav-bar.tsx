@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { BinocularWordmark } from "@/components/binocular-wordmark";
 import { Main2HeroPromptCard } from "@/components/main2-hero-prompt-card";
+import { Main2LocationSelector } from "@/components/main2-location-selector";
 import { MOBILE_ROOT_FONT_SIZE } from "@/lib/mobile-layout";
 
 const MAIN2_NAV_TABS = [
@@ -72,6 +73,75 @@ export function MobileNavBar({
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  const menuButton = (
+    <button
+      type="button"
+      className={`mobile-nav-menu${
+        menuOpen || (isMain2 && searchOpen) ? " is-open" : ""
+      }`}
+      aria-label={
+        isMain2 && searchOpen
+          ? "Close search"
+          : menuOpen
+            ? "Close navigation menu"
+            : "Open navigation menu"
+      }
+      aria-expanded={isMain2 ? menuOpen || searchOpen : undefined}
+      onClick={
+        isMain2
+          ? () => {
+              if (searchOpen) {
+                setSearchOpen(false);
+                return;
+              }
+              onMenuToggle?.();
+            }
+          : undefined
+      }
+    >
+      {isMain2 && searchOpen ? (
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+        >
+          <line x1="6" y1="6" x2="18" y2="18" />
+          <line x1="18" y1="6" x2="6" y2="18" />
+        </svg>
+      ) : (
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+        >
+          <line x1="3" y1="6" x2="21" y2="6" />
+          <line x1="3" y1="12" x2="21" y2="12" />
+          <line x1="3" y1="18" x2="21" y2="18" />
+        </svg>
+      )}
+    </button>
+  );
+
+  const logoControl = staticNav ? (
+    <Link href="/" className={logoClassName} aria-hidden={!logoVisible}>
+      {isMain2 ? <BinocularWordmark /> : "Binocular"}
+    </Link>
+  ) : (
+    <button
+      type="button"
+      className={logoClassName}
+      aria-hidden={!logoVisible}
+      aria-label="Back to top"
+      onClick={scrollToTop}
+    >
+      {isMain2 ? <BinocularWordmark /> : "Binocular"}
+    </button>
+  );
+
   const navRow = (
     <div
       className={`mobile-nav${
@@ -80,72 +150,20 @@ export function MobileNavBar({
         isMain2PastHero ? " mobile-nav--main2-past-hero" : ""
       }${navVisible ? " is-visible" : ""}${expanded ? " is-expanded" : ""}`}
     >
-      {staticNav ? (
-        <Link href="/" className={logoClassName} aria-hidden={!logoVisible}>
-          {isMain2 ? <BinocularWordmark /> : "Binocular"}
-        </Link>
+      {isMain2 ? (
+        <>
+          <div className="mobile-nav-start">
+            <Main2LocationSelector />
+            {menuButton}
+          </div>
+          {logoControl}
+        </>
       ) : (
-        <button
-          type="button"
-          className={logoClassName}
-          aria-hidden={!logoVisible}
-          aria-label="Back to top"
-          onClick={scrollToTop}
-        >
-          {isMain2 ? <BinocularWordmark /> : "Binocular"}
-        </button>
+        <>
+          {logoControl}
+          {menuButton}
+        </>
       )}
-
-      <button
-        type="button"
-        className={`mobile-nav-menu${
-          menuOpen || (isMain2 && searchOpen) ? " is-open" : ""
-        }`}
-        aria-label={
-          isMain2 && searchOpen
-            ? "Close search"
-            : menuOpen
-              ? "Close navigation menu"
-              : "Open navigation menu"
-        }
-        aria-expanded={isMain2 ? menuOpen || searchOpen : undefined}
-        onClick={
-          isMain2
-            ? () => {
-                if (searchOpen) {
-                  setSearchOpen(false);
-                  return;
-                }
-                onMenuToggle?.();
-              }
-            : undefined
-        }
-      >
-        {isMain2 && searchOpen ? (
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-          >
-            <line x1="6" y1="6" x2="18" y2="18" />
-            <line x1="18" y1="6" x2="6" y2="18" />
-          </svg>
-        ) : (
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-          >
-            <line x1="3" y1="6" x2="21" y2="6" />
-            <line x1="3" y1="12" x2="21" y2="12" />
-            <line x1="3" y1="18" x2="21" y2="18" />
-          </svg>
-        )}
-      </button>
     </div>
   );
 
